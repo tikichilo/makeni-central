@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "secondary": "#755b00",
+          "on-surface": "#1a1c1c",
+          "error": "#ba1a1a",
+          "tertiary-container": "#1c2c40",
+          "on-primary": "#ffffff",
+          "on-primary-container": "#8392b7",
+          "inverse-surface": "#2f3131",
+          "secondary-container": "#fed977",
+          "secondary-fixed": "#ffe08f",
+          "on-tertiary-fixed-variant": "#38485d",
+          "on-primary-fixed": "#0a1a3a",
+          "primary-fixed": "#d9e2ff",
+          "inverse-on-surface": "#f0f1f1",
+          "surface-container": "#eeeeee",
+          "on-secondary-container": "#785d00",
+          "on-surface-variant": "#45464e",
+          "on-primary-fixed-variant": "#384668",
+          "surface-tint": "#4f5e81",
+          "primary-fixed-dim": "#b7c6ee",
+          "primary-container": "#1b2a4a",
+          "on-background": "#1a1c1c",
+          "surface": "#f9f9f9",
+          "on-secondary": "#ffffff",
+          "background": "#f9f9f9",
+          "surface-bright": "#f9f9f9",
+          "surface-container-lowest": "#ffffff",
+          "outline-variant": "#c5c6cf",
+          "on-tertiary": "#ffffff",
+          "on-tertiary-fixed": "#0b1c30",
+          "inverse-primary": "#b7c6ee",
+          "surface-container-high": "#e8e8e8",
+          "surface-container-low": "#f3f3f4",
+          "on-error": "#ffffff",
+          "secondary-fixed-dim": "#e6c364",
+          "on-secondary-fixed-variant": "#584400",
+          "surface-dim": "#dadada",
+          "on-secondary-fixed": "#241a00",
+          "outline": "#75777f",
+          "error-container": "#ffdad6",
+          "primary": "#041534",
+          "on-error-container": "#93000a",
+          "tertiary-fixed": "#d3e4fe",
+          "tertiary": "#06172a",
+          "on-tertiary-container": "#8393ac",
+          "tertiary-fixed-dim": "#b7c8e1",
+          "surface-variant": "#e2e2e2",
+          "surface-container-highest": "#e2e2e2"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "12px",
+          "full": "9999px"
+        },
+        "spacing": {
+          "section-gap": "120px",
+          "margin-desktop": "80px",
+          "margin-mobile": "20px",
+          "gutter": "32px",
+          "base": "4px"
+        },
+        "fontFamily": {
+          "label-md": ["Inter"],
+          "headline-lg": ["Playfair Display"],
+          "display-lg": ["Playfair Display"],
+          "body-lg": ["Inter"],
+          "title-lg": ["Inter"],
+          "body-md": ["Inter"],
+          "headline-md": ["Playfair Display"],
+          "headline-lg-mobile": ["Playfair Display"]
+        },
+        "fontSize": {
+          "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "600"}],
+          "headline-lg": ["40px", {"lineHeight": "1.2", "fontWeight": "700"}],
+          "display-lg": ["56px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+          "body-lg": ["18px", {"lineHeight": "1.7", "fontWeight": "400"}],
+          "title-lg": ["20px", {"lineHeight": "1.5", "letterSpacing": "0.01em", "fontWeight": "600"}],
+          "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+          "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+          "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .sacred-shadow {
+    box-shadow: 0 10px 30px -10px rgba(4, 21, 52, 0.08);
+  }
+  .gold-divider {
+    height: 2px;
+    background: #755b00;
+    width: 60px;
+  }
+  .logo-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: #041534;
+    border: 2px solid #755b00;
+    flex-shrink: 0;
+  }
+  .logo-badge img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+  }
+  .logo-badge-sm {
+    width: 44px;
+    height: 44px;
+  }
+  .logo-badge-sm img {
+    width: 30px;
+    height: 30px;
+  }
+  .discussion-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .discussion-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px -10px rgba(4, 21, 52, 0.12);
+  }
+</style>
+</head>
+
+<body class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+
+<!-- ══════════════ TOP NAV ══════════════ -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-2 border-secondary-container shadow-sm">
+  <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+
+    <!-- Brand -->
+    <div class="flex items-center gap-4">
+      <div class="logo-badge">
+        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+      </div>
+      <span class="font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
+    </div>
+
+    <!-- Nav links -->
+    <nav class="hidden md:flex items-center gap-8">
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="index.html">Home</a>
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="kids.html">Kids Corner</a>
+      <a class="font-label-md text-label-md text-primary border-b-2 border-secondary pb-1" href="#">Youth Board</a>
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="building.html">New Building</a>
+    </nav>
+
+    <button class="bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md hover:bg-primary/90 transition-all active:scale-95">
+      Give
+    </button>
+  </div>
+</header>
+
+<main class="pt-20">
+
+  <!-- ══════════════ PAGE HEADER ══════════════ -->
+  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pt-section-gap pb-16 md:text-left text-center">
+    <h1 class="font-display-lg text-display-lg text-primary mb-4 leading-tight">
+      Youth Voice —<br class="hidden md:block"/>
+      <span class="text-secondary">Share. Discuss. Grow.</span>
+    </h1>
+    <div class="gold-divider mb-8 md:mx-0 mx-auto"></div>
+    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+      A sacred space for the youth of Makeni Central to explore faith, ask questions, and build lasting spiritual connections.
+    </p>
+  </section>
+
+  <!-- ══════════════ FILTERS ══════════════ -->
+  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mb-12">
+    <div class="flex flex-wrap gap-3 items-center">
+      <span class="font-label-md text-label-md text-primary mr-2">FILTER BY</span>
+      <button class="px-6 py-2 rounded-full bg-primary text-on-primary font-label-md">All Topics</button>
+      <button class="px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-label-md hover:bg-secondary-container transition-colors">Faith &amp; Doubt</button>
+      <button class="px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-label-md hover:bg-secondary-container transition-colors">Prayer</button>
+      <button class="px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-label-md hover:bg-secondary-container transition-colors">Bible Study</button>
+      <button class="px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-label-md hover:bg-secondary-container transition-colors">Christian Living</button>
+    </div>
+  </section>
+
+  <!-- ══════════════ DISCUSSIONS GRID ══════════════ -->
+  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mb-section-gap">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+
+      <!-- Left sidebar -->
+      <aside class="md:col-span-4 space-y-8">
+
+        <!-- Scripture quote card -->
+        <div class="p-8 bg-surface-container-lowest border-l-4 border-secondary rounded-xl sacred-shadow">
+          <span class="material-symbols-outlined text-secondary mb-4 block" style="font-variation-settings:'FILL' 1;">format_quote</span>
+          <blockquote class="font-headline-md text-headline-md italic text-primary leading-snug">
+            "Don't let anyone look down on you because you are young, but set an example for the believers in speech, in conduct, in love, in faith and in purity."
+          </blockquote>
+          <p class="mt-4 font-label-md text-label-md text-secondary uppercase tracking-widest">1 Timothy 4:12</p>
+        </div>
+
+        <!-- Community rules card -->
+        <div class="p-8 bg-primary text-on-primary rounded-xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full translate-x-12 -translate-y-12"></div>
+          <div class="relative z-10">
+            <h3 class="font-title-lg text-title-lg mb-2">Community Rules</h3>
+            <p class="font-body-md text-body-md text-on-primary/80 mb-4">Keep discussions respectful, biblical, and encouraging for all members.</p>
+            <a class="text-secondary-fixed font-label-md hover:underline flex items-center gap-1" href="#">
+              Read Guidelines
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Discussions list -->
+      <div class="md:col-span-8 space-y-6">
+
+        <!-- Discussion Card 1 -->
+        <article class="discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center font-bold text-on-secondary-container flex-shrink-0">SM</div>
+            <div>
+              <h4 class="font-label-md text-label-md text-primary">Samuel Mwamba</h4>
+              <p class="text-[12px] text-on-surface-variant uppercase tracking-tighter">2 hours ago in Faith &amp; Doubt</p>
+            </div>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">Navigating Career Ambition and Spiritual Growth</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-6">
+            How do we balance the drive to excel in our professional lives while ensuring our walk with Christ remains the priority? I've been struggling lately with...
+          </p>
+          <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2 text-on-surface-variant">
+              <span class="material-symbols-outlined text-[20px]">forum</span>
+              <span class="font-label-md">24 Comments</span>
+            </div>
+            <button class="flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors">
+              <span class="material-symbols-outlined text-[20px]">favorite</span>
+              <span class="font-label-md">15 Likes</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- Discussion Card 2 -->
+        <article class="discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-on-primary-fixed flex-shrink-0">CH</div>
+            <div>
+              <h4 class="font-label-md text-label-md text-primary">Chipo H.</h4>
+              <p class="text-[12px] text-on-surface-variant uppercase tracking-tighter">5 hours ago in Bible Study</p>
+            </div>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">Favorite verses for times of anxiety?</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-6">
+            Final exams are coming up and the stress is real. What are your go-to scriptures when you need to feel the peace that surpasses understanding?
+          </p>
+          <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2 text-on-surface-variant">
+              <span class="material-symbols-outlined text-[20px]">forum</span>
+              <span class="font-label-md">48 Comments</span>
+            </div>
+            <button class="flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors">
+              <span class="material-symbols-outlined text-[20px]">favorite</span>
+              <span class="font-label-md">32 Likes</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- Discussion Card 3 -->
+        <article class="discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center font-bold text-on-secondary-fixed flex-shrink-0">JK</div>
+            <div>
+              <h4 class="font-label-md text-label-md text-primary">Joshua K.</h4>
+              <p class="text-[12px] text-on-surface-variant uppercase tracking-tighter">Yesterday in Christian Living</p>
+            </div>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">Community Service Project: Next Steps</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-6">
+            Thank you to everyone who joined our weekend clean-up! I've uploaded the draft proposal for our next outreach program in the central market...
+          </p>
+          <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2 text-on-surface-variant">
+              <span class="material-symbols-outlined text-[20px]">forum</span>
+              <span class="font-label-md">12 Comments</span>
+            </div>
+            <button class="flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors">
+              <span class="material-symbols-outlined text-[20px]">favorite</span>
+              <span class="font-label-md">8 Likes</span>
+            </button>
+          </div>
+        </article>
+
+        <div class="text-center pt-8">
+          <button class="font-label-md text-label-md text-secondary border-b-2 border-secondary pb-1 hover:opacity-70 transition-all">Load More Discussions</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════════ FAB ══════════════ -->
+<button class="fixed bottom-8 right-8 md:bottom-12 md:right-12 bg-secondary-container text-on-secondary-container px-8 py-4 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-3 z-50">
+  <span class="material-symbols-outlined">add_comment</span>
+  <span class="font-label-md text-label-md uppercase tracking-wider">Start a Discussion</span>
+</button>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="bg-primary text-on-primary w-full py-12 border-t-4 border-secondary">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+
+    <!-- Brand block -->
+    <div class="md:col-span-1">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="logo-badge logo-badge-sm" style="background-color:#0a1a3a; border-color:#e6c364;">
+          <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        </div>
+        <span class="font-headline-md text-headline-md text-on-primary">Makeni Central</span>
+      </div>
+      <p class="font-body-md text-body-md text-on-primary/80">
+        Proclaiming the everlasting gospel to every nation, kindred, tongue, and people.
+      </p>
+    </div>
+
+    <!-- Quick links -->
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
+      <ul class="space-y-3">
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="index.html">Home</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="kids.html">Kids Corner</a></li>
+        <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#">Youth Board</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="building.html">New Building</a></li>
+      </ul>
+    </div>
+
+    <!-- Connect -->
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Connect</h4>
+      <ul class="space-y-3">
+        <li class="flex items-center gap-2 font-body-md text-body-md text-on-primary/80">
+          <span class="material-symbols-outlined text-secondary-container text-[20px]">location_on</span>
+          Makeni Road, Lusaka
+        </li>
+        <li class="flex items-center gap-2 font-body-md text-body-md text-on-primary/80">
+          <span class="material-symbols-outlined text-secondary-container text-[20px]">mail</span>
+          info@makenicentralsda.org
+        </li>
+      </ul>
+    </div>
+
+    <!-- Legal -->
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Legal</h4>
+      <ul class="space-y-3">
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Privacy Policy</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Terms of Service</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Copyright bar -->
+  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 text-center">
+    <p class="font-body-md text-body-md text-on-primary/60">
+      © 2024 Makeni Central SDA Church. All rights reserved.
+    </p>
+  </div>
+</footer>
+<script src="../sda.js" defer></script>
+<script src="../func.js" defer></script>
+</body>
+</html>
