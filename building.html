@@ -140,7 +140,9 @@
   /* ── MOBILE NAV ── */
   @media (max-width: 767px) {
     .logo-text { display: none !important; }
-    .nav-brand  { position: absolute; left: 50%; transform: translateX(-50%); }
+    .nav-brand  { position: absolute; left: 50%; transform: translateX(-50%); z-index: 1; }
+    .hamburger-btn { position: relative; z-index: 2; }
+    .mobile-give { position: relative; z-index: 2; }
     .mobile-hamburger { display: flex; }
     .desktop-give { display: none !important; }
     .mobile-give  { display: flex; }
@@ -643,7 +645,6 @@
 </footer>
 <script src="sda.js" defer></script>
 <script src="func.js" defer></script>
-<<<<<<< HEAD
 <script>
 (function() {
   var btn = document.getElementById('hamburger-btn');
@@ -676,7 +677,5 @@
   });
 })();
 </script>
-=======
->>>>>>> 19fa6ec9fb995c06b5b46b24cbbcda414309644e
 </body>
 </html>
