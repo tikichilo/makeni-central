@@ -428,63 +428,82 @@
     </div>
   </section>
 
-  <!-- ══════════════ FIND US ══════════════ -->
-  <section class="py-section-gap">
-    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
-      <div class="bg-surface-container-lowest rounded-xl overflow-hidden sacred-shadow flex flex-col md:flex-row">
+ <!-- ══════════════ FIND US ══════════════ -->
+<!-- ══════════════ FIND US ══════════════ -->
+<section class="py-section-gap">
+  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="bg-surface-container-lowest rounded-xl overflow-hidden sacred-shadow flex flex-col md:flex-row">
 
-        <!-- Map image -->
-        <div class="md:w-1/2 min-h-[400px] relative">
-          <img
-            class="w-full h-full object-cover"
-            alt="Aerial map view of Makeni, Lusaka"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUOZpqYOPT9-Itw9Y5VZNhA4RaRgYXIZtEh4YAiKFwelfwJYiYatA8GqcDmeQqzBHGKsquKepZwy9fcs82xwiVOwvosGBPkdyrNjOLZb-CwJPnibMKSxQxBTb6gzgwAx82Ois44OpUBqRZhuqB41ayMaHvMy41SGeZxMPCaiAnwTx8ur1OuphMWkckyuWxa1eH9TQ2N0Z0Fj1zULx0Nb6jUuVk-uiAepHz8FAgMIuaTLsEek0odZGqdxZkG-tEBcVPMYI7c4J9wRMt"/>
-          <div class="absolute inset-0 bg-primary/10"></div>
+      <!-- Map -->
+      <div class="md:w-1/2 min-h-[400px] relative" id="map-container">
+        <iframe
+          id="church-map"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3845.4445234150485!2d28.22506487408258!3d-15.460503514820086!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1940f3da5ac4a071%3A0xbf03e4f478ceb8d3!2sMakeni%20Central%20Seventh-Day%20Adventist%20Church!5e0!3m2!1sen!2szm!4v1779315899425!5m2!1sen!2szm"
+          width="100%"
+          height="100%"
+          class="w-full h-full absolute inset-0"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+
+        <!-- Animated badge -->
+        <div id="map-pin-overlay" class="absolute top-4 left-4 flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-md z-10">
+          <span id="pin-dot" class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+          <span class="text-sm font-medium text-gray-700">Makeni Central SDA</span>
         </div>
 
-        <!-- Info -->
-        <div class="md:w-1/2 p-12 lg:p-16 flex flex-col justify-center">
-          <h2 class="font-headline-lg text-headline-lg text-primary mb-8">Join Us This Sabbath</h2>
-          <div class="space-y-8">
+        <!-- Get Directions button pinned on map -->
+        
+          id="map-directions-btn"
+          href="#"
+          class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white text-gray-800 font-semibold text-sm px-5 py-2.5 rounded-full shadow-lg hover:bg-primary hover:text-white transition-all duration-300 z-10 opacity-0">
+          <span class="material-symbols-outlined text-base leading-none">directions</span>
+          Get Directions
+        </a>
 
-            <div class="flex items-start gap-4">
-              <span class="material-symbols-outlined text-secondary mt-1">location_on</span>
-              <div>
-                <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Physical Address</h5>
-                <p class="font-body-md text-body-md text-on-surface-variant">Plot 123, Makeni Road, Lusaka, Zambia</p>
-              </div>
+      </div><!-- end map-container -->
+
+      <!-- Info -->
+      <div class="md:w-1/2 p-12 lg:p-16 flex flex-col justify-center">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-8">Join Us This Sabbath</h2>
+        <div class="space-y-8">
+
+          <div class="flex items-start gap-4">
+            <span class="material-symbols-outlined text-secondary mt-1">location_on</span>
+            <div>
+              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Physical Address</h5>
+              <p class="font-body-md text-body-md text-on-surface-variant">Plot 123, Makeni Road, Lusaka, Zambia</p>
             </div>
-
-            <div class="flex items-start gap-4">
-              <span class="material-symbols-outlined text-secondary mt-1">schedule</span>
-              <div>
-                <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Service Times</h5>
-                <p class="font-body-md text-body-md text-on-surface-variant">
-                  Sabbath School: 09:00 AM<br/>
-                  Divine Service: 11:00 AM<br/>
-                  Youth Service (AY): 03:30 PM
-                </p>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-4">
-              <span class="material-symbols-outlined text-secondary mt-1">mail</span>
-              <div>
-                <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Contact Us</h5>
-                <p class="font-body-md text-body-md text-on-surface-variant">info@makenicentralsda.org</p>
-              </div>
-            </div>
-
           </div>
-          <button class="mt-12 bg-primary text-on-primary px-8 py-4 rounded-xl font-label-md hover:bg-secondary transition-all self-start">
-            Get Directions
-          </button>
+
+          <div class="flex items-start gap-4">
+            <span class="material-symbols-outlined text-secondary mt-1">schedule</span>
+            <div>
+              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Service Times</h5>
+              <p class="font-body-md text-body-md text-on-surface-variant">
+                Sabbath School: 09:00 AM<br/>
+                Divine Service: 11:00 AM<br/>
+                Bible Study: 03:00 PM
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <span class="material-symbols-outlined text-secondary mt-1">mail</span>
+            <div>
+              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Contact Us</h5>
+              <p class="font-body-md text-body-md text-on-surface-variant">info@makenicentralsda.org</p>
+            </div>
+          </div>
+
         </div>
+      </div><!-- end info -->
 
-      </div>
     </div>
-  </section>
-
+  </div>
+</section>
 </main>
 
 <!-- ══════════════ FOOTER ══════════════ -->

@@ -1072,3 +1072,120 @@ document.addEventListener('DOMContentLoaded', () => {
     'color:#e6c364;background:#041534;padding:4px 12px;border-radius:4px;font-weight:600;'
   );
 });
+
+// ── Map animations & interactions ──
+function initMapAnimation() {
+  const pinDot = document.getElementById('pin-dot');
+  const mapContainer = document.getElementById('map-container');
+  const directionsBtn = document.getElementById('map-directions-btn');
+  const mapOverlay = document.getElementById('map-pin-overlay');
+
+  if (!mapContainer) return;
+
+  // Inject keyframes
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes pinPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.6); opacity: 0.5; }
+    }
+    @keyframes mapSlideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes badgeSlideIn {
+      from { opacity: 0; transform: translateX(-12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    #map-container iframe {
+      transition: transform 0.6s ease, filter 0.6s ease;
+      filter: saturate(0.85);
+    }
+    #map-container:hover iframe {
+      transform: scale(1.02);
+      filter: saturate(1.1);
+    }
+    #map-directions-btn {
+      transition: opacity 0.4s ease, background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    }
+    #map-directions-btn:hover {
+      transform: translateX(-50%) scale(1.05) !important;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Pulse the red dot
+  if (pinDot) {
+    pinDot.style.animation = 'pinPulse 1.5s ease-in-out infinite';
+  }
+
+  // IntersectionObserver — trigger when map scrolls into view
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+
+      if (mapOverlay) {
+        mapOverlay.style.animation = 'badgeSlideIn 0.5s ease forwards';
+      }
+
+      if (directionsBtn) {
+        setTimeout(() => {
+          directionsBtn.style.opacity = '1';
+          directionsBtn.style.animation = 'mapSlideUp 0.5s ease forwards';
+        }, 500);
+      }
+
+      mapContainer.style.transition = 'box-shadow 0.6s ease';
+      mapContainer.style.boxShadow = '0 0 0 4px rgba(220, 38, 38, 0.35)';
+      setTimeout(() => {
+        mapContainer.style.boxShadow = '0 0 0 0px rgba(220, 38, 38, 0)';
+      }, 1000);
+
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.25 });
+
+  observer.observe(mapContainer);
+
+  // ── Live directions from user location ──
+  if (!directionsBtn) return;
+
+  const CHURCH_DESTINATION = 'Makeni+Central+Seventh-Day+Adventist+Church+Lusaka+Zambia';
+
+  directionsBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+
+    directionsBtn.innerHTML = `<span class="material-symbols-outlined text-base leading-none">my_location</span> Locating...`;
+    directionsBtn.style.pointerEvents = 'none';
+
+    if (!navigator.geolocation) {
+      openDirections(null);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        openDirections(`${latitude},${longitude}`);
+      },
+      (error) => {
+        console.warn('Geolocation error:', error.message);
+        openDirections(null);
+      },
+      { timeout: 8000 }
+    );
+  });
+
+  function openDirections(origin) {
+    let url = `https://www.google.com/maps/dir/?api=1&destination=${CHURCH_DESTINATION}&travelmode=driving`;
+
+    if (origin) url += `&origin=${origin}`;
+
+    window.open(url, '_blank', 'noopener,noreferrer');
+
+    directionsBtn.innerHTML = `<span class="material-symbols-outlined text-base leading-none">directions</span> Get Directions`;
+    directionsBtn.style.pointerEvents = 'auto';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', initMapAnimation);

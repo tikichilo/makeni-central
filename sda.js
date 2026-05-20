@@ -1,33 +1,20 @@
 /**
- * sda.js — Makeni Central SDA Church  v2
+ * sda.js — Makeni Central SDA Church  v3
  * UI motion, interactions & enhancements
  *
- * FIXES vs v1:
- *  §1  Navbar — removed dynamic drawer builder; the drawer is already in HTML.
- *              Scroll-shrink + hide-on-scroll kept, improved to also show header
- *              when drawer is open (prevent disappearing menu).
- *  §2  Scroll-reveal — hero elements are now excluded so heroFadeUp (§3) runs
- *              cleanly without a competing opacity:0 from data-reveal.
- *  §3  Hero — parallax now checks for the bg-div not an <img> (index hero uses
- *              a background-image div, not an <img> tag).
- *  §4  Counters — restricted to elements that are NOT targeted by func.js
- *              (data-func^="fund-") to avoid double-animation.
- *  §5  Give button — selector restricted to .desktop-give and .mobile-give-btn
- *              only; the mobile nav "Give" button no longer double-opens the modal.
- *              Give modal now calls func.js's apiPost('/donate') if available.
- *  §6  Likes — removed entirely; func.js owns all like logic with API persistence.
- *  §7  Progress bar — removed; func.js owns fund-bar animation via data-func.
- *  §8  Page transitions — unchanged, works well.
- *  §9  Gold dividers — unchanged.
- *  §10 Toast — sda.js defers to func.js's SDAToast if it is already defined,
- *              otherwise provides its own compatible shim with the same 3-arg
- *              signature: SDAToast(message, type, duration).
- *  §11 Copy email — unchanged, works well.
- *  §12 Discussion cards — expand/collapse kept; guard added so it only runs
- *              on static cards (func.js dynamically replaces them anyway).
- *  §13 Back-to-top — repositioned to avoid overlapping Youth FAB.
- *      NEW §14 — Image lazy-load shimmer enhancement.
- *      NEW §15 — Active nav link highlighter (supplements static HTML classes).
+ * CHANGES vs v2:
+ *  §12 Discussion cards — expand/collapse shim removed; youth.html owns its own
+ *              toggleExpand() helper via inline script. sda.js no longer touches
+ *              .line-clamp-2 cards at all.
+ *  NEW §16 — Youth Board page logic (initYouthBoard). Runs only when
+ *              document.body.dataset.page === 'youth'. Owns:
+ *                • Filter buttons (aria-pressed + show/hide cards + empty state)
+ *                • Like buttons (toggle fill + count)
+ *                • Read-more / show-less (toggleExpand exposed on window)
+ *                • "Start a Discussion" modal (open/close/submit/card injection)
+ *                • Char counters for title + body fields
+ *                • Dynamic footer year
+ *              All other §§ are unchanged from v2.
  */
 
 'use strict';
@@ -48,13 +35,13 @@ function init() {
   initGoldDividers();
   initToast();
   initCopyEmail();
-  initDiscussionCards();
   initBackToTop();
   initImageShimmer();
   initActiveNav();
+  initYouthBoard();   // §16 — no-op on non-youth pages
 
   console.log(
-    '%c✦ Makeni Central SDA — sda.js v2 loaded',
+    '%c✦ Makeni Central SDA — sda.js v3 loaded',
     'color:#e6c364;background:#041534;padding:6px 14px;border-radius:4px;font-weight:600;'
   );
 }
@@ -62,9 +49,6 @@ function init() {
 
 /* ═══════════════════════════════════════════════
    1. NAVBAR — scroll shrink / hide-on-scroll
-      The mobile drawer is already in the HTML +
-      wired by the inline script. sda.js only owns
-      the scroll behaviour.
 ═══════════════════════════════════════════════ */
 function initNavbar() {
   const header = document.querySelector('header');
@@ -75,8 +59,6 @@ function initNavbar() {
   let lastScroll = 0;
   let drawerOpen = false;
 
-  // Keep a reference to drawer open state so we never hide
-  // the header while the mobile menu is visible
   const drawer = document.getElementById('mobile-drawer');
   if (drawer) {
     const mo = new MutationObserver(() => {
@@ -86,19 +68,17 @@ function initNavbar() {
   }
 
   window.addEventListener('scroll', () => {
-    if (drawerOpen) return; // never hide while menu is open
+    if (drawerOpen) return;
     const y = window.scrollY;
 
-    // Gold border + deeper shadow after 60 px
     if (y > 60) {
-      header.style.boxShadow    = '0 4px 24px rgba(4,21,52,0.12)';
+      header.style.boxShadow         = '0 4px 24px rgba(4,21,52,0.12)';
       header.style.borderBottomColor = '#e6c364';
     } else {
-      header.style.boxShadow    = '';
+      header.style.boxShadow         = '';
       header.style.borderBottomColor = '';
     }
 
-    // Hide on scroll down, reveal on scroll up
     if (y > lastScroll + 8 && y > 120) {
       header.style.transform = 'translateY(-100%)';
     } else if (y < lastScroll - 4) {
@@ -111,10 +91,6 @@ function initNavbar() {
 
 /* ═══════════════════════════════════════════════
    2. SCROLL-REVEAL
-      Hero elements (inside the first <section> or
-      anything with .hero-animate) are excluded so
-      they don't get opacity:0 applied on top of
-      the heroFadeUp animation in §3.
 ═══════════════════════════════════════════════ */
 function initScrollReveal() {
   const style = document.createElement('style');
@@ -134,7 +110,6 @@ function initScrollReveal() {
   `;
   document.head.appendChild(style);
 
-  // Determine the hero section so we can skip its children
   const heroSection = document.querySelector('section:first-of-type');
 
   const selectors = [
@@ -148,29 +123,26 @@ function initScrollReveal() {
 
   selectors.forEach(sel => {
     document.querySelectorAll(sel).forEach((el, i) => {
-      if (el.closest('header') || el.closest('footer')) return;
-      if (heroSection && heroSection.contains(el))      return; // skip hero
-      if (el.classList.contains('hero-animate'))         return; // skip hero-animated
-      if (el.hasAttribute('data-reveal'))                return; // already tagged
+      if (el.closest('header') || el.closest('footer'))   return;
+      if (heroSection && heroSection.contains(el))         return;
+      if (el.classList.contains('hero-animate'))           return;
+      if (el.hasAttribute('data-reveal'))                  return;
       el.setAttribute('data-reveal', 'up');
       el.style.transitionDelay = `${Math.min(i * 50, 300)}ms`;
     });
   });
 
   document.querySelectorAll('.grid .rounded-xl:not(header .rounded-xl):not(footer .rounded-xl)').forEach((el, i) => {
-    if (el.closest('header') || el.closest('footer')) return;
-    if (heroSection && heroSection.contains(el))      return;
-    if (el.hasAttribute('data-reveal'))                return;
+    if (el.closest('header') || el.closest('footer'))     return;
+    if (heroSection && heroSection.contains(el))           return;
+    if (el.hasAttribute('data-reveal'))                    return;
     el.setAttribute('data-reveal', 'up');
     el.style.transitionDelay = `${i * 80}ms`;
   });
 
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('revealed');
-        observer.unobserve(e.target);
-      }
+      if (e.isIntersecting) { e.target.classList.add('revealed'); observer.unobserve(e.target); }
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
@@ -180,15 +152,11 @@ function initScrollReveal() {
 
 /* ═══════════════════════════════════════════════
    3. HERO — entrance animation + parallax
-      index.html hero uses a background-image div
-      (not an <img>). building.html uses an <img>.
-      Both are handled below.
 ═══════════════════════════════════════════════ */
 function initHero() {
   const hero = document.querySelector('section:first-of-type');
   if (!hero) return;
 
-  // Entrance animation
   const heroTitle = hero.querySelector('h1, h2');
   const heroSub   = hero.querySelector('p');
   const heroBtns  = [...hero.querySelectorAll('button, a[class*="bg-primary"]')];
@@ -211,12 +179,10 @@ function initHero() {
     el.style.animationDelay = `${0.2 + i * 0.15}s`;
   });
 
-  // Parallax — works for both bg-div and img approaches
   const parallaxTarget = hero.querySelector('img') || hero.querySelector('[style*="background-image"]');
   if (parallaxTarget) {
     window.addEventListener('scroll', () => {
-      const y = window.scrollY;
-      parallaxTarget.style.transform = `translateY(${y * 0.22}px)`;
+      parallaxTarget.style.transform = `translateY(${window.scrollY * 0.22}px)`;
     }, { passive: true });
   }
 }
@@ -224,10 +190,6 @@ function initHero() {
 
 /* ═══════════════════════════════════════════════
    4. ANIMATED COUNTERS
-      Skips elements already handled by func.js
-      (data-func^="fund-") to avoid double animation.
-      Also skips hero text so it doesn't get treated
-      as a stat.
 ═══════════════════════════════════════════════ */
 function initCounters() {
   function animateCount(el) {
@@ -235,16 +197,14 @@ function initCounters() {
     const target = parseFloat(raw);
     if (isNaN(target) || target === 0) return;
 
-    const prefix   = el.textContent.match(/^[^0-9]*/)?.[0]  || '';
-    const suffix   = el.textContent.match(/[^0-9.]*$/)?.[0] || '';
-    const isFloat  = el.textContent.includes('.');
-    const duration = 1800;
-    const start    = performance.now();
+    const prefix  = el.textContent.match(/^[^0-9]*/)?.[0]  || '';
+    const suffix  = el.textContent.match(/[^0-9.]*$/)?.[0] || '';
+    const isFloat = el.textContent.includes('.');
+    const start   = performance.now();
 
     function step(now) {
-      const t    = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - t, 3);
-      const val  = target * ease;
+      const t   = Math.min((now - start) / 1800, 1);
+      const val = target * (1 - Math.pow(1 - t, 3));
       el.textContent = prefix + (isFloat ? val.toFixed(1) : Math.floor(val)) + suffix;
       if (t < 1) requestAnimationFrame(step);
       else el.textContent = prefix + (isFloat ? target.toFixed(1) : target) + suffix;
@@ -252,16 +212,15 @@ function initCounters() {
     requestAnimationFrame(step);
   }
 
-  const heroSection  = document.querySelector('section:first-of-type');
-  const statPattern  = /^\s*[\$ZMW%K,]?[\d,]+(\.\d+)?[KMB%]?\s*$/;
+  const heroSection = document.querySelector('section:first-of-type');
+  const statPattern = /^\s*[\$ZMW%K,]?[\d,]+(\.\d+)?[KMB%]?\s*$/;
 
   document.querySelectorAll('.font-display-lg, .font-headline-lg, [class*="text-5xl"], [class*="text-6xl"]').forEach(el => {
-    if (!statPattern.test(el.textContent))              return; // not a stat
-    if (el.closest('header') || el.closest('footer'))   return;
-    if (heroSection && heroSection.contains(el))         return; // skip hero headline
-    if (el.dataset.func && el.dataset.func.startsWith('fund-')) return; // func.js owns these
-    if (el.dataset.counterWired)                         return; // already wired
-
+    if (!statPattern.test(el.textContent))                       return;
+    if (el.closest('header') || el.closest('footer'))            return;
+    if (heroSection && heroSection.contains(el))                  return;
+    if (el.dataset.func && el.dataset.func.startsWith('fund-'))  return;
+    if (el.dataset.counterWired)                                  return;
     el.dataset.counterWired = '1';
     const obs = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting) { animateCount(el); obs.disconnect(); }
@@ -273,15 +232,8 @@ function initCounters() {
 
 /* ═══════════════════════════════════════════════
    5. GIVE BUTTON + MODAL
-      Only hooks .desktop-give and .mobile-give-btn.
-      The nav mobile "Give" button (.mobile-give)
-      intentionally also opens the modal — that's
-      the desired UX. The drawer "Give to the Church"
-      (.mobile-give-btn) is wired too.
-      The in-drawer ripple is also applied.
 ═══════════════════════════════════════════════ */
 function initGiveButton() {
-  // ── Ripple effect ─────────────────────────────
   const rippleStyle = document.createElement('style');
   rippleStyle.textContent = `
     .btn-ripple { position: relative; overflow: hidden; }
@@ -294,7 +246,6 @@ function initGiveButton() {
     }
     @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
 
-    /* ── Give modal ── */
     #give-modal {
       position: fixed; inset: 0; z-index: 9999;
       background: rgba(4,21,52,0.72); backdrop-filter: blur(8px);
@@ -336,18 +287,18 @@ function initGiveButton() {
     }
     .give-submit:hover  { background: #755b00; }
     .give-submit:active { transform: scale(0.98); }
-    .modal-close {
+    .modal-close-give {
       position: absolute; top: 16px; right: 16px;
       width: 36px; height: 36px; border-radius: 50%;
       border: none; background: #f3f3f4; cursor: pointer;
       font-size: 20px; display: flex; align-items: center; justify-content: center;
       transition: background 0.2s;
     }
-    .modal-close:hover { background: #e2e2e2; }
+    .modal-close-give:hover { background: #e2e2e2; }
   `;
   document.head.appendChild(rippleStyle);
 
-  // Ripple on ALL buttons
+  // Ripple on all buttons
   document.querySelectorAll('button, a[class*="bg-primary"], a[class*="bg-secondary"]').forEach(btn => {
     if (btn.dataset.rippleWired) return;
     btn.dataset.rippleWired = '1';
@@ -357,17 +308,12 @@ function initGiveButton() {
       const size   = Math.max(rect.width, rect.height) * 2;
       const ripple = document.createElement('span');
       ripple.className = 'ripple-wave';
-      ripple.style.cssText = `
-        width:${size}px;height:${size}px;
-        left:${e.clientX - rect.left - size / 2}px;
-        top:${e.clientY - rect.top - size / 2}px;
-      `;
+      ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px;`;
       btn.appendChild(ripple);
       ripple.addEventListener('animationend', () => ripple.remove());
     });
   });
 
-  // ── Build modal ────────────────────────────────
   const modal = document.createElement('div');
   modal.id = 'give-modal';
   modal.setAttribute('role', 'dialog');
@@ -375,7 +321,7 @@ function initGiveButton() {
   modal.setAttribute('aria-label', 'Support Makeni Central SDA');
   modal.innerHTML = `
     <div id="give-modal-box">
-      <button class="modal-close" aria-label="Close">✕</button>
+      <button class="modal-close-give" aria-label="Close">✕</button>
       <h2 style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#041534;margin-bottom:6px;">
         Support the Church
       </h2>
@@ -403,9 +349,9 @@ function initGiveButton() {
     </div>`;
   document.body.appendChild(modal);
 
-  // Amount selection
   let selectedAmount = null;
   const customInput  = modal.querySelector('#give-custom-input');
+
   modal.querySelectorAll('.give-amount-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       modal.querySelectorAll('.give-amount-btn').forEach(b => b.classList.remove('selected'));
@@ -416,79 +362,62 @@ function initGiveButton() {
     });
   });
 
-  // Submit — calls func.js apiPost if available, otherwise shows thank-you
   modal.querySelector('.give-submit').addEventListener('click', async () => {
     const amount = selectedAmount === 'custom'
       ? parseFloat(customInput.value)
       : parseFloat(selectedAmount);
-
     if (!amount || amount <= 0) {
       window.SDAToast && window.SDAToast('Please select or enter an amount.', 'error');
       return;
     }
-
     const submitBtn = modal.querySelector('.give-submit');
     submitBtn.textContent = 'Processing…';
     submitBtn.disabled    = true;
-
-    // If func.js apiPost is available, record the donation
-    if (typeof apiPost === 'function') {
-      await apiPost('/donate', { amount, currency: 'ZMW' });
-    }
-
+    if (typeof apiPost === 'function') await apiPost('/donate', { amount, currency: 'ZMW' });
     modal.querySelector('#give-thanks').style.display = 'block';
     submitBtn.style.display = 'none';
     window.SDAToast && window.SDAToast('🙏 Gift recorded — thank you!', 'success', 4000);
-    setTimeout(closeModal, 2800);
+    setTimeout(closeGiveModal, 2800);
   });
 
-  function openModal() {
+  function openGiveModal() {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    modal.querySelector('.modal-close').focus();
+    modal.querySelector('.modal-close-give').focus();
   }
-  function closeModal() {
+  function closeGiveModal() {
     modal.classList.remove('active');
     document.body.style.overflow = '';
     modal.querySelector('#give-thanks').style.display = 'none';
-    modal.querySelector('.give-submit').style.display = '';
-    modal.querySelector('.give-submit').disabled = false;
-    modal.querySelector('.give-submit').textContent = 'Give Now ✦';
+    const sub = modal.querySelector('.give-submit');
+    sub.style.display = ''; sub.disabled = false; sub.textContent = 'Give Now ✦';
     selectedAmount = null;
-    customInput.value = '';
-    customInput.style.display = 'none';
+    customInput.value = ''; customInput.style.display = 'none';
     modal.querySelectorAll('.give-amount-btn').forEach(b => b.classList.remove('selected'));
   }
 
-  modal.querySelector('.modal-close').addEventListener('click', closeModal);
-  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  modal.querySelector('.modal-close-give').addEventListener('click', closeGiveModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeGiveModal(); });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+    if (e.key === 'Escape' && modal.classList.contains('active')) closeGiveModal();
   });
 
-  // Wire only the intended Give buttons — not arbitrary text matches
-  // Targets: nav Give (.desktop-give, .mobile-give),
-  //          drawer Give (.mobile-give-btn),
-  //          any button whose sole visible text is "Give"
-  document.querySelectorAll(
-    '.desktop-give, .mobile-give, .mobile-give-btn, button'
-  ).forEach(btn => {
+  document.querySelectorAll('.desktop-give, .mobile-give, .mobile-give-btn, button').forEach(btn => {
     if (btn.dataset.giveWired) return;
-    const text = btn.textContent.trim().toLowerCase();
-    // Match nav Give buttons by class OR exact "give" text (not "give directions" etc.)
+    const text   = btn.textContent.trim().toLowerCase();
     const isGive = btn.classList.contains('desktop-give')
                 || btn.classList.contains('mobile-give')
                 || btn.classList.contains('mobile-give-btn')
                 || text === 'give';
     if (!isGive) return;
     btn.dataset.giveWired = '1';
-    btn.addEventListener('click', openModal);
+    btn.addEventListener('click', openGiveModal);
   });
 }
 
 
 /* ═══════════════════════════════════════════════
-   8. SMOOTH PAGE TRANSITIONS — unchanged
+   8. SMOOTH PAGE TRANSITIONS
 ═══════════════════════════════════════════════ */
 function initPageTransitions() {
   const overlay = document.createElement('div');
@@ -502,7 +431,6 @@ function initPageTransitions() {
   `;
   document.body.appendChild(overlay);
 
-  // Fade-in on load
   const entry = document.createElement('div');
   entry.style.cssText = `
     position:fixed;inset:0;z-index:99998;
@@ -530,11 +458,11 @@ function initPageTransitions() {
 
 
 /* ═══════════════════════════════════════════════
-   9. GOLD DIVIDERS — animated width on scroll
+   9. GOLD DIVIDERS
 ═══════════════════════════════════════════════ */
 function initGoldDividers() {
   document.querySelectorAll('.gold-divider').forEach(el => {
-    el.style.width = '0px';
+    el.style.width      = '0px';
     el.style.transition = 'width 0.8s cubic-bezier(.4,0,.2,1)';
     const obs = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting) { el.style.width = '60px'; obs.disconnect(); }
@@ -545,15 +473,10 @@ function initGoldDividers() {
 
 
 /* ═══════════════════════════════════════════════
-   10. TOAST — defer to func.js if already defined,
-       otherwise provide a compatible shim.
-       Signature: SDAToast(message, type?, duration?)
-       type: 'success' | 'error' | 'info'  (default 'info')
+   10. TOAST
 ═══════════════════════════════════════════════ */
 function initToast() {
-  // func.js defines SDAToast in an IIFE that runs immediately,
-  // so by the time sda.js DOMContentLoaded fires it is already set.
-  if (typeof window.SDAToast === 'function') return; // func.js owns it
+  if (typeof window.SDAToast === 'function') return;
 
   const wrap = document.createElement('div');
   wrap.style.cssText = `
@@ -614,33 +537,8 @@ function initCopyEmail() {
 
 
 /* ═══════════════════════════════════════════════
-   12. DISCUSSION CARDS — expand / collapse
-       Only applied to statically rendered cards;
-       func.js dynamically replaces them and re-wires.
-═══════════════════════════════════════════════ */
-function initDiscussionCards() {
-  document.querySelectorAll('article.discussion-card').forEach(card => {
-    if (card.dataset.expandWired) return;
-    card.dataset.expandWired = '1';
-    const preview = card.querySelector('.line-clamp-2');
-    if (!preview) return;
-    preview.style.cursor = 'pointer';
-    preview.title = 'Click to expand';
-    preview.addEventListener('click', () => {
-      const collapsed = preview.classList.toggle('line-clamp-2');
-      if (!collapsed) window.SDAToast && window.SDAToast('💬 Thread expanded', 'info');
-    });
-  });
-}
-
-
-/* ═══════════════════════════════════════════════
    13. BACK-TO-TOP
-       Positioned to avoid Youth Board FAB
-       (bottom-8 right-8 = 32px from each edge).
-       Back-to-top sits at bottom:90px right:28px
-       on all pages except youth.html where FAB
-       already occupies bottom-right.
+       Sits above the Youth Board FAB on youth.html.
 ═══════════════════════════════════════════════ */
 function initBackToTop() {
   const isYouth = document.body.dataset.page === 'youth';
@@ -664,8 +562,8 @@ function initBackToTop() {
   document.body.appendChild(btn);
 
   window.addEventListener('scroll', () => {
-    const visible = window.scrollY > 400;
-    btn.style.opacity       = visible ? '1' : '0';
+    const visible         = window.scrollY > 400;
+    btn.style.opacity     = visible ? '1' : '0';
     btn.style.pointerEvents = visible ? 'auto' : 'none';
   }, { passive: true });
 
@@ -676,9 +574,7 @@ function initBackToTop() {
 
 
 /* ═══════════════════════════════════════════════
-   14. IMAGE SHIMMER — lazy-load enhancement
-       Adds a gold-shimmer placeholder while
-       images are loading, removes on load.
+   14. IMAGE SHIMMER
 ═══════════════════════════════════════════════ */
 function initImageShimmer() {
   const s = document.createElement('style');
@@ -710,9 +606,6 @@ function initImageShimmer() {
 
 /* ═══════════════════════════════════════════════
    15. ACTIVE NAV LINK HIGHLIGHTER
-       Supplements the static HTML active classes.
-       Useful when page transitions happen without
-       a full reload (future SPA upgrade path).
 ═══════════════════════════════════════════════ */
 function initActiveNav() {
   const page = document.body.dataset.page || '';
@@ -721,11 +614,229 @@ function initActiveNav() {
   if (!current) return;
 
   document.querySelectorAll('header nav a').forEach(a => {
-    const href = a.getAttribute('href');
+    const href     = a.getAttribute('href');
     const isActive = href === '#' || (current && href === current);
     if (isActive) {
       a.classList.add('text-primary', 'border-b-2', 'border-secondary', 'pb-1');
       a.classList.remove('text-on-surface-variant');
     }
   });
+}
+
+
+/* ═══════════════════════════════════════════════
+   16. YOUTH BOARD
+       Only runs on data-page="youth".
+       Owns: filters, likes, read-more toggle,
+       discussion modal (open/close/submit/inject).
+═══════════════════════════════════════════════ */
+function initYouthBoard() {
+  if (document.body.dataset.page !== 'youth') return;
+
+  /* ── Dynamic footer year ── */
+  const yearEl = document.getElementById('footer-year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  /* ── Filter buttons ── */
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+
+      document.querySelectorAll('.filter-btn').forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+
+      const cards = document.querySelectorAll('#discussions-list article[data-category]');
+      let anyVisible = false;
+      cards.forEach(card => {
+        const match = filter === 'all' || card.dataset.category === filter;
+        card.style.display = match ? '' : 'none';
+        if (match) anyVisible = true;
+      });
+
+      const emptyState = document.getElementById('empty-state');
+      if (emptyState) emptyState.classList.toggle('hidden', anyVisible);
+    });
+  });
+
+  /* ── Like buttons (wire existing + expose helper for injected cards) ── */
+  function wireLikeBtn(btn) {
+    if (btn.dataset.likeWired) return;
+    btn.dataset.likeWired = '1';
+    let liked = false;
+    btn.addEventListener('click', () => {
+      liked = !liked;
+      let count = parseInt(btn.dataset.count) || 0;
+      count = liked ? count + 1 : count - 1;
+      btn.dataset.count = count;
+      const countEl = btn.querySelector('.like-count');
+      if (countEl) countEl.textContent = count + ' Likes';
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (icon) icon.style.fontVariationSettings = liked ? "'FILL' 1" : "'FILL' 0";
+      btn.style.color = liked ? '#ba1a1a' : '';
+    });
+  }
+  document.querySelectorAll('.like-btn').forEach(wireLikeBtn);
+
+  /* ── Read-more toggle (exposed on window for onclick="" in HTML) ── */
+  window.toggleExpand = function(id, btn) {
+    const el          = document.getElementById(id);
+    if (!el) return;
+    const isCollapsed = el.style.webkitLineClamp !== 'unset' && el.style.webkitLineClamp !== '';
+    if (isCollapsed) {
+      el.style.webkitLineClamp = 'unset';
+      el.style.overflow        = 'visible';
+      btn.textContent          = 'Show less';
+    } else {
+      el.style.webkitLineClamp = '2';
+      el.style.overflow        = 'hidden';
+      btn.textContent          = 'Read more';
+    }
+  };
+
+  /* ── Discussion modal ── */
+  const discModal = document.getElementById('discussion-modal');
+  if (!discModal) return;
+
+  window.openModal = function() {
+    document.getElementById('modal-form-view').style.display = '';
+    document.getElementById('modal-success-view').classList.remove('show');
+    discModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      const nameField = document.getElementById('disc-name');
+      if (nameField) nameField.focus();
+    }, 300);
+  };
+
+  window.closeModal = function() {
+    discModal.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => {
+      ['disc-name', 'disc-title', 'disc-body'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      const cat = document.getElementById('disc-category');
+      if (cat) cat.value = '';
+      const tc = document.getElementById('title-count'); if (tc) tc.textContent = '0 / 100';
+      const bc = document.getElementById('body-count');  if (bc) bc.textContent = '0 / 1000';
+      document.getElementById('modal-success-view').classList.remove('show');
+      document.getElementById('modal-form-view').style.display = '';
+    }, 300);
+  };
+
+  // Escape key + backdrop
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && discModal.classList.contains('open')) window.closeModal();
+  });
+  const backdrop = discModal.querySelector('.modal-backdrop');
+  if (backdrop) backdrop.addEventListener('click', window.closeModal);
+
+  // Char counters
+  const titleField = document.getElementById('disc-title');
+  const bodyField  = document.getElementById('disc-body');
+  if (titleField) {
+    titleField.addEventListener('input', function() {
+      const len = this.value.length;
+      const el  = document.getElementById('title-count');
+      if (!el) return;
+      el.textContent = len + ' / 100';
+      el.classList.toggle('near-limit', len > 80);
+    });
+  }
+  if (bodyField) {
+    bodyField.addEventListener('input', function() {
+      const len = this.value.length;
+      const el  = document.getElementById('body-count');
+      if (!el) return;
+      el.textContent = len + ' / 1000';
+      el.classList.toggle('near-limit', len > 850);
+    });
+  }
+
+  // Submit
+  window.submitDiscussion = function() {
+    const name     = (document.getElementById('disc-name')?.value     || '').trim();
+    const category = (document.getElementById('disc-category')?.value || '').trim();
+    const title    = (document.getElementById('disc-title')?.value    || '').trim();
+    const body     = (document.getElementById('disc-body')?.value     || '').trim();
+
+    const fields = [
+      { id: 'disc-name',     val: name },
+      { id: 'disc-category', val: category },
+      { id: 'disc-title',    val: title },
+      { id: 'disc-body',     val: body },
+    ];
+
+    let valid = true;
+    fields.forEach(f => {
+      const el = document.getElementById(f.id);
+      if (!el) return;
+      if (!f.val) {
+        valid = false;
+        el.style.borderColor = '#ba1a1a';
+        el.style.boxShadow   = '0 0 0 3px rgba(186,26,26,0.12)';
+        el.addEventListener('input', () => {
+          el.style.borderColor = '';
+          el.style.boxShadow   = '';
+        }, { once: true });
+      }
+    });
+    if (!valid) return;
+
+    // Sanitise for innerHTML injection
+    function esc(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const newCard  = document.createElement('article');
+    newCard.className    = 'discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow';
+    newCard.dataset.category = category;
+    newCard.style.cssText    = 'opacity:0;transform:translateY(-12px);transition:opacity 0.35s ease,transform 0.35s ease;';
+
+    newCard.innerHTML = `
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center font-bold text-on-secondary-container flex-shrink-0"
+             aria-label="${esc(name)}">${esc(initials)}</div>
+        <div>
+          <h4 class="font-label-md text-label-md text-primary">${esc(name)}</h4>
+          <p class="text-[12px] text-on-surface-variant uppercase tracking-tighter">Just now</p>
+        </div>
+      </div>
+      <span class="card-category">${esc(category)}</span>
+      <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${esc(title)}</h3>
+      <p class="font-body-md text-body-md text-on-surface-variant mb-6">${esc(body)}</p>
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[20px]">forum</span>
+          <span class="font-label-md">0 Comments</span>
+        </div>
+        <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors"
+                aria-label="Like this post" data-count="0">
+          <span class="material-symbols-outlined text-[20px]">favorite</span>
+          <span class="font-label-md like-count">0 Likes</span>
+        </button>
+      </div>`;
+
+    wireLikeBtn(newCard.querySelector('.like-btn'));
+
+    const list = document.getElementById('discussions-list');
+    if (list) list.insertBefore(newCard, list.firstChild);
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      newCard.style.opacity   = '1';
+      newCard.style.transform = 'translateY(0)';
+    }));
+
+    document.getElementById('modal-form-view').style.display = 'none';
+    document.getElementById('modal-success-view').classList.add('show');
+  };
+
+  /* ── FAB wiring (in case onclick attr not present) ── */
+  const fab = document.getElementById('fab-new-discussion');
+  if (fab && !fab.dataset.youthWired) {
+    fab.dataset.youthWired = '1';
+    fab.addEventListener('click', window.openModal);
+  }
 }
