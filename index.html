@@ -138,25 +138,154 @@
     width: 30px;
     height: 30px;
   }
+
+  /* ── MOBILE NAV ── */
+  @media (max-width: 767px) {
+    .logo-text { display: none !important; }
+    .nav-brand  { position: absolute; left: 50%; transform: translateX(-50%); }
+    .mobile-hamburger { display: flex; }
+    .desktop-give { display: none !important; }
+    .mobile-give  { display: flex; }
+  }
+  @media (min-width: 768px) {
+    .mobile-hamburger { display: none !important; }
+    .mobile-give      { display: none !important; }
+    .desktop-give     { display: flex !important; }
+  }
+
+  /* Hamburger lines */
+  .hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    width: 40px;
+    height: 40px;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 6px 4px;
+    border-radius: 8px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    z-index: 60;
+  }
+  .hamburger-btn:hover { background: rgba(4,21,52,0.06); }
+  .hamburger-btn span {
+    display: block;
+    height: 2px;
+    border-radius: 2px;
+    background: #041534;
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .hamburger-btn span:nth-child(1) { width: 24px; }
+  .hamburger-btn span:nth-child(2) { width: 18px; }
+  .hamburger-btn span:nth-child(3) { width: 22px; }
+  .hamburger-btn span:nth-child(4) { width: 14px; }
+
+  /* Open state: 4 lines collapse to X */
+  .hamburger-btn.open span:nth-child(1) { width: 22px; transform: translateY(10.5px) rotate(45deg); }
+  .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger-btn.open span:nth-child(3) { opacity: 0; transform: scaleX(0); }
+  .hamburger-btn.open span:nth-child(4) { width: 22px; transform: translateY(-10.5px) rotate(-45deg); }
+
+  /* Mobile drawer */
+  .mobile-drawer {
+    position: fixed;
+    top: 80px;
+    left: 0; right: 0;
+    z-index: 49;
+    background: rgba(249,249,249,0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 2px solid #fed977;
+    box-shadow: 0 20px 40px -10px rgba(4,21,52,0.12);
+    transform: translateY(-110%);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .mobile-drawer.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .mobile-drawer nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 24px;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: #45464e;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(197,198,207,0.3);
+    transition: background 0.2s, color 0.2s, padding-left 0.2s;
+    position: relative;
+  }
+  .mobile-drawer nav a:hover { background: rgba(254,217,119,0.18); color: #041534; padding-left: 32px; }
+  .mobile-drawer nav a.active { color: #041534; }
+  .mobile-drawer nav a.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: #755b00;
+    border-radius: 0 2px 2px 0;
+  }
+  .mobile-drawer nav a .nav-icon { color: #755b00; font-size: 20px; }
+  .mobile-drawer-inner { padding: 8px 0 20px; }
+  .mobile-give-row {
+    padding: 16px 24px 4px;
+  }
+  .mobile-give-btn {
+    width: 100%;
+    background: #041534;
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .mobile-give-btn:active { transform: scale(0.97); }
+  .mobile-give-btn:hover { background: #755b00; }
+
 </style>
 </head>
 
-<body class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+<body data-page="index" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
 
 <!-- ══════════════ TOP NAV ══════════════ -->
 <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-2 border-secondary-container shadow-sm">
-  <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+  <div class="relative flex items-center justify-between h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
 
-    <!-- Brand -->
-    <div class="flex items-center gap-4">
+    <!-- Mobile: Hamburger (left) -->
+    <button class="hamburger-btn mobile-hamburger" id="hamburger-btn" aria-label="Open navigation menu">
+      <span></span><span></span><span></span><span></span>
+    </button>
+
+    <!-- Brand (centered on mobile via absolute, left on desktop) -->
+    <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
       <div class="logo-badge">
-        <img
-          alt="Makeni Central SDA Logo" src="sda.png"/>  
-        </div>
-      <span class="font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
+        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+      </div>
+      <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </div>
 
-    <!-- Nav links -->
+    <!-- Desktop: Nav links (hidden on mobile) -->
     <nav class="hidden md:flex items-center gap-8">
       <a class="font-label-md text-label-md text-primary border-b-2 border-secondary pb-1" href="#">Home</a>
       <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="kids.html">Kids Corner</a>
@@ -164,11 +293,36 @@
       <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="building.html">New Building</a>
     </nav>
 
-    <button class="bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md hover:bg-primary/90 transition-all active:scale-95">
+    <!-- Desktop: Give button -->
+    <button class="desktop-give bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md hover:bg-primary/90 transition-all active:scale-95">
       Give
     </button>
+
+    <!-- Mobile: Give button (right) -->
+    <button class="mobile-give bg-primary text-on-primary px-4 py-2 rounded-xl font-label-md text-[13px] hover:bg-primary/90 transition-all active:scale-95">
+      Give
+    </button>
+
   </div>
 </header>
+
+<!-- Mobile Drawer -->
+<div class="mobile-drawer" id="mobile-drawer">
+  <div class="mobile-drawer-inner">
+    <nav>
+        <a class="active" href="#"><span class="material-symbols-outlined nav-icon">home</span>Home</a>
+        <a href="kids.html"><span class="material-symbols-outlined nav-icon">child_care</span>Kids Corner</a>
+        <a href="youth.html"><span class="material-symbols-outlined nav-icon">groups</span>Youth Board</a>
+        <a href="building.html"><span class="material-symbols-outlined nav-icon">domain</span>New Building</a>
+    </nav>
+    <div class="mobile-give-row">
+      <button class="mobile-give-btn">
+        <span class="material-symbols-outlined" style="font-size:18px;">volunteer_activism</span>
+        Give to the Church
+      </button>
+    </div>
+  </div>
+</div>
 
 <main class="pt-20">
 
@@ -184,11 +338,17 @@
         Makeni Central SDA Church
       </h1>
       <div class="gold-divider mx-auto mb-8"></div>
-      <p class="text-on-primary/90 font-body-lg text-body-lg max-w-2xl mx-auto italic">
+      <p class="text-on-primary/90 font-body-lg text-body-lg max-w-2xl mx-auto italic" data-func="verse">
         "A Sanctuary of Hope, A Community of Grace."
       </p>
     </div>
   </section>
+
+  
+  <!-- ══════════════ ANNOUNCEMENTS TICKER ══════════════ -->
+  <div class="bg-secondary-container border-b border-secondary/30 py-3 overflow-hidden">
+    <div data-func="announcements" class="font-label-md text-label-md text-on-secondary-container"></div>
+  </div>
 
   <!-- ══════════════ LESSON + THEME (BENTO) ══════════════ -->
   <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
@@ -218,16 +378,8 @@
 
       <!-- Theme of the Month -->
       <div class="lg:col-span-5 bg-primary p-10 rounded-xl relative overflow-hidden flex flex-col justify-center">
-        <div class="absolute top-0 right-0 p-8 opacity-10">
-          <span class="material-symbols-outlined text-[120px] text-on-primary" style="font-variation-settings: 'FILL' 1;">format_quote</span>
-        </div>
-        <span class="font-label-md text-label-md text-secondary-fixed uppercase tracking-widest mb-6">Theme of the Month</span>
-        <h3 class="font-headline-md text-headline-md text-on-primary mb-6">Abiding in the Vine</h3>
-        <div class="gold-divider mb-8"></div>
-        <blockquote class="font-body-lg text-body-lg text-on-primary/90 border-l-4 border-secondary pl-6 mb-4 italic">
-          "I am the vine, you are the branches. He who abides in Me, and I in him, bears much fruit; for without Me you can do nothing."
-        </blockquote>
-        <cite class="font-label-md text-label-md text-secondary-fixed block text-right">— John 15:5</cite>
+        <div data-func="theme" class="relative z-10 flex flex-col justify-center h-full"></div>
+      <cite class="font-label-md text-label-md text-secondary-fixed block text-right">— John 15:5</cite>
       </div>
 
     </div>
@@ -399,5 +551,37 @@
 </footer>
 <script src="sda.js" defer></script>
 <script src="func.js" defer></script>
+<script>
+(function() {
+  var btn = document.getElementById('hamburger-btn');
+  var drawer = document.getElementById('mobile-drawer');
+  var open = false;
+  if (!btn || !drawer) return;
+  btn.addEventListener('click', function() {
+    open = !open;
+    btn.classList.toggle('open', open);
+    drawer.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    if (open && !btn.contains(e.target) && !drawer.contains(e.target)) {
+      open = false;
+      btn.classList.remove('open');
+      drawer.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+  // Close on resize to desktop
+  window.addEventListener('resize', function() {
+    if (window.innerWidth >= 768 && open) {
+      open = false;
+      btn.classList.remove('open');
+      drawer.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+})();
+</script>
 </body>
 </html>
