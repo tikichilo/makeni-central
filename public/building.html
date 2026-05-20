@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "secondary": "#755b00",
+          "on-surface": "#1a1c1c",
+          "error": "#ba1a1a",
+          "tertiary-container": "#1c2c40",
+          "on-primary": "#ffffff",
+          "on-primary-container": "#8392b7",
+          "inverse-surface": "#2f3131",
+          "secondary-container": "#fed977",
+          "secondary-fixed": "#ffe08f",
+          "on-tertiary-fixed-variant": "#38485d",
+          "on-primary-fixed": "#0a1a3a",
+          "primary-fixed": "#d9e2ff",
+          "inverse-on-surface": "#f0f1f1",
+          "surface-container": "#eeeeee",
+          "on-secondary-container": "#785d00",
+          "on-surface-variant": "#45464e",
+          "on-primary-fixed-variant": "#384668",
+          "surface-tint": "#4f5e81",
+          "primary-fixed-dim": "#b7c6ee",
+          "primary-container": "#1b2a4a",
+          "on-background": "#1a1c1c",
+          "surface": "#f9f9f9",
+          "on-secondary": "#ffffff",
+          "background": "#f9f9f9",
+          "surface-bright": "#f9f9f9",
+          "surface-container-lowest": "#ffffff",
+          "outline-variant": "#c5c6cf",
+          "on-tertiary": "#ffffff",
+          "on-tertiary-fixed": "#0b1c30",
+          "inverse-primary": "#b7c6ee",
+          "surface-container-high": "#e8e8e8",
+          "surface-container-low": "#f3f3f4",
+          "on-error": "#ffffff",
+          "secondary-fixed-dim": "#e6c364",
+          "on-secondary-fixed-variant": "#584400",
+          "surface-dim": "#dadada",
+          "on-secondary-fixed": "#241a00",
+          "outline": "#75777f",
+          "error-container": "#ffdad6",
+          "primary": "#041534",
+          "on-error-container": "#93000a",
+          "tertiary-fixed": "#d3e4fe",
+          "tertiary": "#06172a",
+          "on-tertiary-container": "#8393ac",
+          "tertiary-fixed-dim": "#b7c8e1",
+          "surface-variant": "#e2e2e2",
+          "surface-container-highest": "#e2e2e2"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "12px",
+          "full": "9999px"
+        },
+        "spacing": {
+          "section-gap": "120px",
+          "margin-desktop": "80px",
+          "margin-mobile": "20px",
+          "gutter": "32px",
+          "base": "4px"
+        },
+        "fontFamily": {
+          "label-md": ["Inter"],
+          "headline-lg": ["Playfair Display"],
+          "display-lg": ["Playfair Display"],
+          "body-lg": ["Inter"],
+          "title-lg": ["Inter"],
+          "body-md": ["Inter"],
+          "headline-md": ["Playfair Display"],
+          "headline-lg-mobile": ["Playfair Display"]
+        },
+        "fontSize": {
+          "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "600"}],
+          "headline-lg": ["40px", {"lineHeight": "1.2", "fontWeight": "700"}],
+          "display-lg": ["56px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+          "body-lg": ["18px", {"lineHeight": "1.7", "fontWeight": "400"}],
+          "title-lg": ["20px", {"lineHeight": "1.5", "letterSpacing": "0.01em", "fontWeight": "600"}],
+          "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+          "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+          "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .sacred-shadow {
+    box-shadow: 0 10px 30px -10px rgba(4, 21, 52, 0.08);
+  }
+  .gold-divider {
+    height: 2px;
+    background: #755b00;
+    width: 60px;
+  }
+  .logo-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: #041534;
+    border: 2px solid #755b00;
+    flex-shrink: 0;
+  }
+  .logo-badge img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+  }
+  .logo-badge-sm {
+    width: 44px;
+    height: 44px;
+  }
+  .logo-badge-sm img {
+    width: 30px;
+    height: 30px;
+  }
+  .text-shadow-premium {
+    text-shadow: 0 4px 12px rgba(4, 21, 52, 0.3);
+  }
+
+  /* ── MOBILE NAV ── */
+  @media (max-width: 767px) {
+    .logo-text { display: none !important; }
+    .nav-brand  { position: absolute; left: 50%; transform: translateX(-50%); z-index: 1; }
+    .hamburger-btn { position: relative; z-index: 2; }
+    .mobile-give { position: relative; z-index: 2; }
+    .mobile-hamburger { display: flex; }
+    .desktop-give { display: none !important; }
+    .mobile-give  { display: flex; }
+  }
+  @media (min-width: 768px) {
+    .mobile-hamburger { display: none !important; }
+    .mobile-give      { display: none !important; }
+    .desktop-give     { display: flex !important; }
+  }
+
+  /* Hamburger lines */
+  .hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    width: 40px;
+    height: 40px;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 6px 4px;
+    border-radius: 8px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    z-index: 60;
+  }
+  .hamburger-btn:hover { background: rgba(4,21,52,0.06); }
+  .hamburger-btn span {
+    display: block;
+    height: 2px;
+    border-radius: 2px;
+    background: #041534;
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .hamburger-btn span:nth-child(1) { width: 24px; }
+  .hamburger-btn span:nth-child(2) { width: 18px; }
+  .hamburger-btn span:nth-child(3) { width: 22px; }
+  .hamburger-btn span:nth-child(4) { width: 14px; }
+
+  /* Open state: 4 lines collapse to X */
+  .hamburger-btn.open span:nth-child(1) { width: 22px; transform: translateY(10.5px) rotate(45deg); }
+  .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger-btn.open span:nth-child(3) { opacity: 0; transform: scaleX(0); }
+  .hamburger-btn.open span:nth-child(4) { width: 22px; transform: translateY(-10.5px) rotate(-45deg); }
+
+  /* Mobile drawer */
+  .mobile-drawer {
+    position: fixed;
+    top: 80px;
+    left: 0; right: 0;
+    z-index: 49;
+    background: rgba(249,249,249,0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 2px solid #fed977;
+    box-shadow: 0 20px 40px -10px rgba(4,21,52,0.12);
+    transform: translateY(-110%);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .mobile-drawer.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .mobile-drawer nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 24px;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: #45464e;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(197,198,207,0.3);
+    transition: background 0.2s, color 0.2s, padding-left 0.2s;
+    position: relative;
+  }
+  .mobile-drawer nav a:hover { background: rgba(254,217,119,0.18); color: #041534; padding-left: 32px; }
+  .mobile-drawer nav a.active { color: #041534; }
+  .mobile-drawer nav a.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: #755b00;
+    border-radius: 0 2px 2px 0;
+  }
+  .mobile-drawer nav a .nav-icon { color: #755b00; font-size: 20px; }
+  .mobile-drawer-inner { padding: 8px 0 20px; }
+  .mobile-give-row {
+    padding: 16px 24px 4px;
+  }
+  .mobile-give-btn {
+    width: 100%;
+    background: #041534;
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .mobile-give-btn:active { transform: scale(0.97); }
+  .mobile-give-btn:hover { background: #755b00; }
+
+</style>
+</head>
+
+<body data-page="building" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+
+<!-- ══════════════ TOP NAV ══════════════ -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-2 border-secondary-container shadow-sm">
+  <div class="relative flex items-center justify-between h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+
+    <!-- Mobile: Hamburger (left) -->
+    <button class="hamburger-btn mobile-hamburger" id="hamburger-btn" aria-label="Open navigation menu">
+      <span></span><span></span><span></span><span></span>
+    </button>
+
+    <!-- Brand (centered on mobile via absolute, left on desktop) -->
+    <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
+      <div class="logo-badge">
+        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+      </div>
+      <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
+    </div>
+
+    <!-- Desktop: Nav links (hidden on mobile) -->
+    <nav class="hidden md:flex items-center gap-8">
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="index.html">Home</a>
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="kids.html">Kids Corner</a>
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="youth.html">Youth Board</a>
+      <a class="font-label-md text-label-md text-primary border-b-2 border-secondary pb-1" href="#">New Building</a>
+    </nav>
+
+    <!-- Desktop: Give button -->
+    <button class="desktop-give bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md hover:bg-primary/90 transition-all active:scale-95">
+      Give
+    </button>
+
+    <!-- Mobile: Give button (right) -->
+    <button class="mobile-give bg-primary text-on-primary px-4 py-2 rounded-xl font-label-md text-[13px] hover:bg-primary/90 transition-all active:scale-95">
+      Give
+    </button>
+
+  </div>
+</header>
+
+<!-- Mobile Drawer -->
+<div class="mobile-drawer" id="mobile-drawer">
+  <div class="mobile-drawer-inner">
+    <nav>
+        <a href="index.html"><span class="material-symbols-outlined nav-icon">home</span>Home</a>
+        <a href="kids.html"><span class="material-symbols-outlined nav-icon">child_care</span>Kids Corner</a>
+        <a href="youth.html"><span class="material-symbols-outlined nav-icon">groups</span>Youth Board</a>
+        <a class="active" href="#"><span class="material-symbols-outlined nav-icon">domain</span>New Building</a>
+    </nav>
+    <div class="mobile-give-row">
+      <button class="mobile-give-btn">
+        <span class="material-symbols-outlined" style="font-size:18px;">volunteer_activism</span>
+        Give to the Church
+      </button>
+    </div>
+  </div>
+</div>
+
+<main class="pt-20">
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="relative h-[80vh] flex items-end overflow-hidden">
+    <div class="absolute inset-0 z-0">
+      <img class="w-full h-full object-cover"
+        alt="A grand architectural 3D render of a modern SDA church building at sunset"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgpRsklSS9NUKZHJ5zC-tRSc6XcQWt_HBD5tV6MgKEFO-NjhC01-65b0JTfx8qF3UmjxHalYTimM_0kcUS1cPmks3akhMMOrU2-tWgTZ_od3NwUzPcWpUvVpc2hw6WdZ9HzkpRzJgp4l6NTEOGy78G7qICn_hxxOvZ9rb5vaU5OkiAGesZS3wfTXNitDZH--Wo239VutHHDDMtOjUlSes_FVoj7dlYivG4GI3AtYdNTWGCHmVPnVzuJETR1jg_jVCBuTCVNRrFJbML"/>
+      <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent"></div>
+    </div>
+    <div class="relative z-10 w-full max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pb-section-gap">
+      <h1 class="font-display-lg text-display-lg text-on-primary mb-6 text-shadow-premium">Building Our Future Together</h1>
+      <p class="font-body-lg text-body-lg text-on-primary/90 max-w-2xl mb-8">
+        A sacred sanctuary designed to foster worship, community, and spiritual growth for generations to come.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- ══════════════ FUND STATS ══════════════ -->
+  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pt-section-gap">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <p class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-2">Raised</p>
+        <p class="font-headline-md text-headline-md text-primary" data-func="fund-raised">ZMW —</p>
+      </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-outline-variant">
+        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mb-2">Goal</p>
+        <p class="font-headline-md text-headline-md text-primary" data-func="fund-goal">ZMW —</p>
+      </div>
+      <div class="bg-primary p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <p class="font-label-md text-label-md text-secondary-fixed uppercase tracking-widest mb-2">Complete</p>
+        <p class="font-headline-md text-headline-md text-on-primary" data-func="fund-percent">—%</p>
+      </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-outline-variant">
+        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mb-2">Donors</p>
+        <p class="font-headline-md text-headline-md text-primary" data-func="fund-donors">—</p>
+      </div>
+    </div>
+    <!-- Animated fund progress bar -->
+    <div class="mb-4 flex justify-between items-center">
+      <span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Fundraising Progress</span>
+      <span class="font-label-md text-label-md text-primary" data-func="fund-percent">—%</span>
+    </div>
+    <div class="h-3 bg-surface-container-highest rounded-full overflow-hidden mb-section-gap">
+      <div class="h-full bg-secondary rounded-full" data-func="fund-bar" style="width:0%"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════ PROGRESS TRACKER ══════════════ -->
+  <section class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="text-center mb-16">
+      <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Construction Progress</h2>
+      <div class="gold-divider mx-auto"></div>
+    </div>
+
+    <div class="relative pt-12 pb-8">
+      <!-- Track line background -->
+      <div class="absolute top-[28px] left-0 w-full h-0.5 bg-surface-container-highest"></div>
+      <!-- Track line filled (60%) -->
+      <div class="absolute top-[28px] left-0 w-[60%] h-0.5 bg-secondary"></div>
+
+      <div class="relative flex justify-between">
+
+        <!-- Step: Land Acquired (done) -->
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-lg z-10">
+            <span class="material-symbols-outlined !text-[20px]" style="font-variation-settings:'FILL' 1;">check</span>
+          </div>
+          <span class="font-label-md text-label-md text-primary">Land Acquired</span>
+        </div>
+
+        <!-- Step: Foundation (done) -->
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-lg z-10">
+            <span class="material-symbols-outlined !text-[20px]" style="font-variation-settings:'FILL' 1;">check</span>
+          </div>
+          <span class="font-label-md text-label-md text-primary">Foundation</span>
+        </div>
+
+        <!-- Step: Walls (current) -->
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="w-12 h-12 rounded-full border-4 border-secondary bg-surface-container-lowest flex items-center justify-center text-secondary shadow-lg z-10 -mt-1 scale-110">
+            <span class="material-symbols-outlined !text-[24px]" style="font-variation-settings:'FILL' 1;">architecture</span>
+          </div>
+          <span class="font-label-md text-label-md text-secondary font-bold">Walls</span>
+        </div>
+
+        <!-- Step: Roofing (pending) -->
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10"></div>
+          <span class="font-label-md text-label-md text-on-surface-variant">Roofing</span>
+        </div>
+
+        <!-- Step: Interior (pending) -->
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10"></div>
+          <span class="font-label-md text-label-md text-on-surface-variant">Interior</span>
+        </div>
+
+        <!-- Step: Completion (pending) -->
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10"></div>
+          <span class="font-label-md text-label-md text-on-surface-variant">Completion</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ VISION ══════════════ -->
+  <section class="bg-surface-container-low py-section-gap">
+    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
+
+      <div class="order-2 md:order-1 space-y-8">
+        <span class="font-label-md text-label-md text-secondary tracking-[0.2em] uppercase block">The Vision</span>
+        <h2 class="font-headline-lg text-headline-lg text-primary leading-tight">A Sanctuary for Spiritual Growth and Community Service</h2>
+        <div class="border-l-4 border-secondary pl-8 py-2">
+          <p class="font-body-lg text-body-lg text-on-surface-variant italic">
+            "Our new building isn't just about brick and mortar; it's about creating a space where the weary find rest, the seeking find truth, and our community finds a home. We are building a lighthouse for the Makeni region."
+          </p>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+          This ambitious project incorporates a 1,200-seat sanctuary, dedicated youth education wings, and a multi-purpose community hall designed to host outreach programs and health expos. Every architectural detail has been chosen to reflect our commitment to reverence, excellence, and the welcoming spirit of Christ.
+        </p>
+      </div>
+
+      <div class="order-1 md:order-2">
+        <img class="rounded-xl shadow-xl w-full h-[500px] object-cover"
+          alt="Architectural interior of a church with high vaulted ceilings and modern wooden pews"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrXG8FZbwMAXASUG-KEg0Psq53ZaL0anmgdFW8rMP9RuvAPCn6u02VhG7rsdRa_C53F3QjiLMwUq2bN2gI6gDFHRFi21seCIVsBTJF3V_liQaEZCzs_q-cZ9y7Qs5G0oyctl0A08tSeCc0I7k7PXQiKy_Dp4mgS57RDYe0nhog4APscufiqpRXy42JiLv2_486TGfDEqupgb0tm9Ahze2TnbX4bsbF7Pk1UBr2azmcMahT_ixefRmvQ3YWX1qy2KArFdnIfRe1x2Fk"/>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════ PHOTO GALLERY ══════════════ -->
+  <section class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="flex justify-between items-end mb-12">
+      <div>
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-2">Construction Gallery</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant">Witness the transformation as we build together.</p>
+      </div>
+      <button class="font-label-md text-label-md text-primary flex items-center gap-2 hover:text-secondary transition-all">
+        VIEW ALL <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+    </div>
+
+    <!-- Bento Grid Gallery -->
+    <div class="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-[600px]">
+
+      <div class="md:col-span-2 md:row-span-2 relative overflow-hidden rounded-xl group">
+        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          alt="Wide angle construction site during foundation phase"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwmFSOdLKY-tOmmHBml9FNFJ7cPoUnURW6ycIVzvt_HmCFmZp8bTcu4ssMU7bSBOSi0nRxhY0ecyPHS4zFW8qotQSS3HyUR0nDs9houhLHfSmP9tmzPml8RWR3ZVflGsoi3_F03Qy5VGcsokPvqyFbn-ukoR7a_UqNxVzl_6QX9cpQ-s8mVi9un_RFj6uRUDaxb7-3T5iugvZqMAKbEth4oGOefKRUovKzy4Eg61PfJsvm7tB9z8BSvUhkyHxArqCz_7BMlHvY4ltm"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+          <span class="font-label-md text-label-md text-white">Foundation Laying — June 2023</span>
+        </div>
+      </div>
+
+      <div class="md:col-span-2 relative overflow-hidden rounded-xl group">
+        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          alt="Close up detail of brickwork on the new church walls"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdl36Yxx8iYUnrIguBD-zZHTf6CK8ACKh1YY5KgFnX317DVLidRth2mMm2y_hzFj9sBIYkKXId1YV6xJKvNSeF6dc-7t_5FYF5MRnEyUdoxBUXCtUVAPlca7Wzxxp3o2rnxMw723t06zwc4V1bc78me-KjVtlyrLvQ91heuewD_hTec3RKCjYCepAUtGBnI8MS0Vv2Y3kxfHnGsKl6kzweV2J6XWe6J_Uqioo0-w-9C9ndPWdJ5isR-d5IcwSmMnJiymj9"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+          <span class="font-label-md text-label-md text-white">Main Wall Progress</span>
+        </div>
+      </div>
+
+      <div class="relative overflow-hidden rounded-xl group">
+        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          alt="Interior shot looking up at roof trusses and framework"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyRZlSCcLVFeAVnSzYJeDLa8_cdjVb90RpB8yqO-ZPOH1yO9Dl_FypWrprXilCX5P6_opircR_tdEw0H1j7VPE3nm-aonkeFrL1BHRv30PBVY4jdQ9JWbSpp8PvBO_uWmJ4vrDE4yRTiJyoSF3L44ARVPJBFEjrMh-RHyA8aVYxfAj1ArGSvX02NWcUrjOjRrJBcLBQeBFGm6eBVQN89wY2O9jwW0adJUTn0OT9FTVxPb8E5dlzQrmr3gphjedey-rSLLoWwIsgK_o"/>
+      </div>
+
+      <div class="relative overflow-hidden rounded-xl group">
+        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          alt="Aerial drone photography showing the church footprint within the landscape"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBClmXFznLx_2spKx1EQ_fBUCcUyCxqzLvd4NAtCcMCxYLXYQdaOlaYb-SLeSaxuvgjCC2fHD06YN3JiDqWL1leq6-kOCMcv0GIPS_OWW0SHOb0nTxYU4yj1BmAxeCXsJwtprN9ehV642tSr6oL39vOEyBWiwFYrjYl8bH_0AMr3XxFVETDaQ0jOZ-j_IuOrX_cMGLJ8-40mc1lhs-i6WFBZp9zFmewq95LucWzQ4b2BI4IzCGTADyOGgAiHzHq05VVUNTvpASW1_FT"/>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════ CTA ══════════════ -->
+  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mb-section-gap">
+    <div class="bg-primary rounded-[2rem] p-12 md:p-20 text-center relative overflow-hidden sacred-shadow">
+      <div class="absolute top-0 right-0 w-64 h-64 bg-secondary/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+      <div class="absolute bottom-0 left-0 w-32 h-32 bg-secondary/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+      <div class="relative z-10">
+        <h2 class="font-headline-lg text-headline-lg text-on-primary mb-6">Leave Your Legacy</h2>
+        <p class="font-body-lg text-body-lg text-on-primary/80 max-w-2xl mx-auto mb-10">
+          Join us in this historical journey. Your support, whether large or small, helps us move closer to completing this spiritual home.
+        </p>
+        <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+          <button class="bg-secondary text-white px-10 py-4 rounded-xl font-title-lg text-title-lg hover:bg-secondary/90 transition-all active:scale-95 flex items-center gap-3">
+            Support the Project <span class="material-symbols-outlined">volunteer_activism</span>
+          </button>
+          <button class="border-2 border-on-primary/20 text-on-primary px-10 py-4 rounded-xl font-title-lg text-title-lg hover:bg-on-primary/10 transition-all">
+            View Giving Plans
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ TESTIMONIALS ══════════════ -->
+  <section class="bg-primary py-section-gap">
+    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="text-center mb-16">
+        <h2 class="font-headline-lg text-headline-lg text-on-primary mb-4">Leadership Perspective</h2>
+        <div class="gold-divider mx-auto"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+
+        <div class="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 hover:border-secondary/50 transition-all">
+          <span class="material-symbols-outlined text-secondary text-5xl mb-6">format_quote</span>
+          <p class="font-body-md text-body-md text-on-primary/90 italic mb-8 leading-relaxed">
+            "This building represents our faith made visible. It is a testament to what God can do when a community unites for a single, holy purpose."
+          </p>
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-secondary-container flex-shrink-0"></div>
+            <div>
+              <h4 class="font-title-lg text-title-lg text-on-primary">Elder John Musonda</h4>
+              <span class="font-label-md text-label-md text-on-primary/60">Project Chairman</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 hover:border-secondary/50 transition-all">
+          <span class="material-symbols-outlined text-secondary text-5xl mb-6">format_quote</span>
+          <p class="font-body-md text-body-md text-on-primary/90 italic mb-8 leading-relaxed">
+            "We are not just erecting walls; we are expanding our capacity to serve. This project is the engine of our future evangelism efforts."
+          </p>
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-secondary-container flex-shrink-0"></div>
+            <div>
+              <h4 class="font-title-lg text-title-lg text-on-primary">Pastor Sarah Lungu</h4>
+              <span class="font-label-md text-label-md text-on-primary/60">Senior Pastor</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 hover:border-secondary/50 transition-all">
+          <span class="material-symbols-outlined text-secondary text-5xl mb-6">format_quote</span>
+          <p class="font-body-md text-body-md text-on-primary/90 italic mb-8 leading-relaxed">
+            "Seeing the youth get excited about their new classrooms and recreation hall makes every sacrifice worth it. This is for them."
+          </p>
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-secondary-container flex-shrink-0"></div>
+            <div>
+              <h4 class="font-title-lg text-title-lg text-on-primary">Chanda Mwale</h4>
+              <span class="font-label-md text-label-md text-on-primary/60">Youth Director</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="bg-primary text-on-primary w-full py-12 border-t-4 border-secondary">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+
+    <!-- Brand block -->
+    <div class="md:col-span-1">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="logo-badge logo-badge-sm" style="background-color:#0a1a3a; border-color:#e6c364;">
+          <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        </div>
+        <span class="font-headline-md text-headline-md text-on-primary">Makeni Central</span>
+      </div>
+      <p class="font-body-md text-body-md text-on-primary/80">
+        Proclaiming the everlasting gospel to every nation, kindred, tongue, and people.
+      </p>
+    </div>
+
+    <!-- Quick links -->
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
+      <ul class="space-y-3">
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="index.html">Home</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="kids.html">Kids Corner</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="youth.html">Youth Board</a></li>
+        <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#">New Building</a></li>
+      </ul>
+    </div>
+
+    <!-- Connect -->
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Connect</h4>
+      <ul class="space-y-3">
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Contact Us</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Find a Church</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Prayer Requests</a></li>
+      </ul>
+    </div>
+
+    <!-- Legal -->
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Legal</h4>
+      <ul class="space-y-3">
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Privacy Policy</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Terms of Service</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Copyright bar -->
+  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 text-center">
+    <p class="font-body-md text-body-md text-on-primary/60">
+      © 2024 Makeni Central SDA Church. All rights reserved.
+    </p>
+  </div>
+</footer>
+<script src="../sda.js" defer></script>
+<script src="../func.js" defer></script>
+<script>
+(function() {
+  var btn = document.getElementById('hamburger-btn');
+  var drawer = document.getElementById('mobile-drawer');
+  var open = false;
+  if (!btn || !drawer) return;
+  btn.addEventListener('click', function() {
+    open = !open;
+    btn.classList.toggle('open', open);
+    drawer.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    if (open && !btn.contains(e.target) && !drawer.contains(e.target)) {
+      open = false;
+      btn.classList.remove('open');
+      drawer.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+  // Close on resize to desktop
+  window.addEventListener('resize', function() {
+    if (window.innerWidth >= 768 && open) {
+      open = false;
+      btn.classList.remove('open');
+      drawer.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+})();
+</script>
+</body>
+</html>
