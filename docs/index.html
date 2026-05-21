@@ -621,77 +621,96 @@
   <!-- ══════════════ FIND US ══════════════ -->
   <section id="find-us" class="py-section-gap" aria-labelledby="find-us-heading">
     <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
-      <div class="bg-surface-container-lowest rounded-xl overflow-hidden sacred-shadow flex flex-col md:flex-row">
 
-        <!-- Map -->
-        <div class="md:w-1/2 min-h-[400px] relative" id="map-container">
-          <iframe
-            id="church-map"
-            title="Map showing Makeni Central SDA Church location"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3845.4445234150485!2d28.22506487408258!3d-15.460503514820086!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1940f3da5ac4a071%3A0xbf03e4f478ceb8d3!2sMakeni%20Central%20Seventh-Day%20Adventist%20Church!5e0!3m2!1sen!2szm!4v1779315899425!5m2!1sen!2szm"
-            width="100%"
-            height="100%"
-            class="w-full h-full absolute inset-0"
-            style="border:0;"
-            allowfullscreen=""
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade">
-          </iframe>
+      <!-- Section header -->
+      <div class="text-center mb-12">
+        <h2 id="find-us-heading" class="font-headline-lg text-headline-lg text-primary mb-4">Join Us This Sabbath</h2>
+        <div class="gold-divider mx-auto"></div>
+      </div>
 
-          <!-- Animated map pin badge -->
-          <div id="map-pin-overlay" class="absolute top-4 left-4 flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-md z-10" aria-hidden="true">
-            <span id="pin-dot" class="w-3 h-3 rounded-full bg-red-500 inline-block flex-shrink-0"></span>
-            <span class="text-sm font-medium text-gray-700">Makeni Central SDA</span>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter items-stretch">
+
+        <!-- Map card -->
+        <div class="rounded-xl overflow-hidden sacred-shadow flex flex-col" style="min-height:460px;">
+          <!-- Map iframe — full height, no overlapping badges -->
+          <div class="relative flex-1" style="min-height:360px;">
+            <iframe
+              id="church-map"
+              title="Map showing Makeni Central SDA Church location"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3845.4445234150485!2d28.22506487408258!3d-15.460503514820086!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1940f3da5ac4a071%3A0xbf03e4f478ceb8d3!2sMakeni%20Central%20Seventh-Day%20Adventist%20Church!5e0!3m2!1sen!2szm!4v1779315899425!5m2!1sen!2szm"
+              width="100%"
+              height="100%"
+              class="absolute inset-0 w-full h-full"
+              style="border:0;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
           </div>
-
-          <!-- Get Directions button — FIXED: was missing opening <a tag; now always visible -->
+          <!-- Get Directions — below the map, not overlapping it -->
           <a
-            id="map-directions-btn"
             href="https://www.google.com/maps/dir/?api=1&destination=Makeni+Central+Seventh-Day+Adventist+Church+Lusaka+Zambia"
             target="_blank"
             rel="noopener noreferrer"
-            class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white text-gray-800 font-semibold text-sm px-5 py-2.5 rounded-full shadow-lg hover:bg-primary hover:text-white transition-all duration-300 z-10 whitespace-nowrap">
-            <span class="material-symbols-outlined text-base leading-none" aria-hidden="true">directions</span>
+            class="flex items-center justify-center gap-2 bg-primary text-on-primary font-label-md text-label-md px-6 py-4 hover:bg-secondary transition-colors"
+            style="text-decoration:none;">
+            <span class="material-symbols-outlined" style="font-size:20px;" aria-hidden="true">directions</span>
             Get Directions
           </a>
         </div>
 
-        <!-- Info -->
-        <div class="md:w-1/2 p-12 lg:p-16 flex flex-col justify-center">
-          <h2 id="find-us-heading" class="font-headline-lg text-headline-lg text-primary mb-8">Join Us This Sabbath</h2>
-          <div class="space-y-8">
+        <!-- Info card -->
+        <div class="bg-surface-container-lowest rounded-xl sacred-shadow p-10 lg:p-12 flex flex-col justify-center space-y-8">
 
-            <div class="flex items-start gap-4">
-              <span class="material-symbols-outlined text-secondary mt-1 flex-shrink-0" aria-hidden="true">location_on</span>
-              <div>
-                <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Physical Address</h5>
-                <p class="font-body-md text-body-md text-on-surface-variant">Plot 123, Makeni Road, Lusaka, Zambia</p>
-              </div>
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">location_on</span>
             </div>
-
-            <div class="flex items-start gap-4">
-              <span class="material-symbols-outlined text-secondary mt-1 flex-shrink-0" aria-hidden="true">schedule</span>
-              <div>
-                <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Service Times</h5>
-                <p class="font-body-md text-body-md text-on-surface-variant">
-                  Sabbath School: <strong>09:00 AM</strong><br/>
-                  Divine Service: <strong>11:00 AM</strong><br/>
-                  Bible Study: <strong>03:00 PM</strong>
-                </p>
-              </div>
+            <div>
+              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Physical Address</h5>
+              <p class="font-body-md text-body-md text-on-surface-variant">Plot 123, Makeni Road, Lusaka, Zambia</p>
             </div>
-
-            <div class="flex items-start gap-4">
-              <span class="material-symbols-outlined text-secondary mt-1 flex-shrink-0" aria-hidden="true">mail</span>
-              <div>
-                <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Contact Us</h5>
-                <a href="mailto:info@makenicentralsda.org" class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors">
-                  info@makenicentralsda.org
-                </a>
-              </div>
-            </div>
-
           </div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">schedule</span>
+            </div>
+            <div>
+              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Service Times</h5>
+              <div class="space-y-1 mt-1">
+                <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+                  <span>Sabbath School</span><strong class="text-primary">09:00 AM</strong>
+                </div>
+                <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+                  <span>Divine Service</span><strong class="text-primary">11:00 AM</strong>
+                </div>
+                <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+                  <span>Bible Study</span><strong class="text-primary">03:00 PM</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">mail</span>
+            </div>
+            <div>
+              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Contact Us</h5>
+              <a href="mailto:info@makenicentralsda.org" class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors">
+                info@makenicentralsda.org
+              </a>
+            </div>
+          </div>
+
+          <a href="#announcements"
+            class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-8 py-4 rounded-xl font-label-md text-label-md hover:bg-secondary transition-all active:scale-95 mt-2"
+            style="text-decoration:none;">
+            <span class="material-symbols-outlined" style="font-size:18px;" aria-hidden="true">calendar_month</span>
+            Plan Your Visit
+          </a>
+
         </div>
 
       </div>
@@ -764,8 +783,66 @@
 </footer>
 
 <!-- External scripts (yours — untouched) -->
-<script src="sda.js" defer></script>
-<script src="func.js" defer></script>
+<script src="../sda.js" defer></script>
+<script src="../func.js" defer></script>
 
+<script>
+(function() {
+  /* ── Mobile nav toggle ── */
+  var btn    = document.getElementById('hamburger-btn');
+  var drawer = document.getElementById('mobile-drawer');
+  var isOpen = false;
+
+  function setOpen(state) {
+    isOpen = state;
+    btn.classList.toggle('open', isOpen);
+    btn.setAttribute('aria-expanded', isOpen);
+    drawer.classList.toggle('open', isOpen);
+    drawer.setAttribute('aria-hidden', !isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  }
+
+  if (btn && drawer) {
+    btn.addEventListener('click', function() { setOpen(!isOpen); });
+
+    document.addEventListener('click', function(e) {
+      if (isOpen && !btn.contains(e.target) && !drawer.contains(e.target)) setOpen(false);
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && isOpen) setOpen(false);
+    });
+
+    window.addEventListener('resize', function() {
+      if (window.innerWidth >= 768 && isOpen) setOpen(false);
+    });
+  }
+
+  /* ── Header scroll-shrink ── */
+  var header = document.getElementById('main-header');
+  if (header) {
+    window.addEventListener('scroll', function() {
+      header.classList.toggle('scrolled', window.scrollY > 40);
+    }, { passive: true });
+  }
+
+  /* ── Scroll-reveal for value tiles ── */
+  var reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && reveals.length) {
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(function(el) { io.observe(el); });
+  } else {
+    /* Fallback: show everything immediately */
+    reveals.forEach(function(el) { el.classList.add('visible'); });
+  }
+})();
+</script>
 </body>
 </html>
