@@ -97,6 +97,7 @@
     }
   }
 </script>
+<link rel="stylesheet" href="../sda-shared.css"/>
 <style>
   .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -274,7 +275,7 @@
 
 <!-- ══════════════ TOP NAV ══════════════ -->
 <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-2 border-secondary-container shadow-sm">
-  <div class="relative flex items-center justify-between h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+  <div class="nav-inner relative flex items-center justify-between h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
 
     <!-- Mobile: Hamburger (left) -->
     <button class="hamburger-btn mobile-hamburger" id="hamburger-btn" aria-label="Open navigation menu">
@@ -536,43 +537,12 @@
   <!-- Copyright bar -->
   <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 text-center">
     <p class="font-body-md text-body-md text-on-primary/60">
-      © 2024 Makeni Central SDA Church. All rights reserved.
+      © 2025 Makeni Central SDA Church. All rights reserved.
     </p>
   </div>
 </footer>
 <script src="../sda.js" defer></script>
 <script src="../func.js" defer></script>
-<script>
-(function() {
-  var btn = document.getElementById('hamburger-btn');
-  var drawer = document.getElementById('mobile-drawer');
-  var open = false;
-  if (!btn || !drawer) return;
-  btn.addEventListener('click', function() {
-    open = !open;
-    btn.classList.toggle('open', open);
-    drawer.classList.toggle('open', open);
-    document.body.style.overflow = open ? 'hidden' : '';
-  });
-  // Close on outside click
-  document.addEventListener('click', function(e) {
-    if (open && !btn.contains(e.target) && !drawer.contains(e.target)) {
-      open = false;
-      btn.classList.remove('open');
-      drawer.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-  });
-  // Close on resize to desktop
-  window.addEventListener('resize', function() {
-    if (window.innerWidth >= 768 && open) {
-      open = false;
-      btn.classList.remove('open');
-      drawer.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-  });
-})();
-</script>
+
 </body>
 </html>

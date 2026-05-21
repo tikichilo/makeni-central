@@ -98,6 +98,15 @@
   }
 </script>
 <style>
+  /* ── Global ── */
+  html { scroll-behavior: smooth; }
+
+  *:focus-visible {
+    outline: 2px solid #755b00;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
   .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
@@ -110,8 +119,7 @@
     width: 60px;
   }
 
-  /* ── Logo badge: gives the emblem a dark circular backing so it reads
-        clearly on both the light nav and the dark footer ── */
+  /* ── Logo badge ── */
   .logo-badge {
     display: flex;
     align-items: center;
@@ -119,17 +127,20 @@
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    background-color: #041534;           /* primary colour */
-    border: 2px solid #755b00;           /* gold ring */
+    background-color: #041534;
+    border: 2px solid #755b00;
     flex-shrink: 0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .logo-badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 4px rgba(117, 91, 0, 0.15);
   }
   .logo-badge img {
     width: 38px;
     height: 38px;
     object-fit: contain;
   }
-
-  /* Footer variant – slightly smaller */
   .logo-badge-sm {
     width: 44px;
     height: 44px;
@@ -137,6 +148,21 @@
   .logo-badge-sm img {
     width: 30px;
     height: 30px;
+  }
+
+  /* ── Nav scroll-shrink ── */
+  header {
+    transition: height 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease;
+  }
+  header.scrolled {
+    box-shadow: 0 4px 24px -4px rgba(4, 21, 52, 0.14);
+  }
+  header.scrolled .nav-inner {
+    height: 64px;
+  }
+  .nav-inner {
+    height: 80px;
+    transition: height 0.3s ease;
   }
 
   /* ── MOBILE NAV ── */
@@ -186,7 +212,6 @@
   .hamburger-btn span:nth-child(3) { width: 22px; }
   .hamburger-btn span:nth-child(4) { width: 14px; }
 
-  /* Open state: 4 lines collapse to X */
   .hamburger-btn.open span:nth-child(1) { width: 22px; transform: translateY(10.5px) rotate(45deg); }
   .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
   .hamburger-btn.open span:nth-child(3) { opacity: 0; transform: scaleX(0); }
@@ -241,9 +266,7 @@
   }
   .mobile-drawer nav a .nav-icon { color: #755b00; font-size: 20px; }
   .mobile-drawer-inner { padding: 8px 0 20px; }
-  .mobile-give-row {
-    padding: 16px 24px 4px;
-  }
+  .mobile-give-row { padding: 16px 24px 4px; }
   .mobile-give-btn {
     width: 100%;
     background: #041534;
@@ -265,43 +288,177 @@
   .mobile-give-btn:active { transform: scale(0.97); }
   .mobile-give-btn:hover { background: #755b00; }
 
+  /* ── Hero: Ken Burns zoom + staggered text entrance ── */
+  @keyframes kenBurns {
+    0%   { transform: scale(1);    }
+    100% { transform: scale(1.08); }
+  }
+  .hero-bg {
+    animation: kenBurns 14s ease-out forwards;
+    will-change: transform;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-h1   { animation: fadeUp 0.8s 0.2s ease both; }
+  .hero-div  { animation: fadeUp 0.8s 0.55s ease both; }
+  .hero-p    { animation: fadeUp 0.8s 0.8s ease both; }
+  .hero-cta  { animation: fadeUp 0.8s 1.05s ease both; }
+
+  /* ── Scroll-down chevron ── */
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0) translateX(-50%); }
+    50%       { transform: translateY(8px) translateX(-50%); }
+  }
+  .scroll-indicator {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s ease-in-out infinite;
+    opacity: 0.75;
+    z-index: 10;
+    cursor: pointer;
+  }
+
+  /* ── Announcements ticker ── */
+  .ticker-wrap {
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+  }
+  .ticker-wrap::before,
+  .ticker-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 60px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .ticker-wrap::before { left: 0;  background: linear-gradient(to right,  #fed977, transparent); }
+  .ticker-wrap::after  { right: 0; background: linear-gradient(to left,   #fed977, transparent); }
+
+  @keyframes ticker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .ticker-track {
+    display: inline-flex;
+    gap: 0;
+    animation: ticker 28s linear infinite;
+  }
+  .ticker-track:hover { animation-play-state: paused; }
+  .ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 40px;
+  }
+  .ticker-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #755b00;
+    flex-shrink: 0;
+  }
+
+  /* ── Pulsing map pin dot ── */
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+    50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+  }
+  #pin-dot { animation: pulse 1.8s ease-in-out infinite; }
+
+  /* ── Scroll-reveal for value tiles ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Lesson card button ── */
+  .lesson-btn {
+    position: relative;
+    overflow: hidden;
+    background: #041534;
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    border: none;
+    border-bottom: 4px solid #755b00;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .lesson-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.06);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .lesson-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px -6px rgba(4,21,52,0.3);
+  }
+  .lesson-btn:hover::after { opacity: 1; }
+  .lesson-btn:active { transform: translateY(0); }
+
+  /* ── Directions button (fixed) ── */
+  #map-directions-btn {
+    opacity: 1 !important;  /* was opacity-0 — now always visible */
+  }
 </style>
 </head>
 
 <body data-page="index" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
 
 <!-- ══════════════ TOP NAV ══════════════ -->
-<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-2 border-secondary-container shadow-sm">
-  <div class="relative flex items-center justify-between h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+<header id="main-header" class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-2 border-secondary-container shadow-sm">
+  <div class="nav-inner relative flex items-center justify-between px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
 
     <!-- Mobile: Hamburger (left) -->
-    <button class="hamburger-btn mobile-hamburger" id="hamburger-btn" aria-label="Open navigation menu">
+    <button class="hamburger-btn mobile-hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-drawer">
       <span></span><span></span><span></span><span></span>
     </button>
 
-    <!-- Brand (centered on mobile via absolute, left on desktop) -->
-    <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
+    <!-- Brand -->
+    <a href="#" class="nav-brand flex items-center gap-4 md:static md:transform-none no-underline" aria-label="Makeni Central SDA — Home">
       <div class="logo-badge">
         <img alt="Makeni Central SDA Logo" src="sda.png"/>
       </div>
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
-    </div>
+    </a>
 
-    <!-- Desktop: Nav links (hidden on mobile) -->
-    <nav class="hidden md:flex items-center gap-8">
-      <a class="font-label-md text-label-md text-primary border-b-2 border-secondary pb-1" href="#">Home</a>
+    <!-- Desktop: Nav links -->
+    <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
+      <a class="font-label-md text-label-md text-primary border-b-2 border-secondary pb-1" href="#" aria-current="page">Home</a>
       <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="kids.html">Kids Corner</a>
       <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="youth.html">Youth Board</a>
       <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="building.html">New Building</a>
     </nav>
 
     <!-- Desktop: Give button -->
-    <button class="desktop-give bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md hover:bg-primary/90 transition-all active:scale-95">
+    <button class="desktop-give bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md hover:bg-secondary transition-all active:scale-95" aria-label="Give to the church">
       Give
     </button>
 
     <!-- Mobile: Give button (right) -->
-    <button class="mobile-give bg-primary text-on-primary px-4 py-2 rounded-xl font-label-md text-[13px] hover:bg-primary/90 transition-all active:scale-95">
+    <button class="mobile-give bg-primary text-on-primary px-4 py-2 rounded-xl font-label-md text-[13px] hover:bg-secondary transition-all active:scale-95" aria-label="Give to the church">
       Give
     </button>
 
@@ -309,17 +466,17 @@
 </header>
 
 <!-- Mobile Drawer -->
-<div class="mobile-drawer" id="mobile-drawer">
+<div class="mobile-drawer" id="mobile-drawer" role="dialog" aria-label="Navigation menu" aria-hidden="true">
   <div class="mobile-drawer-inner">
-    <nav>
-        <a class="active" href="#"><span class="material-symbols-outlined nav-icon">home</span>Home</a>
-        <a href="kids.html"><span class="material-symbols-outlined nav-icon">child_care</span>Kids Corner</a>
-        <a href="youth.html"><span class="material-symbols-outlined nav-icon">groups</span>Youth Board</a>
-        <a href="building.html"><span class="material-symbols-outlined nav-icon">domain</span>New Building</a>
+    <nav aria-label="Mobile navigation">
+      <a class="active" href="#" aria-current="page"><span class="material-symbols-outlined nav-icon" aria-hidden="true">home</span>Home</a>
+      <a href="kids.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">child_care</span>Kids Corner</a>
+      <a href="youth.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span>Youth Board</a>
+      <a href="building.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">domain</span>New Building</a>
     </nav>
     <div class="mobile-give-row">
-      <button class="mobile-give-btn">
-        <span class="material-symbols-outlined" style="font-size:18px;">volunteer_activism</span>
+      <button class="mobile-give-btn" aria-label="Give to the church">
+        <span class="material-symbols-outlined" style="font-size:18px;" aria-hidden="true">volunteer_activism</span>
         Give to the Church
       </button>
     </div>
@@ -329,41 +486,71 @@
 <main class="pt-20">
 
   <!-- ══════════════ HERO ══════════════ -->
-  <section class="relative h-[85vh] w-full overflow-hidden flex items-center justify-center">
+  <section class="relative h-[85vh] w-full overflow-hidden flex items-center justify-center" aria-label="Welcome hero">
+    <!-- Ken Burns background -->
     <div
-      class="absolute inset-0 bg-cover bg-center"
-      style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCz9b-GgALQl_H5AA3OcLi9MRcAuuznCvcyQsZAUcuEzU89UWqfhVPySHAfvu5P4f2U1Vi6o_0UfOOKB-3Ao1sumD04stAFQfgwa86uAdiixY4fbU903JrlzxW2wcgIhw2THj5APZbFrvq86_f3nzKLBWW1ypotkJWVin5rBraN3ZHQvMSprm810tkvgv7SpY6eED9gBNCDwfk2-L41VzipThApx2jGI46DgBNfVvhSCZgYLnuuom9ZS3EH_J16vjMNKX6GyJ5iZfIw')">
+      class="hero-bg absolute inset-0 bg-cover bg-center"
+      style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCz9b-GgALQl_H5AA3OcLi9MRcAuuznCvcyQsZAUcuEzU89UWqfhVPySHAfvu5P4f2U1Vi6o_0UfOOKB-3Ao1sumD04stAFQfgwa86uAdiixY4fbU903JrlzxW2wcgIhw2THj5APZbFrvq86_f3nzKLBWW1ypotkJWVin5rBraN3ZHQvMSprm810tkvgv7SpY6eED9gBNCDwfk2-L41VzipThApx2jGI46DgBNfVvhSCZgYLnuuom9ZS3EH_J16vjMNKX6GyJ5iZfIw')"
+      role="img"
+      aria-label="Makeni Central SDA Church">
     </div>
-    <div class="absolute inset-0 bg-primary/40"></div>
+    <!-- Overlay: gradient for depth -->
+    <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(4,21,52,0.55) 0%, rgba(4,21,52,0.35) 60%, rgba(4,21,52,0.65) 100%);"></div>
+
+    <!-- Content -->
     <div class="relative z-10 text-center px-margin-mobile">
-      <h1 class="font-display-lg text-display-lg text-on-primary mb-6 max-w-4xl mx-auto">
+      <h1 class="hero-h1 font-display-lg text-display-lg text-on-primary mb-6 max-w-4xl mx-auto">
         Makeni Central SDA Church
       </h1>
-      <div class="gold-divider mx-auto mb-8"></div>
-      <p class="text-on-primary/90 font-body-lg text-body-lg max-w-2xl mx-auto italic" data-func="verse">
+      <div class="hero-div gold-divider mx-auto mb-8"></div>
+      <p class="hero-p text-on-primary/90 font-body-lg text-body-lg max-w-2xl mx-auto italic" data-func="verse">
         "A Sanctuary of Hope, A Community of Grace."
       </p>
+      <!-- CTA buttons -->
+      <div class="hero-cta flex flex-wrap gap-4 justify-center mt-10">
+        <a href="#find-us" class="bg-secondary-container text-on-secondary-container px-7 py-3 rounded-xl font-label-md text-label-md hover:bg-secondary-fixed transition-all active:scale-95">
+          Join Us This Sabbath
+        </a>
+        <a href="#mission" class="border-2 border-on-primary/50 text-on-primary px-7 py-3 rounded-xl font-label-md text-label-md hover:border-on-primary hover:bg-on-primary/10 transition-all active:scale-95">
+          Our Mission
+        </a>
+      </div>
     </div>
+
+    <!-- Scroll indicator -->
+    <a href="#announcements" class="scroll-indicator text-on-primary/70 hover:text-on-primary transition-colors" aria-label="Scroll down">
+      <span class="material-symbols-outlined" style="font-size:32px;">keyboard_arrow_down</span>
+    </a>
   </section>
 
-  
   <!-- ══════════════ ANNOUNCEMENTS TICKER ══════════════ -->
-  <div class="bg-secondary-container border-b border-secondary/30 py-3 overflow-hidden">
-    <div data-func="announcements" class="font-label-md text-label-md text-on-secondary-container"></div>
+  <div id="announcements" class="bg-secondary-container border-b border-secondary/30 py-3 ticker-wrap" role="region" aria-label="Church announcements">
+    <!-- JS populates data-func="announcements"; fallback ticker shown if JS not ready -->
+    <div data-func="announcements" class="ticker-track font-label-md text-label-md text-on-secondary-container">
+      <!-- Populated by func.js; each item should be wrapped in .ticker-item with a .ticker-dot -->
+      <span class="ticker-item">
+        <span class="ticker-dot" aria-hidden="true"></span>
+        Welcome to Makeni Central SDA — Sabbath School 09:00 AM &nbsp;·&nbsp; Divine Service 11:00 AM
+      </span>
+      <span class="ticker-item">
+        <span class="ticker-dot" aria-hidden="true"></span>
+        Welcome to Makeni Central SDA — Sabbath School 09:00 AM &nbsp;·&nbsp; Divine Service 11:00 AM
+      </span>
+    </div>
   </div>
 
   <!-- ══════════════ LESSON + THEME (BENTO) ══════════════ -->
-  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
+  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap" aria-labelledby="lesson-heading">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
 
       <!-- Lesson of the Week -->
-      <div class="lg:col-span-7 bg-surface-container-lowest p-10 rounded-xl sacred-shadow border-t-4 border-secondary flex flex-col justify-between">
+      <article class="lg:col-span-7 bg-surface-container-lowest p-10 rounded-xl sacred-shadow border-t-4 border-secondary flex flex-col justify-between">
         <div>
           <div class="flex items-center gap-2 mb-6">
-            <span class="material-symbols-outlined text-secondary">menu_book</span>
+            <span class="material-symbols-outlined text-secondary" aria-hidden="true">menu_book</span>
             <span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Lesson of the Week</span>
           </div>
-          <h2 class="font-headline-md text-headline-md text-primary mb-4">The Promise of Restoration</h2>
+          <h2 id="lesson-heading" class="font-headline-md text-headline-md text-primary mb-4">The Promise of Restoration</h2>
           <p class="font-title-lg text-title-lg text-on-surface-variant italic mb-6">
             "He restores my soul; He leads me in the paths of righteousness for His name's sake." — Psalm 23:3
           </p>
@@ -372,29 +559,32 @@
           </p>
         </div>
         <div>
-          <button class="bg-primary text-on-primary px-8 py-4 rounded-xl font-label-md border-b-4 border-secondary hover:translate-y-[-2px] transition-all">
+          <button class="lesson-btn">
+            <span class="material-symbols-outlined" style="font-size:18px;" aria-hidden="true">open_in_new</span>
             Read Full Lesson
           </button>
         </div>
-      </div>
+      </article>
 
       <!-- Theme of the Month -->
-      <div class="lg:col-span-5 bg-primary p-10 rounded-xl relative overflow-hidden flex flex-col justify-center">
+      <div class="lg:col-span-5 bg-primary p-10 rounded-xl relative overflow-hidden flex flex-col justify-center" aria-labelledby="theme-heading">
+        <!-- Decorative cross pattern -->
+        <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 70% 30%, #fff 1px, transparent 1px); background-size: 24px 24px;" aria-hidden="true"></div>
         <div data-func="theme" class="relative z-10 flex flex-col justify-center h-full"></div>
-      <cite class="font-label-md text-label-md text-secondary-fixed block text-right">— John 15:5</cite>
+        <cite class="font-label-md text-label-md text-secondary-fixed block text-right relative z-10 mt-4">— John 15:5</cite>
       </div>
 
     </div>
   </section>
 
   <!-- ══════════════ MISSION & VALUES ══════════════ -->
-  <section class="bg-surface-container-low py-section-gap">
+  <section id="mission" class="bg-surface-container-low py-section-gap" aria-labelledby="mission-heading">
     <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
 
         <!-- Left: content -->
         <div class="space-y-8">
-          <h2 class="font-display-lg text-display-lg text-primary">Our Mission &amp; Values</h2>
+          <h2 id="mission-heading" class="font-display-lg text-display-lg text-primary">Our Mission &amp; Values</h2>
           <div class="gold-divider"></div>
           <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
             We are committed to sharing the everlasting gospel of Jesus Christ in the context of the three angels' messages of Revelation 14:6-12. Our purpose is to nurture a diverse community through scripture-led worship, compassionate service, and intentional spiritual growth.
@@ -404,23 +594,23 @@
           </p>
         </div>
 
-        <!-- Right: value tiles -->
+        <!-- Right: value tiles (scroll-reveal with stagger) -->
         <div class="grid grid-cols-2 gap-6">
-          <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300">
-            <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block">groups</span>
-            <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary">Community</h4>
+          <div class="reveal bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:0ms;">
+            <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block transition-colors" aria-hidden="true">groups</span>
+            <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary transition-colors">Community</h4>
           </div>
-          <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300">
-            <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block">auto_awesome</span>
-            <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary">Faith</h4>
+          <div class="reveal bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:80ms;">
+            <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block transition-colors" aria-hidden="true">auto_awesome</span>
+            <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary transition-colors">Faith</h4>
           </div>
-          <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300">
-            <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block">volunteer_activism</span>
-            <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary">Service</h4>
+          <div class="reveal bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:160ms;">
+            <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block transition-colors" aria-hidden="true">volunteer_activism</span>
+            <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary transition-colors">Service</h4>
           </div>
-          <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300">
-            <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block">trending_up</span>
-            <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary">Growth</h4>
+          <div class="reveal bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:240ms;">
+            <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block transition-colors" aria-hidden="true">trending_up</span>
+            <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary transition-colors">Growth</h4>
           </div>
         </div>
 
@@ -428,95 +618,97 @@
     </div>
   </section>
 
- <!-- ══════════════ FIND US ══════════════ -->
-<!-- ══════════════ FIND US ══════════════ -->
-<section class="py-section-gap">
-  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
-    <div class="bg-surface-container-lowest rounded-xl overflow-hidden sacred-shadow flex flex-col md:flex-row">
+  <!-- ══════════════ FIND US ══════════════ -->
+  <section id="find-us" class="py-section-gap" aria-labelledby="find-us-heading">
+    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="bg-surface-container-lowest rounded-xl overflow-hidden sacred-shadow flex flex-col md:flex-row">
 
-      <!-- Map -->
-      <div class="md:w-1/2 min-h-[400px] relative" id="map-container">
-        <iframe
-          id="church-map"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3845.4445234150485!2d28.22506487408258!3d-15.460503514820086!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1940f3da5ac4a071%3A0xbf03e4f478ceb8d3!2sMakeni%20Central%20Seventh-Day%20Adventist%20Church!5e0!3m2!1sen!2szm!4v1779315899425!5m2!1sen!2szm"
-          width="100%"
-          height="100%"
-          class="w-full h-full absolute inset-0"
-          style="border:0;"
-          allowfullscreen=""
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
+        <!-- Map -->
+        <div class="md:w-1/2 min-h-[400px] relative" id="map-container">
+          <iframe
+            id="church-map"
+            title="Map showing Makeni Central SDA Church location"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3845.4445234150485!2d28.22506487408258!3d-15.460503514820086!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1940f3da5ac4a071%3A0xbf03e4f478ceb8d3!2sMakeni%20Central%20Seventh-Day%20Adventist%20Church!5e0!3m2!1sen!2szm!4v1779315899425!5m2!1sen!2szm"
+            width="100%"
+            height="100%"
+            class="w-full h-full absolute inset-0"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
 
-        <!-- Animated badge -->
-        <div id="map-pin-overlay" class="absolute top-4 left-4 flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-md z-10">
-          <span id="pin-dot" class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
-          <span class="text-sm font-medium text-gray-700">Makeni Central SDA</span>
+          <!-- Animated map pin badge -->
+          <div id="map-pin-overlay" class="absolute top-4 left-4 flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-md z-10" aria-hidden="true">
+            <span id="pin-dot" class="w-3 h-3 rounded-full bg-red-500 inline-block flex-shrink-0"></span>
+            <span class="text-sm font-medium text-gray-700">Makeni Central SDA</span>
+          </div>
+
+          <!-- Get Directions button — FIXED: was missing opening <a tag; now always visible -->
+          <a
+            id="map-directions-btn"
+            href="https://www.google.com/maps/dir/?api=1&destination=Makeni+Central+Seventh-Day+Adventist+Church+Lusaka+Zambia"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white text-gray-800 font-semibold text-sm px-5 py-2.5 rounded-full shadow-lg hover:bg-primary hover:text-white transition-all duration-300 z-10 whitespace-nowrap">
+            <span class="material-symbols-outlined text-base leading-none" aria-hidden="true">directions</span>
+            Get Directions
+          </a>
         </div>
 
-        <!-- Get Directions button pinned on map -->
-        
-          id="map-directions-btn"
-          href="#"
-          class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white text-gray-800 font-semibold text-sm px-5 py-2.5 rounded-full shadow-lg hover:bg-primary hover:text-white transition-all duration-300 z-10 opacity-0">
-          <span class="material-symbols-outlined text-base leading-none">directions</span>
-          Get Directions
-        </a>
+        <!-- Info -->
+        <div class="md:w-1/2 p-12 lg:p-16 flex flex-col justify-center">
+          <h2 id="find-us-heading" class="font-headline-lg text-headline-lg text-primary mb-8">Join Us This Sabbath</h2>
+          <div class="space-y-8">
 
-      </div><!-- end map-container -->
-
-      <!-- Info -->
-      <div class="md:w-1/2 p-12 lg:p-16 flex flex-col justify-center">
-        <h2 class="font-headline-lg text-headline-lg text-primary mb-8">Join Us This Sabbath</h2>
-        <div class="space-y-8">
-
-          <div class="flex items-start gap-4">
-            <span class="material-symbols-outlined text-secondary mt-1">location_on</span>
-            <div>
-              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Physical Address</h5>
-              <p class="font-body-md text-body-md text-on-surface-variant">Plot 123, Makeni Road, Lusaka, Zambia</p>
+            <div class="flex items-start gap-4">
+              <span class="material-symbols-outlined text-secondary mt-1 flex-shrink-0" aria-hidden="true">location_on</span>
+              <div>
+                <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Physical Address</h5>
+                <p class="font-body-md text-body-md text-on-surface-variant">Plot 123, Makeni Road, Lusaka, Zambia</p>
+              </div>
             </div>
-          </div>
 
-          <div class="flex items-start gap-4">
-            <span class="material-symbols-outlined text-secondary mt-1">schedule</span>
-            <div>
-              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Service Times</h5>
-              <p class="font-body-md text-body-md text-on-surface-variant">
-                Sabbath School: 09:00 AM<br/>
-                Divine Service: 11:00 AM<br/>
-                Bible Study: 03:00 PM
-              </p>
+            <div class="flex items-start gap-4">
+              <span class="material-symbols-outlined text-secondary mt-1 flex-shrink-0" aria-hidden="true">schedule</span>
+              <div>
+                <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Service Times</h5>
+                <p class="font-body-md text-body-md text-on-surface-variant">
+                  Sabbath School: <strong>09:00 AM</strong><br/>
+                  Divine Service: <strong>11:00 AM</strong><br/>
+                  Bible Study: <strong>03:00 PM</strong>
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div class="flex items-start gap-4">
-            <span class="material-symbols-outlined text-secondary mt-1">mail</span>
-            <div>
-              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Contact Us</h5>
-              <p class="font-body-md text-body-md text-on-surface-variant">info@makenicentralsda.org</p>
+            <div class="flex items-start gap-4">
+              <span class="material-symbols-outlined text-secondary mt-1 flex-shrink-0" aria-hidden="true">mail</span>
+              <div>
+                <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Contact Us</h5>
+                <a href="mailto:info@makenicentralsda.org" class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors">
+                  info@makenicentralsda.org
+                </a>
+              </div>
             </div>
-          </div>
 
+          </div>
         </div>
-      </div><!-- end info -->
 
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+
 </main>
 
 <!-- ══════════════ FOOTER ══════════════ -->
-<footer class="bg-primary text-on-primary w-full py-12 border-t-4 border-secondary">
+<footer class="bg-primary text-on-primary w-full py-12 border-t-4 border-secondary" role="contentinfo">
   <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
 
     <!-- Brand block -->
     <div class="md:col-span-1">
       <div class="flex items-center gap-3 mb-6">
-        <!-- Footer logo: white ring on white icon – use the same badge but with a lighter border -->
         <div class="logo-badge logo-badge-sm" style="background-color:#0a1a3a; border-color:#e6c364;">
-          <img
-            alt="Makeni Central SDA Logo" src="sda.png"/>
+          <img alt="Makeni Central SDA Logo" src="sda.png"/>
         </div>
         <span class="font-headline-md text-headline-md text-on-primary">Makeni Central</span>
       </div>
@@ -526,37 +718,37 @@
     </div>
 
     <!-- Quick links -->
-    <div>
+    <nav aria-label="Footer quick links">
       <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
-      <ul class="space-y-3">
-        <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#">Home</a></li>
+      <ul class="space-y-3" role="list">
+        <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#" aria-current="page">Home</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="kids.html">Kids Corner</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="youth.html">Youth Board</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="building.html">New Building</a></li>
       </ul>
-    </div>
+    </nav>
 
     <!-- Legal -->
-    <div>
+    <nav aria-label="Legal links">
       <h4 class="font-title-lg text-title-lg mb-6">Legal</h4>
-      <ul class="space-y-3">
+      <ul class="space-y-3" role="list">
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Privacy Policy</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Terms of Service</a></li>
       </ul>
-    </div>
+    </nav>
 
     <!-- Social -->
     <div>
       <h4 class="font-title-lg text-title-lg mb-6">Follow Us</h4>
       <div class="flex gap-4">
-        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
-          <span class="material-symbols-outlined">public</span>
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#" aria-label="Website">
+          <span class="material-symbols-outlined" aria-hidden="true">public</span>
         </a>
-        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
-          <span class="material-symbols-outlined">groups</span>
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#" aria-label="Facebook group">
+          <span class="material-symbols-outlined" aria-hidden="true">groups</span>
         </a>
-        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
-          <span class="material-symbols-outlined">video_library</span>
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#" aria-label="Video channel">
+          <span class="material-symbols-outlined" aria-hidden="true">video_library</span>
         </a>
       </div>
     </div>
@@ -566,42 +758,71 @@
   <!-- Copyright bar -->
   <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 text-center">
     <p class="font-body-md text-body-md text-on-primary/60">
-      © 2024 Makeni Central SDA Church. All rights reserved.
+      © 2025 Makeni Central SDA Church. All rights reserved.
     </p>
   </div>
 </footer>
+
+<!-- External scripts (yours — untouched) -->
 <script src="../sda.js" defer></script>
 <script src="../func.js" defer></script>
+
 <script>
 (function() {
-  var btn = document.getElementById('hamburger-btn');
+  /* ── Mobile nav toggle ── */
+  var btn    = document.getElementById('hamburger-btn');
   var drawer = document.getElementById('mobile-drawer');
-  var open = false;
-  if (!btn || !drawer) return;
-  btn.addEventListener('click', function() {
-    open = !open;
-    btn.classList.toggle('open', open);
-    drawer.classList.toggle('open', open);
-    document.body.style.overflow = open ? 'hidden' : '';
-  });
-  // Close on outside click
-  document.addEventListener('click', function(e) {
-    if (open && !btn.contains(e.target) && !drawer.contains(e.target)) {
-      open = false;
-      btn.classList.remove('open');
-      drawer.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-  });
-  // Close on resize to desktop
-  window.addEventListener('resize', function() {
-    if (window.innerWidth >= 768 && open) {
-      open = false;
-      btn.classList.remove('open');
-      drawer.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-  });
+  var isOpen = false;
+
+  function setOpen(state) {
+    isOpen = state;
+    btn.classList.toggle('open', isOpen);
+    btn.setAttribute('aria-expanded', isOpen);
+    drawer.classList.toggle('open', isOpen);
+    drawer.setAttribute('aria-hidden', !isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  }
+
+  if (btn && drawer) {
+    btn.addEventListener('click', function() { setOpen(!isOpen); });
+
+    document.addEventListener('click', function(e) {
+      if (isOpen && !btn.contains(e.target) && !drawer.contains(e.target)) setOpen(false);
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && isOpen) setOpen(false);
+    });
+
+    window.addEventListener('resize', function() {
+      if (window.innerWidth >= 768 && isOpen) setOpen(false);
+    });
+  }
+
+  /* ── Header scroll-shrink ── */
+  var header = document.getElementById('main-header');
+  if (header) {
+    window.addEventListener('scroll', function() {
+      header.classList.toggle('scrolled', window.scrollY > 40);
+    }, { passive: true });
+  }
+
+  /* ── Scroll-reveal for value tiles ── */
+  var reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && reveals.length) {
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(function(el) { io.observe(el); });
+  } else {
+    /* Fallback: show everything immediately */
+    reveals.forEach(function(el) { el.classList.add('visible'); });
+  }
 })();
 </script>
 </body>

@@ -1,23 +1,46 @@
 /**
- * sda.js — Makeni Central SDA Church  v3
+ * sda.js — Makeni Central SDA Church  v4
  * UI motion, interactions & enhancements
  *
- * CHANGES vs v2:
- *  §12 Discussion cards — expand/collapse shim removed; youth.html owns its own
- *              toggleExpand() helper via inline script. sda.js no longer touches
- *              .line-clamp-2 cards at all.
- *  NEW §16 — Youth Board page logic (initYouthBoard). Runs only when
- *              document.body.dataset.page === 'youth'. Owns:
- *                • Filter buttons (aria-pressed + show/hide cards + empty state)
- *                • Like buttons (toggle fill + count)
- *                • Read-more / show-less (toggleExpand exposed on window)
- *                • "Start a Discussion" modal (open/close/submit/card injection)
- *                • Char counters for title + body fields
- *                • Dynamic footer year
- *              All other §§ are unchanged from v2.
+ * CHANGES vs v3:
+ *  § Responsive fluid typography injected via JS (clamp) so every page
+ *    benefits without a separate CSS file dependency.
+ *  § @media (prefers-reduced-motion) respected — all animations skip
+ *    or use instant transitions when the user prefers reduced motion.
+ *  § initNavbar — hide-on-scroll now accounts for the mobile drawer being
+ *    open (already existed) AND uses a smaller threshold on mobile.
+ *    Hamburger / drawer wiring moved here from inline page scripts.
+ *  § initScrollReveal — will-change added; REDUCED_MOTION skips animation;
+ *    stagger capped at 300 ms.
+ *  § initHero — Ken Burns bg animation added; REDUCED_MOTION guard added;
+ *    parallax factor corrected to 0.18; desktop-only parallax.
+ *  § initCounters — REDUCED_MOTION collapses duration to 0.
+ *  § initGiveButton — ripple gated behind REDUCED_MOTION; mobile padding
+ *    rule added; modal box uses width:100% with padding for safe overflow.
+ *  § initPageTransitions — REDUCED_MOTION guard (skips entire setup).
+ *  § initGoldDividers — REDUCED_MOTION guard (instant width).
+ *  § initImageShimmer — now covers ALL <img>, not just lazy ones;
+ *    REDUCED_MOTION guard (skips purely decorative animation).
+ *  § initActiveNav — also targets .mobile-drawer nav a; uses array map
+ *    so both 'index.html' and '/' match the home page.
+ *  § initToast — max-width:88vw added so long messages don't overflow.
+ *  § initBackToTop — REDUCED_MOTION guard on scroll behavior and hover.
+ *  § initYouthBoard — REMOVED. func.js owns the full API-driven youth
+ *    board (discussions, filters, FAB, modal). sda.js no longer touches
+ *    youth board data or DOM beyond scroll-reveal + hero.
+ *    The Give-modal openModal / closeModal / submitDiscussion window
+ *    globals are also removed from here (func.js owns discussion modal).
+ *  § initResponsive — NEW §17: injects fluid typography + mobile spacing
+ *    CSS into <head> once, replacing the need for sda-shared.css.
  */
 
 'use strict';
+
+
+/* ═══════════════════════════════════════════════
+   MOTION PREFERENCE — checked once, used everywhere
+═══════════════════════════════════════════════ */
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 
 /* ═══════════════════════════════════════════════
@@ -26,29 +49,181 @@
 document.addEventListener('DOMContentLoaded', init);
 
 function init() {
-  initNavbar();
-  initScrollReveal();
-  initHero();
-  initCounters();
-  initGiveButton();
-  initPageTransitions();
-  initGoldDividers();
-  initToast();
-  initCopyEmail();
-  initBackToTop();
-  initImageShimmer();
-  initActiveNav();
-  initYouthBoard();   // §16 — no-op on non-youth pages
+  initResponsive();      // §17 — fluid type + mobile spacing
+  initNavbar();          // §1
+  initScrollReveal();    // §2
+  initHero();            // §3
+  initCounters();        // §4
+  initGiveButton();      // §5
+  initPageTransitions(); // §8
+  initGoldDividers();    // §9
+  initToast();           // §10
+  initCopyEmail();       // §11
+  initBackToTop();       // §13
+  initImageShimmer();    // §14
+  initActiveNav();       // §15
+  // §16 removed — func.js owns all youth-board logic
 
   console.log(
-    '%c✦ Makeni Central SDA — sda.js v3 loaded',
+    '%c✦ Makeni Central SDA — sda.js v4 loaded',
     'color:#e6c364;background:#041534;padding:6px 14px;border-radius:4px;font-weight:600;'
   );
 }
 
 
 /* ═══════════════════════════════════════════════
-   1. NAVBAR — scroll shrink / hide-on-scroll
+   §17. RESPONSIVE — fluid typography + mobile spacing
+   Injected once into <head>; avoids a separate CSS file.
+═══════════════════════════════════════════════ */
+function initResponsive() {
+  if (document.getElementById('sda-responsive-style')) return;
+
+  const s = document.createElement('style');
+  s.id = 'sda-responsive-style';
+  s.textContent = `
+    /* ── Fluid typography ─────────────────────────── */
+    /* display-lg  56 px → 32 px */
+    .font-display-lg, .text-display-lg {
+      font-size: clamp(2rem, 4vw + 0.75rem, 3.5rem) !important;
+      line-height: 1.1 !important;
+    }
+    /* headline-lg  40 px → 26 px */
+    .font-headline-lg, .text-headline-lg {
+      font-size: clamp(1.625rem, 3vw + 0.5rem, 2.5rem) !important;
+      line-height: 1.2 !important;
+    }
+    /* headline-md  32 px → 22 px */
+    .font-headline-md, .text-headline-md {
+      font-size: clamp(1.375rem, 2.5vw + 0.25rem, 2rem) !important;
+      line-height: 1.3 !important;
+    }
+
+    /* ── Mobile section gap ───────────────────────── */
+    @media (max-width: 767px) {
+      .py-section-gap { padding-top: 60px !important; padding-bottom: 60px !important; }
+      .pt-section-gap { padding-top: 60px !important; }
+      .pb-section-gap { padding-bottom: 60px !important; }
+      .mb-section-gap { margin-bottom: 60px !important; }
+      .mt-section-gap { margin-top: 60px !important; }
+    }
+
+    /* ── Building page ────────────────────────────── */
+    @media (max-width: 767px) {
+      /* Bento gallery: fixed 600 px height breaks on mobile */
+      .grid.grid-rows-2.h-\\[600px\\] {
+        height: auto !important;
+      }
+      .grid.grid-rows-2.h-\\[600px\\] > div {
+        height: 220px !important;
+        grid-column: auto !important;
+        grid-row: auto !important;
+      }
+      /* Fund stat numbers */
+      [data-func="fund-raised"],
+      [data-func="fund-goal"],
+      [data-func="fund-percent"],
+      [data-func="fund-donors"] {
+        font-size: clamp(1.1rem, 4vw, 1.75rem) !important;
+        word-break: break-word;
+      }
+    }
+
+    /* ── Kids page ────────────────────────────────── */
+    @media (max-width: 767px) {
+      /* Large bento story card: force vertical stack */
+      [data-func="stories"] .md\\:col-span-8 {
+        flex-direction: column !important;
+      }
+      [data-func="stories"] .md\\:col-span-8 .md\\:w-1\\/2 {
+        width: 100% !important;
+        height: 200px !important;
+      }
+    }
+
+    /* ── Youth page ───────────────────────────────── */
+    @media (max-width: 767px) {
+      /* FAB → round icon-only button */
+      #fab-new-discussion {
+        width: 56px !important;
+        height: 56px !important;
+        padding: 0 !important;
+        justify-content: center !important;
+        border-radius: 50% !important;
+      }
+      #fab-new-discussion .fab-label { display: none !important; }
+
+      /* Filter pills */
+      [data-filter] {
+        font-size: 12px !important;
+        padding: 6px 14px !important;
+      }
+      /* Discussion cards */
+      .discussion-card { padding: 20px !important; }
+    }
+
+    /* ── FAB pulse ring ───────────────────────────── */
+    @keyframes fabPulse {
+      0%   { box-shadow: 0 0 0 0   rgba(254,217,119,0.5); }
+      70%  { box-shadow: 0 0 0 12px rgba(254,217,119,0); }
+      100% { box-shadow: 0 0 0 0   rgba(254,217,119,0); }
+    }
+    #fab-new-discussion { animation: fabPulse 2.5s ease-in-out infinite; }
+    #fab-new-discussion:hover { animation: none; transform: scale(1.04); }
+    #fab-new-discussion:active { transform: scale(0.96) !important; }
+
+    /* ── Progress bar shimmer ─────────────────────── */
+    @keyframes progressShimmer {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+    [data-func="fund-bar"] {
+      background: linear-gradient(90deg, #755b00 0%, #e6c364 50%, #755b00 100%) !important;
+      background-size: 200% auto !important;
+      animation: progressShimmer 3s linear infinite !important;
+    }
+
+    /* ── Map pin pulse ────────────────────────────── */
+    @keyframes pinPulse {
+      0%, 100% { box-shadow: 0 0 0 0   rgba(239,68,68,0.5); }
+      50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+    }
+    #pin-dot { animation: pinPulse 1.8s ease-in-out infinite; }
+
+    /* ── Touch targets ────────────────────────────── */
+    button, [role="button"], a { -webkit-tap-highlight-color: transparent; }
+    @media (max-width: 767px) {
+      .mobile-give, .hamburger-btn { min-height: 44px; min-width: 44px; }
+    }
+
+    /* ── Focus visible ────────────────────────────── */
+    *:focus-visible {
+      outline: 2px solid #755b00;
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    /* ── Reduced motion overrides ─────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  `;
+  document.head.appendChild(s);
+
+  /* Mark FAB label for mobile hide */
+  const fabLabel = document.querySelector('#fab-new-discussion span:last-child');
+  if (fabLabel && !fabLabel.classList.contains('material-symbols-outlined')) {
+    fabLabel.classList.add('fab-label');
+  }
+}
+
+
+/* ═══════════════════════════════════════════════
+   §1. NAVBAR — scroll shrink / hide-on-scroll
+       Hamburger / drawer wiring also lives here.
 ═══════════════════════════════════════════════ */
 function initNavbar() {
   const header = document.querySelector('header');
@@ -60,55 +235,88 @@ function initNavbar() {
   let drawerOpen = false;
 
   const drawer = document.getElementById('mobile-drawer');
-  if (drawer) {
-    const mo = new MutationObserver(() => {
-      drawerOpen = drawer.classList.contains('open');
+
+  /* Mobile nav toggle — replaces copy-pasted inline scripts on each page */
+  const hamburger = document.getElementById('hamburger-btn');
+  if (hamburger && drawer) {
+    function setDrawerOpen(state) {
+      drawerOpen = state;
+      hamburger.classList.toggle('open', state);
+      hamburger.setAttribute('aria-expanded', String(state));
+      drawer.classList.toggle('open', state);
+      drawer.setAttribute('aria-hidden', String(!state));
+      document.body.style.overflow = state ? 'hidden' : '';
+    }
+
+    hamburger.addEventListener('click', () => setDrawerOpen(!drawerOpen));
+
+    document.addEventListener('click', e => {
+      if (drawerOpen && !hamburger.contains(e.target) && !drawer.contains(e.target))
+        setDrawerOpen(false);
     });
-    mo.observe(drawer, { attributes: true, attributeFilter: ['class'] });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && drawerOpen) { setDrawerOpen(false); hamburger.focus(); }
+    });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768 && drawerOpen) setDrawerOpen(false);
+    }, { passive: true });
+
+    // Watch class so scroll handler knows drawer state
+    new MutationObserver(() => { drawerOpen = drawer.classList.contains('open'); })
+      .observe(drawer, { attributes: true, attributeFilter: ['class'] });
+  } else if (drawer) {
+    // No hamburger button — still track drawer state for scroll handler
+    new MutationObserver(() => { drawerOpen = drawer.classList.contains('open'); })
+      .observe(drawer, { attributes: true, attributeFilter: ['class'] });
   }
+
+  /* Scroll shrink + hide */
+  const HIDE_THRESHOLD = window.innerWidth < 768 ? 80 : 120;
 
   window.addEventListener('scroll', () => {
     if (drawerOpen) return;
     const y = window.scrollY;
 
-    if (y > 60) {
-      header.style.boxShadow         = '0 4px 24px rgba(4,21,52,0.12)';
-      header.style.borderBottomColor = '#e6c364';
-    } else {
-      header.style.boxShadow         = '';
-      header.style.borderBottomColor = '';
+    header.style.boxShadow         = y > 60 ? '0 4px 24px rgba(4,21,52,0.12)' : '';
+    header.style.borderBottomColor = y > 60 ? '#e6c364' : '';
+
+    if (!REDUCED_MOTION) {
+      if (y > lastScroll + 8 && y > HIDE_THRESHOLD) {
+        header.style.transform = 'translateY(-100%)';
+      } else if (y < lastScroll - 4) {
+        header.style.transform = 'translateY(0)';
+      }
     }
 
-    if (y > lastScroll + 8 && y > 120) {
-      header.style.transform = 'translateY(-100%)';
-    } else if (y < lastScroll - 4) {
-      header.style.transform = 'translateY(0)';
-    }
     lastScroll = y;
   }, { passive: true });
 }
 
 
 /* ═══════════════════════════════════════════════
-   2. SCROLL-REVEAL
+   §2. SCROLL-REVEAL
 ═══════════════════════════════════════════════ */
 function initScrollReveal() {
-  const style = document.createElement('style');
-  style.textContent = `
+  const s = document.createElement('style');
+  s.textContent = `
     [data-reveal] {
       opacity: 0;
       transform: translateY(32px);
       transition: opacity 0.65s cubic-bezier(.4,0,.2,1), transform 0.65s cubic-bezier(.4,0,.2,1);
+      will-change: opacity, transform;
     }
-    [data-reveal].revealed { opacity: 1; transform: translateY(0); }
+    [data-reveal].revealed { opacity: 1; transform: translateY(0) !important; }
     [data-reveal="left"]  { transform: translateX(-32px); }
     [data-reveal="right"] { transform: translateX(32px); }
-    [data-reveal="scale"] { transform: scale(0.92); }
-    [data-reveal="left"].revealed,
-    [data-reveal="right"].revealed,
-    [data-reveal="scale"].revealed { transform: none; opacity: 1; }
+    [data-reveal="scale"] { transform: scale(0.92); opacity: 0; }
   `;
-  document.head.appendChild(style);
+  document.head.appendChild(s);
+
+  // If reduced motion, skip all animation — just show everything
+  if (REDUCED_MOTION) {
+    document.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('revealed'));
+    return;
+  }
 
   const heroSection = document.querySelector('section:first-of-type');
 
@@ -123,21 +331,21 @@ function initScrollReveal() {
 
   selectors.forEach(sel => {
     document.querySelectorAll(sel).forEach((el, i) => {
-      if (el.closest('header') || el.closest('footer'))   return;
-      if (heroSection && heroSection.contains(el))         return;
-      if (el.classList.contains('hero-animate'))           return;
-      if (el.hasAttribute('data-reveal'))                  return;
+      if (el.closest('header') || el.closest('footer'))  return;
+      if (heroSection && heroSection.contains(el))        return;
+      if (el.classList.contains('hero-animate'))          return;
+      if (el.hasAttribute('data-reveal'))                 return;
       el.setAttribute('data-reveal', 'up');
       el.style.transitionDelay = `${Math.min(i * 50, 300)}ms`;
     });
   });
 
   document.querySelectorAll('.grid .rounded-xl:not(header .rounded-xl):not(footer .rounded-xl)').forEach((el, i) => {
-    if (el.closest('header') || el.closest('footer'))     return;
-    if (heroSection && heroSection.contains(el))           return;
-    if (el.hasAttribute('data-reveal'))                    return;
+    if (el.closest('header') || el.closest('footer'))  return;
+    if (heroSection && heroSection.contains(el))        return;
+    if (el.hasAttribute('data-reveal'))                 return;
     el.setAttribute('data-reveal', 'up');
-    el.style.transitionDelay = `${i * 80}ms`;
+    el.style.transitionDelay = `${Math.min(i * 80, 300)}ms`;
   });
 
   const observer = new IntersectionObserver(entries => {
@@ -151,7 +359,7 @@ function initScrollReveal() {
 
 
 /* ═══════════════════════════════════════════════
-   3. HERO — entrance animation + parallax
+   §3. HERO — entrance animation + Ken Burns + parallax
 ═══════════════════════════════════════════════ */
 function initHero() {
   const hero = document.querySelector('section:first-of-type');
@@ -159,7 +367,7 @@ function initHero() {
 
   const heroTitle = hero.querySelector('h1, h2');
   const heroSub   = hero.querySelector('p');
-  const heroBtns  = [...hero.querySelectorAll('button, a[class*="bg-primary"]')];
+  const heroBtns  = [...hero.querySelectorAll('button, a[class*="bg-primary"], a[class*="bg-secondary"]')];
 
   const s = document.createElement('style');
   s.textContent = `
@@ -170,26 +378,43 @@ function initHero() {
     .hero-animate {
       animation: heroFadeUp 0.9s cubic-bezier(.4,0,.2,1) both;
     }
+    @keyframes kenBurns {
+      from { transform: scale(1); }
+      to   { transform: scale(1.08); }
+    }
+    .hero-bg-animate {
+      animation: kenBurns 14s ease-out forwards;
+      will-change: transform;
+    }
   `;
   document.head.appendChild(s);
 
-  [heroTitle, heroSub, ...heroBtns].forEach((el, i) => {
-    if (!el) return;
-    el.classList.add('hero-animate');
-    el.style.animationDelay = `${0.2 + i * 0.15}s`;
-  });
+  if (!REDUCED_MOTION) {
+    [heroTitle, heroSub, ...heroBtns].forEach((el, i) => {
+      if (!el) return;
+      el.classList.add('hero-animate');
+      el.style.animationDelay = `${0.2 + i * 0.15}s`;
+    });
 
-  const parallaxTarget = hero.querySelector('img') || hero.querySelector('[style*="background-image"]');
-  if (parallaxTarget) {
-    window.addEventListener('scroll', () => {
-      parallaxTarget.style.transform = `translateY(${window.scrollY * 0.22}px)`;
-    }, { passive: true });
+    // Ken Burns on background image div (index) or img (building)
+    const bgDiv = hero.querySelector('[style*="background-image"]');
+    const bgImg = hero.querySelector('img');
+    if (bgDiv) bgDiv.classList.add('hero-bg-animate');
+    else if (bgImg) bgImg.classList.add('hero-bg-animate');
+
+    // Parallax — only on desktop (too jumpy on mobile)
+    const parallaxTarget = bgDiv || bgImg;
+    if (parallaxTarget && window.innerWidth >= 768) {
+      window.addEventListener('scroll', () => {
+        parallaxTarget.style.transform = `translateY(${window.scrollY * 0.18}px) scale(1.08)`;
+      }, { passive: true });
+    }
   }
 }
 
 
 /* ═══════════════════════════════════════════════
-   4. ANIMATED COUNTERS
+   §4. ANIMATED COUNTERS
 ═══════════════════════════════════════════════ */
 function initCounters() {
   function animateCount(el) {
@@ -201,9 +426,10 @@ function initCounters() {
     const suffix  = el.textContent.match(/[^0-9.]*$/)?.[0] || '';
     const isFloat = el.textContent.includes('.');
     const start   = performance.now();
+    const dur     = REDUCED_MOTION ? 0 : 1800;
 
     function step(now) {
-      const t   = Math.min((now - start) / 1800, 1);
+      const t   = Math.min((now - start) / (dur || 1), 1);
       const val = target * (1 - Math.pow(1 - t, 3));
       el.textContent = prefix + (isFloat ? val.toFixed(1) : Math.floor(val)) + suffix;
       if (t < 1) requestAnimationFrame(step);
@@ -219,7 +445,7 @@ function initCounters() {
     if (!statPattern.test(el.textContent))                       return;
     if (el.closest('header') || el.closest('footer'))            return;
     if (heroSection && heroSection.contains(el))                  return;
-    if (el.dataset.func && el.dataset.func.startsWith('fund-'))  return;
+    if (el.dataset.func && el.dataset.func.startsWith('fund-'))  return; // func.js owns these
     if (el.dataset.counterWired)                                  return;
     el.dataset.counterWired = '1';
     const obs = new IntersectionObserver(entries => {
@@ -231,7 +457,7 @@ function initCounters() {
 
 
 /* ═══════════════════════════════════════════════
-   5. GIVE BUTTON + MODAL
+   §5. GIVE BUTTON + MODAL
 ═══════════════════════════════════════════════ */
 function initGiveButton() {
   const rippleStyle = document.createElement('style');
@@ -250,13 +476,14 @@ function initGiveButton() {
       position: fixed; inset: 0; z-index: 9999;
       background: rgba(4,21,52,0.72); backdrop-filter: blur(8px);
       display: flex; align-items: center; justify-content: center;
+      padding: 20px;
       opacity: 0; pointer-events: none;
       transition: opacity 0.3s ease;
     }
     #give-modal.active { opacity: 1; pointer-events: all; }
     #give-modal-box {
       background: #fff; border-radius: 20px; padding: 40px;
-      max-width: 480px; width: 90%; position: relative;
+      max-width: 480px; width: 100%; position: relative;
       transform: translateY(30px) scale(0.96);
       transition: transform 0.35s cubic-bezier(.4,0,.2,1);
       box-shadow: 0 32px 80px rgba(4,21,52,0.25);
@@ -295,24 +522,32 @@ function initGiveButton() {
       transition: background 0.2s;
     }
     .modal-close-give:hover { background: #e2e2e2; }
+
+    /* Mobile: full-width modal */
+    @media (max-width: 480px) {
+      #give-modal-box { padding: 28px 20px; border-radius: 16px; }
+      .give-amount-btn { font-size: 14px; }
+    }
   `;
   document.head.appendChild(rippleStyle);
 
-  // Ripple on all buttons
-  document.querySelectorAll('button, a[class*="bg-primary"], a[class*="bg-secondary"]').forEach(btn => {
-    if (btn.dataset.rippleWired) return;
-    btn.dataset.rippleWired = '1';
-    btn.classList.add('btn-ripple');
-    btn.addEventListener('click', e => {
-      const rect   = btn.getBoundingClientRect();
-      const size   = Math.max(rect.width, rect.height) * 2;
-      const ripple = document.createElement('span');
-      ripple.className = 'ripple-wave';
-      ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px;`;
-      btn.appendChild(ripple);
-      ripple.addEventListener('animationend', () => ripple.remove());
+  // Ripple on all primary buttons — only when motion is allowed
+  if (!REDUCED_MOTION) {
+    document.querySelectorAll('button, a[class*="bg-primary"], a[class*="bg-secondary"]').forEach(btn => {
+      if (btn.dataset.rippleWired) return;
+      btn.dataset.rippleWired = '1';
+      btn.classList.add('btn-ripple');
+      btn.addEventListener('click', e => {
+        const rect   = btn.getBoundingClientRect();
+        const size   = Math.max(rect.width, rect.height) * 2;
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple-wave';
+        ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px;`;
+        btn.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
+      });
     });
-  });
+  }
 
   const modal = document.createElement('div');
   modal.id = 'give-modal';
@@ -367,16 +602,17 @@ function initGiveButton() {
       ? parseFloat(customInput.value)
       : parseFloat(selectedAmount);
     if (!amount || amount <= 0) {
-      window.SDAToast && window.SDAToast('Please select or enter an amount.', 'error');
+      window.SDAToast?.('Please select or enter an amount.', 'error');
       return;
     }
     const submitBtn = modal.querySelector('.give-submit');
     submitBtn.textContent = 'Processing…';
     submitBtn.disabled    = true;
+    // apiPost is defined in func.js — call if available
     if (typeof apiPost === 'function') await apiPost('/donate', { amount, currency: 'ZMW' });
     modal.querySelector('#give-thanks').style.display = 'block';
     submitBtn.style.display = 'none';
-    window.SDAToast && window.SDAToast('🙏 Gift recorded — thank you!', 'success', 4000);
+    window.SDAToast?.('🙏 Gift recorded — thank you!', 'success', 4000);
     setTimeout(closeGiveModal, 2800);
   });
 
@@ -402,6 +638,7 @@ function initGiveButton() {
     if (e.key === 'Escape' && modal.classList.contains('active')) closeGiveModal();
   });
 
+  // Wire all Give buttons
   document.querySelectorAll('.desktop-give, .mobile-give, .mobile-give-btn, button').forEach(btn => {
     if (btn.dataset.giveWired) return;
     const text   = btn.textContent.trim().toLowerCase();
@@ -417,9 +654,11 @@ function initGiveButton() {
 
 
 /* ═══════════════════════════════════════════════
-   8. SMOOTH PAGE TRANSITIONS
+   §8. SMOOTH PAGE TRANSITIONS
 ═══════════════════════════════════════════════ */
 function initPageTransitions() {
+  if (REDUCED_MOTION) return;
+
   const overlay = document.createElement('div');
   overlay.id = 'page-transition';
   overlay.style.cssText = `
@@ -440,6 +679,7 @@ function initPageTransitions() {
     pointer-events:none;
   `;
   document.body.appendChild(entry);
+
   requestAnimationFrame(() => requestAnimationFrame(() => { entry.style.transform = 'scaleY(0)'; }));
   entry.addEventListener('transitionend', () => entry.remove());
 
@@ -458,10 +698,11 @@ function initPageTransitions() {
 
 
 /* ═══════════════════════════════════════════════
-   9. GOLD DIVIDERS
+   §9. GOLD DIVIDERS — animate width on scroll
 ═══════════════════════════════════════════════ */
 function initGoldDividers() {
   document.querySelectorAll('.gold-divider').forEach(el => {
+    if (REDUCED_MOTION) { el.style.width = '60px'; return; }
     el.style.width      = '0px';
     el.style.transition = 'width 0.8s cubic-bezier(.4,0,.2,1)';
     const obs = new IntersectionObserver(entries => {
@@ -473,9 +714,11 @@ function initGoldDividers() {
 
 
 /* ═══════════════════════════════════════════════
-   10. TOAST
+   §10. TOAST — yields to func.js's richer version
 ═══════════════════════════════════════════════ */
 function initToast() {
+  // func.js runs its own IIFE toast setup before DOMContentLoaded;
+  // only install the fallback if func.js isn't loaded.
   if (typeof window.SDAToast === 'function') return;
 
   const wrap = document.createElement('div');
@@ -495,7 +738,7 @@ function initToast() {
       box-shadow:0 8px 24px rgba(4,21,52,0.3);
       opacity:0;transform:translateY(20px);
       transition:all 0.35s cubic-bezier(.4,0,.2,1);
-      pointer-events:all;white-space:nowrap;
+      pointer-events:all;white-space:nowrap;max-width:88vw;
     }
     .sda-toast.show{opacity:1;transform:translateY(0);}
     .sda-toast.t-success{border-color:#4caf50;}
@@ -518,7 +761,7 @@ function initToast() {
 
 
 /* ═══════════════════════════════════════════════
-   11. COPY EMAIL
+   §11. COPY EMAIL — click-to-copy
 ═══════════════════════════════════════════════ */
 function initCopyEmail() {
   document.querySelectorAll('p, a').forEach(el => {
@@ -527,9 +770,9 @@ function initCopyEmail() {
     el.title = 'Click to copy email';
     el.addEventListener('click', () => {
       navigator.clipboard?.writeText('info@makenicentralsda.org').then(() => {
-        window.SDAToast('✉ Email copied!', 'success');
+        window.SDAToast?.('✉ Email copied!', 'success');
       }).catch(() => {
-        window.SDAToast('Could not copy — please copy manually.', 'error');
+        window.SDAToast?.('Could not copy — please copy manually.', 'error');
       });
     });
   });
@@ -537,8 +780,8 @@ function initCopyEmail() {
 
 
 /* ═══════════════════════════════════════════════
-   13. BACK-TO-TOP
-       Sits above the Youth Board FAB on youth.html.
+   §13. BACK-TO-TOP
+   Sits above the Youth Board FAB on youth.html.
 ═══════════════════════════════════════════════ */
 function initBackToTop() {
   const isYouth = document.body.dataset.page === 'youth';
@@ -562,21 +805,23 @@ function initBackToTop() {
   document.body.appendChild(btn);
 
   window.addEventListener('scroll', () => {
-    const visible         = window.scrollY > 400;
-    btn.style.opacity     = visible ? '1' : '0';
+    const visible           = window.scrollY > 400;
+    btn.style.opacity       = visible ? '1' : '0';
     btn.style.pointerEvents = visible ? 'auto' : 'none';
   }, { passive: true });
 
-  btn.addEventListener('click',      () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-  btn.addEventListener('mouseenter', () => { btn.style.transform = 'scale(1.1)'; });
+  btn.addEventListener('click',      () => window.scrollTo({ top: 0, behavior: REDUCED_MOTION ? 'auto' : 'smooth' }));
+  btn.addEventListener('mouseenter', () => { if (!REDUCED_MOTION) btn.style.transform = 'scale(1.1)'; });
   btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
 }
 
 
 /* ═══════════════════════════════════════════════
-   14. IMAGE SHIMMER
+   §14. IMAGE SHIMMER — loading placeholder
 ═══════════════════════════════════════════════ */
 function initImageShimmer() {
+  if (REDUCED_MOTION) return; // skip purely decorative loading animation
+
   const s = document.createElement('style');
   s.textContent = `
     img.img-loading {
@@ -592,7 +837,8 @@ function initImageShimmer() {
   `;
   document.head.appendChild(s);
 
-  document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+  // All <img> — not just lazy ones
+  document.querySelectorAll('img').forEach(img => {
     img.classList.add('img-loading');
     if (img.complete) {
       img.classList.replace('img-loading', 'img-loaded');
@@ -605,238 +851,29 @@ function initImageShimmer() {
 
 
 /* ═══════════════════════════════════════════════
-   15. ACTIVE NAV LINK HIGHLIGHTER
+   §15. ACTIVE NAV LINK HIGHLIGHTER
+   Matches against the full pathname so sub-pages
+   don't incorrectly light up "Home".
+   Also targets .mobile-drawer nav a.
 ═══════════════════════════════════════════════ */
 function initActiveNav() {
-  const page = document.body.dataset.page || '';
-  const map  = { index: 'index.html', kids: 'kids.html', youth: 'youth.html', building: 'building.html' };
-  const current = map[page];
-  if (!current) return;
+  const page    = document.body.dataset.page || '';
+  const pathMap = {
+    index:    ['index.html', '/'],
+    kids:     ['kids.html'],
+    youth:    ['youth.html'],
+    building: ['building.html'],
+  };
+  const matches = pathMap[page] || [];
 
-  document.querySelectorAll('header nav a').forEach(a => {
-    const href     = a.getAttribute('href');
-    const isActive = href === '#' || (current && href === current);
+  document.querySelectorAll('header nav a, .mobile-drawer nav a').forEach(a => {
+    const href = a.getAttribute('href') || '';
+    const isActive = href === '#' || matches.some(m => href.endsWith(m));
     if (isActive) {
       a.classList.add('text-primary', 'border-b-2', 'border-secondary', 'pb-1');
       a.classList.remove('text-on-surface-variant');
-    }
-  });
-}
-
-
-/* ═══════════════════════════════════════════════
-   16. YOUTH BOARD
-       Only runs on data-page="youth".
-       Owns: filters, likes, read-more toggle,
-       discussion modal (open/close/submit/inject).
-═══════════════════════════════════════════════ */
-function initYouthBoard() {
-  if (document.body.dataset.page !== 'youth') return;
-
-  /* ── Dynamic footer year ── */
-  const yearEl = document.getElementById('footer-year');
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-  /* ── Filter buttons ── */
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const filter = btn.dataset.filter;
-
-      document.querySelectorAll('.filter-btn').forEach(b => b.setAttribute('aria-pressed', 'false'));
-      btn.setAttribute('aria-pressed', 'true');
-
-      const cards = document.querySelectorAll('#discussions-list article[data-category]');
-      let anyVisible = false;
-      cards.forEach(card => {
-        const match = filter === 'all' || card.dataset.category === filter;
-        card.style.display = match ? '' : 'none';
-        if (match) anyVisible = true;
-      });
-
-      const emptyState = document.getElementById('empty-state');
-      if (emptyState) emptyState.classList.toggle('hidden', anyVisible);
-    });
-  });
-
-  /* ── Like buttons (wire existing + expose helper for injected cards) ── */
-  function wireLikeBtn(btn) {
-    if (btn.dataset.likeWired) return;
-    btn.dataset.likeWired = '1';
-    let liked = false;
-    btn.addEventListener('click', () => {
-      liked = !liked;
-      let count = parseInt(btn.dataset.count) || 0;
-      count = liked ? count + 1 : count - 1;
-      btn.dataset.count = count;
-      const countEl = btn.querySelector('.like-count');
-      if (countEl) countEl.textContent = count + ' Likes';
-      const icon = btn.querySelector('.material-symbols-outlined');
-      if (icon) icon.style.fontVariationSettings = liked ? "'FILL' 1" : "'FILL' 0";
-      btn.style.color = liked ? '#ba1a1a' : '';
-    });
-  }
-  document.querySelectorAll('.like-btn').forEach(wireLikeBtn);
-
-  /* ── Read-more toggle (exposed on window for onclick="" in HTML) ── */
-  window.toggleExpand = function(id, btn) {
-    const el          = document.getElementById(id);
-    if (!el) return;
-    const isCollapsed = el.style.webkitLineClamp !== 'unset' && el.style.webkitLineClamp !== '';
-    if (isCollapsed) {
-      el.style.webkitLineClamp = 'unset';
-      el.style.overflow        = 'visible';
-      btn.textContent          = 'Show less';
     } else {
-      el.style.webkitLineClamp = '2';
-      el.style.overflow        = 'hidden';
-      btn.textContent          = 'Read more';
+      a.classList.remove('text-primary', 'border-b-2', 'border-secondary', 'pb-1');
     }
-  };
-
-  /* ── Discussion modal ── */
-  const discModal = document.getElementById('discussion-modal');
-  if (!discModal) return;
-
-  window.openModal = function() {
-    document.getElementById('modal-form-view').style.display = '';
-    document.getElementById('modal-success-view').classList.remove('show');
-    discModal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => {
-      const nameField = document.getElementById('disc-name');
-      if (nameField) nameField.focus();
-    }, 300);
-  };
-
-  window.closeModal = function() {
-    discModal.classList.remove('open');
-    document.body.style.overflow = '';
-    setTimeout(() => {
-      ['disc-name', 'disc-title', 'disc-body'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      const cat = document.getElementById('disc-category');
-      if (cat) cat.value = '';
-      const tc = document.getElementById('title-count'); if (tc) tc.textContent = '0 / 100';
-      const bc = document.getElementById('body-count');  if (bc) bc.textContent = '0 / 1000';
-      document.getElementById('modal-success-view').classList.remove('show');
-      document.getElementById('modal-form-view').style.display = '';
-    }, 300);
-  };
-
-  // Escape key + backdrop
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && discModal.classList.contains('open')) window.closeModal();
   });
-  const backdrop = discModal.querySelector('.modal-backdrop');
-  if (backdrop) backdrop.addEventListener('click', window.closeModal);
-
-  // Char counters
-  const titleField = document.getElementById('disc-title');
-  const bodyField  = document.getElementById('disc-body');
-  if (titleField) {
-    titleField.addEventListener('input', function() {
-      const len = this.value.length;
-      const el  = document.getElementById('title-count');
-      if (!el) return;
-      el.textContent = len + ' / 100';
-      el.classList.toggle('near-limit', len > 80);
-    });
-  }
-  if (bodyField) {
-    bodyField.addEventListener('input', function() {
-      const len = this.value.length;
-      const el  = document.getElementById('body-count');
-      if (!el) return;
-      el.textContent = len + ' / 1000';
-      el.classList.toggle('near-limit', len > 850);
-    });
-  }
-
-  // Submit
-  window.submitDiscussion = function() {
-    const name     = (document.getElementById('disc-name')?.value     || '').trim();
-    const category = (document.getElementById('disc-category')?.value || '').trim();
-    const title    = (document.getElementById('disc-title')?.value    || '').trim();
-    const body     = (document.getElementById('disc-body')?.value     || '').trim();
-
-    const fields = [
-      { id: 'disc-name',     val: name },
-      { id: 'disc-category', val: category },
-      { id: 'disc-title',    val: title },
-      { id: 'disc-body',     val: body },
-    ];
-
-    let valid = true;
-    fields.forEach(f => {
-      const el = document.getElementById(f.id);
-      if (!el) return;
-      if (!f.val) {
-        valid = false;
-        el.style.borderColor = '#ba1a1a';
-        el.style.boxShadow   = '0 0 0 3px rgba(186,26,26,0.12)';
-        el.addEventListener('input', () => {
-          el.style.borderColor = '';
-          el.style.boxShadow   = '';
-        }, { once: true });
-      }
-    });
-    if (!valid) return;
-
-    // Sanitise for innerHTML injection
-    function esc(str) {
-      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-    const newCard  = document.createElement('article');
-    newCard.className    = 'discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow';
-    newCard.dataset.category = category;
-    newCard.style.cssText    = 'opacity:0;transform:translateY(-12px);transition:opacity 0.35s ease,transform 0.35s ease;';
-
-    newCard.innerHTML = `
-      <div class="flex items-center gap-3 mb-4">
-        <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center font-bold text-on-secondary-container flex-shrink-0"
-             aria-label="${esc(name)}">${esc(initials)}</div>
-        <div>
-          <h4 class="font-label-md text-label-md text-primary">${esc(name)}</h4>
-          <p class="text-[12px] text-on-surface-variant uppercase tracking-tighter">Just now</p>
-        </div>
-      </div>
-      <span class="card-category">${esc(category)}</span>
-      <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${esc(title)}</h3>
-      <p class="font-body-md text-body-md text-on-surface-variant mb-6">${esc(body)}</p>
-      <div class="flex items-center gap-6">
-        <div class="flex items-center gap-2 text-on-surface-variant">
-          <span class="material-symbols-outlined text-[20px]">forum</span>
-          <span class="font-label-md">0 Comments</span>
-        </div>
-        <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors"
-                aria-label="Like this post" data-count="0">
-          <span class="material-symbols-outlined text-[20px]">favorite</span>
-          <span class="font-label-md like-count">0 Likes</span>
-        </button>
-      </div>`;
-
-    wireLikeBtn(newCard.querySelector('.like-btn'));
-
-    const list = document.getElementById('discussions-list');
-    if (list) list.insertBefore(newCard, list.firstChild);
-
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      newCard.style.opacity   = '1';
-      newCard.style.transform = 'translateY(0)';
-    }));
-
-    document.getElementById('modal-form-view').style.display = 'none';
-    document.getElementById('modal-success-view').classList.add('show');
-  };
-
-  /* ── FAB wiring (in case onclick attr not present) ── */
-  const fab = document.getElementById('fab-new-discussion');
-  if (fab && !fab.dataset.youthWired) {
-    fab.dataset.youthWired = '1';
-    fab.addEventListener('click', window.openModal);
-  }
 }
