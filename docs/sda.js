@@ -455,7 +455,6 @@ function initCounters() {
   });
 }
 
-
 /* ═══════════════════════════════════════════════
    §5. GIVE BUTTON + MODAL
 ═══════════════════════════════════════════════ */
@@ -523,7 +522,6 @@ function initGiveButton() {
     }
     .modal-close-give:hover { background: #e2e2e2; }
 
-    /* Mobile: full-width modal */
     @media (max-width: 480px) {
       #give-modal-box { padding: 28px 20px; border-radius: 16px; }
       .give-amount-btn { font-size: 14px; }
@@ -608,7 +606,6 @@ function initGiveButton() {
     const submitBtn = modal.querySelector('.give-submit');
     submitBtn.textContent = 'Processing…';
     submitBtn.disabled    = true;
-    // apiPost is defined in func.js — call if available
     if (typeof apiPost === 'function') await apiPost('/donate', { amount, currency: 'ZMW' });
     modal.querySelector('#give-thanks').style.display = 'block';
     submitBtn.style.display = 'none';
@@ -638,20 +635,27 @@ function initGiveButton() {
     if (e.key === 'Escape' && modal.classList.contains('active')) closeGiveModal();
   });
 
-  // Wire all Give buttons
-  document.querySelectorAll('.desktop-give, .mobile-give, .mobile-give-btn, button').forEach(btn => {
+  // Expose globally so onclick="openGiveModal()" in HTML works too
+  window.openGiveModal  = openGiveModal;
+  window.closeGiveModal = closeGiveModal;
+
+  // Wire all Give buttons — fixed: use innerText trimmed + lowercase, check all class variants
+  function isGiveButton(btn) {
+    if (btn.closest('#give-modal')) return false; // never wire modal's own buttons
+    if (btn.classList.contains('desktop-give'))    return true;
+    if (btn.classList.contains('mobile-give'))     return true;
+    if (btn.classList.contains('mobile-give-btn')) return true;
+    const text = (btn.innerText || btn.textContent || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    return text === 'give' || text.startsWith('give ') || text.endsWith(' give');
+  }
+
+  document.querySelectorAll('button, a').forEach(btn => {
     if (btn.dataset.giveWired) return;
-    const text   = btn.textContent.trim().toLowerCase();
-    const isGive = btn.classList.contains('desktop-give')
-                || btn.classList.contains('mobile-give')
-                || btn.classList.contains('mobile-give-btn')
-                || text === 'give';
-    if (!isGive) return;
+    if (!isGiveButton(btn)) return;
     btn.dataset.giveWired = '1';
-    btn.addEventListener('click', openGiveModal);
+    btn.addEventListener('click', e => { e.preventDefault(); openGiveModal(); });
   });
 }
-
 
 /* ═══════════════════════════════════════════════
    §8. SMOOTH PAGE TRANSITIONS
