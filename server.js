@@ -2,12 +2,19 @@
  * server.js — Makeni Central SDA Church
  * Node.js + Express + MongoDB (Mongoose)
  *
- * Handles all data endpoints consumed by func.js and sda.js:
- *  POST /api/donate        — Give modal (sda.js §5)
- *  GET  /api/fund          — Fund tracker stats (func.js initFundTracker)
- *  GET  /api/discussions   — Youth board list
- *  POST /api/discussions   — Submit new discussion (func.js submitDiscussion)
+ * Handles all data endpoints consumed by func.js, sda.js, and admin.html:
+ *
+ *  — Public (site) endpoints —
+ *  POST /api/donate               — Give modal (sda.js §5)
+ *  GET  /api/fund                 — Fund tracker stats (func.js initFundTracker)
+ *  GET  /api/discussions          — Youth board list
+ *  POST /api/discussions          — Submit new discussion (func.js submitDiscussion)
  *  POST /api/discussions/:id/like — Like a discussion
+ *
+ *  — Admin endpoints (admin.html) —
+ *  GET    /api/donations          — List all donations
+ *  DELETE /api/discussions/:id    — Delete a discussion
+ *  POST   /api/fund/goal          — Update fundraising goal
  *
  * Usage:
  *  npm install express mongoose dotenv cors
@@ -79,7 +86,7 @@ const Discussion = mongoose.model('Discussion', discussionSchema);
 
 
 /* ═══════════════════════════════════════════════
-   ROUTES
+   ROUTES — PUBLIC (site)
 ═══════════════════════════════════════════════ */
 
 // ── POST /api/donate ──────────────────────────
@@ -196,6 +203,70 @@ app.post('/api/discussions/:id/like', async (req, res) => {
     res.json({ likes: discussion.likes });
   } catch (err) {
     console.error('POST /api/discussions/:id/like:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+/* ═══════════════════════════════════════════════
+   ROUTES — ADMIN (admin.html)
+═══════════════════════════════════════════════ */
+
+// ── GET /api/donations ───────────────────────
+// Returns all donation records, newest first.
+// Powers the Donations page table and recent donations widget.
+app.get('/api/donations', async (req, res) => {
+  try {
+    const donations = await Donation
+      .find()
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.json(donations);
+  } catch (err) {
+    console.error('GET /api/donations:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── DELETE /api/discussions/:id ──────────────
+// Permanently removes a discussion post.
+// Called by the Delete button in admin.html Discussions page.
+app.delete('/api/discussions/:id', async (req, res) => {
+  try {
+    const discussion = await Discussion.findByIdAndDelete(req.params.id);
+
+    if (!discussion) return res.status(404).json({ error: 'Not found' });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('DELETE /api/discussions/:id:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── POST /api/fund/goal ──────────────────────
+// Updates the fundraising goal shown on the building page.
+// Uses $set so the existing raised amount and donor count are never touched.
+app.post('/api/fund/goal', async (req, res) => {
+  try {
+    const { goal } = req.body;
+
+    if (!goal || isNaN(goal) || Number(goal) <= 0) {
+      return res.status(400).json({ error: 'Invalid goal amount' });
+    }
+
+    const fund = await Fund.findOneAndUpdate(
+      {},
+      { $set: { goal: Number(goal) } },
+      { upsert: true, new: true }
+    );
+
+    res.json({ success: true, goal: fund.goal });
+  } catch (err) {
+    console.error('POST /api/fund/goal:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
