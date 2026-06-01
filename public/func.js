@@ -21,6 +21,11 @@
  *  § @media (prefers-reduced-motion) respected throughout sda.js.
  *  § Hamburger / drawer wiring moved from inline page scripts into sda.js §1.
  *  § initYouthBoard moved here from sda.js (this file is the authoritative owner).
+ *
+ * CHANGES v4 → v4.1:
+ *  § loadDiscussions() — fetches real discussions from /api/discussions on page load,
+ *    replaces static placeholder cards with live MongoDB data.
+ *  § wireLikeBtn — now persists likes to /api/discussions/:id/like (one like per session).
  */
 
 'use strict';
@@ -118,7 +123,7 @@ function funcInit() {
   initYouthBoard();    // §16 — youth.html only
 
   console.log(
-    '%c✦ Makeni Central SDA — func.js v4 loaded',
+    '%c✦ Makeni Central SDA — func.js v4.1 loaded',
     'color:#e6c364;background:#041534;padding:6px 14px;border-radius:4px;font-weight:600;'
   );
 }
@@ -136,15 +141,14 @@ function initHeroSlideshow() {
 
   if (!slides.length) return;
 
-  const INTERVAL  = 6000;  // ms between auto-advances
-  const RESUME_DELAY = 8000; // ms before resuming after manual nav
+  const INTERVAL     = 6000;  // ms between auto-advances
+  const RESUME_DELAY = 8000;  // ms before resuming after manual nav
 
-  let current    = 0;
-  let timer      = null;
+  let current     = 0;
+  let timer       = null;
   let resumeTimer = null;
 
   function goTo(index) {
-    // Remove active/prev classes from current slide
     slides[current].classList.remove('active');
     slides[current].classList.add('prev');
     if (dots[current]) {
@@ -152,11 +156,9 @@ function initHeroSlideshow() {
       dots[current].setAttribute('aria-selected', 'false');
     }
 
-    // After fade-out transition, remove 'prev'
     const leaving = slides[current];
     setTimeout(() => leaving.classList.remove('prev'), 1300);
 
-    // Reset the Ken Burns animation on the incoming slide by toggling a class
     current = (index + slides.length) % slides.length;
     const incoming = slides[current];
     incoming.style.animation = 'none';
@@ -170,20 +172,11 @@ function initHeroSlideshow() {
     }
   }
 
-  function next() {
-    goTo(current + 1);
-  }
+  function next() { goTo(current + 1); }
 
-  function startAuto() {
-    stopAuto();
-    timer = setInterval(next, INTERVAL);
-  }
+  function startAuto() { stopAuto(); timer = setInterval(next, INTERVAL); }
+  function stopAuto()  { if (timer) { clearInterval(timer); timer = null; } }
 
-  function stopAuto() {
-    if (timer) { clearInterval(timer); timer = null; }
-  }
-
-  // Dot click — manual navigation
   dots.forEach((dot, i) => {
     dot.addEventListener('click', () => {
       if (i === current) return;
@@ -194,23 +187,19 @@ function initHeroSlideshow() {
     });
   });
 
-  // Pause on hover over the section
   const section = document.querySelector('[aria-label="Welcome hero"]');
   if (section) {
     section.addEventListener('mouseenter', stopAuto);
     section.addEventListener('mouseleave', startAuto);
   }
 
-  // Keyboard nav (left/right arrows) when section is focused
   document.addEventListener('keydown', e => {
     if (!section) return;
     if (e.key === 'ArrowRight') { stopAuto(); goTo(current + 1); clearTimeout(resumeTimer); resumeTimer = setTimeout(startAuto, RESUME_DELAY); }
     if (e.key === 'ArrowLeft')  { stopAuto(); goTo(current - 1); clearTimeout(resumeTimer); resumeTimer = setTimeout(startAuto, RESUME_DELAY); }
   });
 
-  // Respect prefers-reduced-motion
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
   startAuto();
 }
 
@@ -229,7 +218,6 @@ function initFundTracker() {
 
   if (!raised && !goal && !percent && !donors && !bar) return;
 
-  // Animate a numeric element from 0 to target
   function animateValue(el, target, prefix, suffix, isFloat) {
     if (!el) return;
     const start = performance.now();
@@ -244,7 +232,6 @@ function initFundTracker() {
     requestAnimationFrame(step);
   }
 
-  // Wire up with IntersectionObserver so animation plays on scroll-into-view
   function observeOnce(el, cb) {
     if (!el) return;
     const obs = new IntersectionObserver(entries => {
@@ -253,22 +240,21 @@ function initFundTracker() {
     obs.observe(el);
   }
 
-  // Fetch live data — gracefully falls back to HTML values if fetch fails
   fetch('/api/fund')
     .then(r => r.ok ? r.json() : null)
     .catch(() => null)
     .then(data => {
-      if (!data) return; // keep static HTML values
+      if (!data) return;
 
-      const raisedVal  = Number(data.raised)  || 0;
-      const goalVal    = Number(data.goal)     || 0;
-      const donorsVal  = Number(data.donors)   || 0;
-      const pct        = goalVal ? Math.min(Math.round((raisedVal / goalVal) * 100), 100) : 0;
+      const raisedVal = Number(data.raised) || 0;
+      const goalVal   = Number(data.goal)   || 0;
+      const donorsVal = Number(data.donors) || 0;
+      const pct       = goalVal ? Math.min(Math.round((raisedVal / goalVal) * 100), 100) : 0;
 
-      observeOnce(raised,  () => animateValue(raised,  raisedVal,  'ZMW ', '', false));
-      observeOnce(goal,    () => animateValue(goal,    goalVal,    'ZMW ', '', false));
-      observeOnce(percent, () => animateValue(percent, pct,        '',    '%', false));
-      observeOnce(donors,  () => animateValue(donors,  donorsVal,  '',    '', false));
+      observeOnce(raised,  () => animateValue(raised,  raisedVal, 'ZMW ', '', false));
+      observeOnce(goal,    () => animateValue(goal,    goalVal,   'ZMW ', '', false));
+      observeOnce(percent, () => animateValue(percent, pct,       '',    '%', false));
+      observeOnce(donors,  () => animateValue(donors,  donorsVal, '',    '', false));
 
       if (bar) {
         observeOnce(bar, () => {
@@ -282,10 +268,6 @@ function initFundTracker() {
 
 /* ═══════════════════════════════════════════════
    STORIES — kids.html
-   [data-func="stories"] container: wires up
-   a simple prev/next carousel if navigation
-   arrows are present, otherwise does nothing
-   (grid layout works without JS).
 ═══════════════════════════════════════════════ */
 function initStories() {
   const container = document.querySelector('[data-func="stories"]');
@@ -295,11 +277,11 @@ function initStories() {
   const nextBtn = container.querySelector('[data-stories-next]');
   const track   = container.querySelector('[data-stories-track]');
 
-  if (!prevBtn || !nextBtn || !track) return; // no carousel UI — grid mode
+  if (!prevBtn || !nextBtn || !track) return;
 
-  const cards      = [...track.children];
-  const cardCount  = cards.length;
-  let   current    = 0;
+  const cards     = [...track.children];
+  const cardCount = cards.length;
+  let   current   = 0;
 
   function goTo(index) {
     current = (index + cardCount) % cardCount;
@@ -311,19 +293,18 @@ function initStories() {
   prevBtn.addEventListener('click', () => goTo(current - 1));
   nextBtn.addEventListener('click', () => goTo(current + 1));
 
-  // Keyboard arrow support
   container.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft')  goTo(current - 1);
     if (e.key === 'ArrowRight') goTo(current + 1);
   });
 
-  goTo(0); // initialise
+  goTo(0);
 }
 
 
 /* ═══════════════════════════════════════════════
    §16. YOUTH BOARD — youth.html only
-   Owns: filters, likes, read-more toggle,
+   Owns: API load, filters, likes, read-more toggle,
    "Start a Discussion" modal (open/close/submit/inject),
    char counters, FAB wiring, dynamic footer year.
 ═══════════════════════════════════════════════ */
@@ -333,6 +314,133 @@ function initYouthBoard() {
   /* ── Dynamic footer year ── */
   const yearEl = document.getElementById('footer-year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  /* ── Like buttons ──
+     Wire existing static cards + expose helper for injected cards.
+     Persists one like per card per session to the API.
+  ── */
+  function wireLikeBtn(btn) {
+    if (btn.dataset.likeWired) return;
+    btn.dataset.likeWired = '1';
+    let liked = false;
+    btn.addEventListener('click', async () => {
+      if (liked) return; // one like per session
+      liked = true;
+
+      let count = parseInt(btn.dataset.count) || 0;
+      count++;
+      btn.dataset.count = count;
+
+      const countEl = btn.querySelector('.like-count');
+      if (countEl) countEl.textContent = count + ' Likes';
+
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (icon) icon.style.fontVariationSettings = "'FILL' 1";
+      btn.style.color = '#ba1a1a';
+
+      // Persist to server
+      const id = btn.dataset.id;
+      if (id) {
+        try {
+          await fetch(`/api/discussions/${id}/like`, { method: 'POST' });
+        } catch (e) { /* silent fail — UI already updated */ }
+      }
+    });
+  }
+  document.querySelectorAll('.like-btn').forEach(wireLikeBtn);
+
+  /* ── Load discussions from API ──
+     Fetches /api/discussions, clears static placeholder cards,
+     and renders live cards from MongoDB. Falls back to static
+     HTML gracefully if the fetch fails.
+  ── */
+  async function loadDiscussions() {
+    const list = document.getElementById('discussions-list');
+    if (!list) return;
+
+    try {
+      const res = await fetch('/api/discussions');
+      if (!res.ok) return; // keep static HTML on error
+
+      const data = await res.json();
+      if (!Array.isArray(data) || !data.length) return;
+
+      // Remove static placeholder articles, keep empty-state div
+      list.querySelectorAll('article').forEach(a => a.remove());
+
+      function esc(str) {
+        return String(str)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      function timeAgo(dateStr) {
+        const diff = Date.now() - new Date(dateStr).getTime();
+        const m = Math.floor(diff / 60000);
+        if (m < 1)  return 'Just now';
+        if (m < 60) return `${m} minute${m > 1 ? 's' : ''} ago`;
+        const h = Math.floor(m / 60);
+        if (h < 24) return `${h} hour${h > 1 ? 's' : ''} ago`;
+        const d = Math.floor(h / 24);
+        if (d < 7)  return `${d} day${d > 1 ? 's' : ''} ago`;
+        return new Date(dateStr).toLocaleDateString();
+      }
+
+      // Render newest-first (API already sorts by createdAt: -1)
+      data.forEach(d => {
+        const initials = d.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+        const card = document.createElement('article');
+        card.className       = 'discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow';
+        card.dataset.category = d.category;
+        card.dataset.id       = d._id;
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center font-bold text-on-secondary-container flex-shrink-0"
+                 aria-label="${esc(d.name)}">${esc(initials)}</div>
+            <div>
+              <h4 class="font-label-md text-label-md text-primary">${esc(d.name)}</h4>
+              <p class="text-[12px] text-on-surface-variant uppercase tracking-tighter">${timeAgo(d.createdAt)} in ${esc(d.category)}</p>
+            </div>
+          </div>
+          <span class="card-category">${esc(d.category)}</span>
+          <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${esc(d.title)}</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-6">${esc(d.body)}</p>
+          <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2 text-on-surface-variant">
+              <span class="material-symbols-outlined text-[20px]">forum</span>
+              <span class="font-label-md">${d.comments || 0} Comments</span>
+            </div>
+            <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors"
+                    aria-label="Like this post" data-count="${d.likes || 0}" data-id="${esc(d._id)}">
+              <span class="material-symbols-outlined text-[20px]">favorite</span>
+              <span class="font-label-md like-count">${d.likes || 0} Likes</span>
+            </button>
+          </div>`;
+
+        // Append in order (API is already sorted newest-first)
+        const emptyState = document.getElementById('empty-state');
+        if (emptyState) {
+          list.insertBefore(card, emptyState);
+        } else {
+          list.appendChild(card);
+        }
+
+        wireLikeBtn(card.querySelector('.like-btn'));
+      });
+
+      // Hide empty state since we have real cards
+      const emptyState = document.getElementById('empty-state');
+      if (emptyState) emptyState.classList.add('hidden');
+
+    } catch (err) {
+      console.warn('[func.js] loadDiscussions failed:', err);
+      // Static HTML placeholder cards remain visible
+    }
+  }
+
+  loadDiscussions();
 
   /* ── Filter buttons ── */
   document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -355,28 +463,9 @@ function initYouthBoard() {
     });
   });
 
-  /* ── Like buttons (wire existing + expose helper for injected cards) ── */
-  function wireLikeBtn(btn) {
-    if (btn.dataset.likeWired) return;
-    btn.dataset.likeWired = '1';
-    let liked = false;
-    btn.addEventListener('click', () => {
-      liked = !liked;
-      let count = parseInt(btn.dataset.count) || 0;
-      count = liked ? count + 1 : count - 1;
-      btn.dataset.count = count;
-      const countEl = btn.querySelector('.like-count');
-      if (countEl) countEl.textContent = count + ' Likes';
-      const icon = btn.querySelector('.material-symbols-outlined');
-      if (icon) icon.style.fontVariationSettings = liked ? "'FILL' 1" : "'FILL' 0";
-      btn.style.color = liked ? '#ba1a1a' : '';
-    });
-  }
-  document.querySelectorAll('.like-btn').forEach(wireLikeBtn);
-
   /* ── Read-more toggle (exposed on window for onclick="" in HTML) ── */
   window.toggleExpand = function(id, btn) {
-    const el          = document.getElementById(id);
+    const el = document.getElementById(id);
     if (!el) return;
     const isCollapsed = el.style.webkitLineClamp !== 'unset' && el.style.webkitLineClamp !== '';
     if (isCollapsed) {
@@ -451,7 +540,7 @@ function initYouthBoard() {
     });
   }
 
-  // Submit — also posts to API if available
+  // Submit — posts to API then injects card into DOM immediately
   window.submitDiscussion = async function() {
     const name     = (document.getElementById('disc-name')?.value     || '').trim();
     const category = (document.getElementById('disc-category')?.value || '').trim();
@@ -481,18 +570,18 @@ function initYouthBoard() {
     });
     if (!valid) return;
 
-    // POST to server (fire-and-forget; UI responds immediately)
-    apiPost('/api/discussions', { name, category, title, body });
+    // POST to server — get back the new _id so the like button can use it
+    const result = await apiPost('/api/discussions', { name, category, title, body });
 
-    // Sanitise for innerHTML injection
     function esc(str) {
-      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
     const newCard  = document.createElement('article');
-    newCard.className    = 'discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow';
+    newCard.className        = 'discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow';
     newCard.dataset.category = category;
+    if (result?.id) newCard.dataset.id = result.id;
     newCard.style.cssText    = 'opacity:0;transform:translateY(-12px);transition:opacity 0.35s ease,transform 0.35s ease;';
 
     newCard.innerHTML = `
@@ -506,14 +595,14 @@ function initYouthBoard() {
       </div>
       <span class="card-category">${esc(category)}</span>
       <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${esc(title)}</h3>
-      <p class="font-body-md text-body-md text-on-surface-variant mb-6">${esc(body)}</p>
+      <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-6">${esc(body)}</p>
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2 text-on-surface-variant">
           <span class="material-symbols-outlined text-[20px]">forum</span>
           <span class="font-label-md">0 Comments</span>
         </div>
         <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors"
-                aria-label="Like this post" data-count="0">
+                aria-label="Like this post" data-count="0" ${result?.id ? `data-id="${result.id}"` : ''}>
           <span class="material-symbols-outlined text-[20px]">favorite</span>
           <span class="font-label-md like-count">0 Likes</span>
         </button>
