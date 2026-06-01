@@ -112,6 +112,7 @@ async function apiPost(endpoint, payload) {
 document.addEventListener('DOMContentLoaded', funcInit);
 
 function funcInit() {
+  initHeroSlideshow(); // index.html
   initFundTracker();   // building.html
   initStories();       // kids.html
   initYouthBoard();    // §16 — youth.html only
@@ -120,6 +121,97 @@ function funcInit() {
     '%c✦ Makeni Central SDA — func.js v4 loaded',
     'color:#e6c364;background:#041534;padding:6px 14px;border-radius:4px;font-weight:600;'
   );
+}
+
+
+/* ═══════════════════════════════════════════════
+   HERO SLIDESHOW — index.html
+   Crossfades between hero-slide divs with Ken Burns
+   per slide. Dots below allow manual navigation.
+   Pauses on user interaction, resumes after 8 s.
+═══════════════════════════════════════════════ */
+function initHeroSlideshow() {
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots   = document.querySelectorAll('.hero-dots .hero-dot');
+
+  if (!slides.length) return;
+
+  const INTERVAL  = 6000;  // ms between auto-advances
+  const RESUME_DELAY = 8000; // ms before resuming after manual nav
+
+  let current    = 0;
+  let timer      = null;
+  let resumeTimer = null;
+
+  function goTo(index) {
+    // Remove active/prev classes from current slide
+    slides[current].classList.remove('active');
+    slides[current].classList.add('prev');
+    if (dots[current]) {
+      dots[current].classList.remove('active');
+      dots[current].setAttribute('aria-selected', 'false');
+    }
+
+    // After fade-out transition, remove 'prev'
+    const leaving = slides[current];
+    setTimeout(() => leaving.classList.remove('prev'), 1300);
+
+    // Reset the Ken Burns animation on the incoming slide by toggling a class
+    current = (index + slides.length) % slides.length;
+    const incoming = slides[current];
+    incoming.style.animation = 'none';
+    incoming.offsetHeight; // reflow to restart animation
+    incoming.style.animation = '';
+    incoming.classList.add('active');
+
+    if (dots[current]) {
+      dots[current].classList.add('active');
+      dots[current].setAttribute('aria-selected', 'true');
+    }
+  }
+
+  function next() {
+    goTo(current + 1);
+  }
+
+  function startAuto() {
+    stopAuto();
+    timer = setInterval(next, INTERVAL);
+  }
+
+  function stopAuto() {
+    if (timer) { clearInterval(timer); timer = null; }
+  }
+
+  // Dot click — manual navigation
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      if (i === current) return;
+      stopAuto();
+      clearTimeout(resumeTimer);
+      goTo(i);
+      resumeTimer = setTimeout(startAuto, RESUME_DELAY);
+    });
+  });
+
+  // Pause on hover over the section
+  const section = document.querySelector('[aria-label="Welcome hero"]');
+  if (section) {
+    section.addEventListener('mouseenter', stopAuto);
+    section.addEventListener('mouseleave', startAuto);
+  }
+
+  // Keyboard nav (left/right arrows) when section is focused
+  document.addEventListener('keydown', e => {
+    if (!section) return;
+    if (e.key === 'ArrowRight') { stopAuto(); goTo(current + 1); clearTimeout(resumeTimer); resumeTimer = setTimeout(startAuto, RESUME_DELAY); }
+    if (e.key === 'ArrowLeft')  { stopAuto(); goTo(current - 1); clearTimeout(resumeTimer); resumeTimer = setTimeout(startAuto, RESUME_DELAY); }
+  });
+
+  // Respect prefers-reduced-motion
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  startAuto();
 }
 
 

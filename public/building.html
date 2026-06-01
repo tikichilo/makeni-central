@@ -154,7 +154,6 @@
     .desktop-give     { display: flex !important; }
   }
 
-  /* Hamburger lines */
   .hamburger-btn {
     display: flex;
     flex-direction: column;
@@ -185,13 +184,11 @@
   .hamburger-btn span:nth-child(3) { width: 22px; }
   .hamburger-btn span:nth-child(4) { width: 14px; }
 
-  /* Open state: 4 lines collapse to X */
   .hamburger-btn.open span:nth-child(1) { width: 22px; transform: translateY(10.5px) rotate(45deg); }
   .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
   .hamburger-btn.open span:nth-child(3) { opacity: 0; transform: scaleX(0); }
   .hamburger-btn.open span:nth-child(4) { width: 22px; transform: translateY(-10.5px) rotate(-45deg); }
 
-  /* Mobile drawer */
   .mobile-drawer {
     position: fixed;
     top: 80px;
@@ -240,9 +237,7 @@
   }
   .mobile-drawer nav a .nav-icon { color: #755b00; font-size: 20px; }
   .mobile-drawer-inner { padding: 8px 0 20px; }
-  .mobile-give-row {
-    padding: 16px 24px 4px;
-  }
+  .mobile-give-row { padding: 16px 24px 4px; }
   .mobile-give-btn {
     width: 100%;
     background: #041534;
@@ -264,6 +259,95 @@
   .mobile-give-btn:active { transform: scale(0.97); }
   .mobile-give-btn:hover { background: #755b00; }
 
+  /* ── Hero Slideshow ── */
+  .building-hero-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+    will-change: opacity, transform;
+  }
+  .building-hero-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .building-hero-slide.active {
+    opacity: 1;
+    animation: heroZoom 14s ease-out forwards;
+  }
+  .building-hero-slide.prev {
+    opacity: 0;
+  }
+  @keyframes heroZoom {
+    0%   { transform: scale(1); }
+    100% { transform: scale(1.06); }
+  }
+
+  /* Hero dots */
+  .building-hero-dots {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 20;
+  }
+  .building-hero-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    padding: 0;
+  }
+  .building-hero-dot.active {
+    background: #fed977;
+    transform: scale(1.3);
+  }
+
+  /* ── Gallery image placeholder ── */
+  .gallery-img-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #e2e2e2;
+  }
+  .gallery-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+  }
+  .gallery-img-wrap:hover img { transform: scale(1.1); }
+
+  /* Fallback placeholder shown when no image is set */
+  .gallery-img-wrap.placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #eeeeee;
+    border: 2px dashed #c5c6cf;
+    border-radius: 12px;
+  }
+  .gallery-img-wrap.placeholder .ph-icon {
+    font-size: 40px;
+    color: #c5c6cf;
+  }
+  .gallery-img-wrap.placeholder .ph-label {
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #75777f;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
 </style>
 </head>
 
@@ -273,12 +357,10 @@
 <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-2 border-secondary-container shadow-sm">
   <div class="nav-inner relative flex items-center justify-between h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
 
-    <!-- Mobile: Hamburger (left) -->
     <button class="hamburger-btn mobile-hamburger" id="hamburger-btn" aria-label="Open navigation menu">
       <span></span><span></span><span></span><span></span>
     </button>
 
-    <!-- Brand (centered on mobile via absolute, left on desktop) -->
     <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
       <div class="logo-badge">
         <img alt="Makeni Central SDA Logo" src="sda.png"/>
@@ -286,7 +368,6 @@
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </div>
 
-    <!-- Desktop: Nav links (hidden on mobile) -->
     <nav class="hidden md:flex items-center gap-8">
       <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="index.html">Home</a>
       <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="kids.html">Kids Corner</a>
@@ -294,12 +375,9 @@
       <a class="font-label-md text-label-md text-primary border-b-2 border-secondary pb-1" href="#">New Building</a>
     </nav>
 
-    <!-- Desktop: Give button -->
     <button class="desktop-give bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md hover:bg-primary/90 transition-all active:scale-95">
       Give
     </button>
-
-    <!-- Mobile: Give button (right) -->
     <button class="mobile-give bg-primary text-on-primary px-4 py-2 rounded-xl font-label-md text-[13px] hover:bg-primary/90 transition-all active:scale-95">
       Give
     </button>
@@ -328,19 +406,47 @@
 <main class="pt-20">
 
   <!-- ══════════════ HERO ══════════════ -->
-  <section class="building-hero relative h-[80vh] flex items-end overflow-hidden">
-    <div class="absolute inset-0 z-0">
-      <img class="w-full h-full object-cover"
-        alt="A grand architectural 3D render of a modern SDA church building at sunset"
-        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgpRsklSS9NUKZHJ5zC-tRSc6XcQWt_HBD5tV6MgKEFO-NjhC01-65b0JTfx8qF3UmjxHalYTimM_0kcUS1cPmks3akhMMOrU2-tWgTZ_od3NwUzPcWpUvVpc2hw6WdZ9HzkpRzJgp4l6NTEOGy78G7qICn_hxxOvZ9rb5vaU5OkiAGesZS3wfTXNitDZH--Wo239VutHHDDMtOjUlSes_FVoj7dlYivG4GI3AtYdNTWGCHmVPnVzuJETR1jg_jVCBuTCVNRrFJbML"/>
+  <!--
+    HERO SLIDESHOW
+    Add your building photos to the images/ folder and update the src attributes below.
+    Recommended: 3–5 landscape photos, at least 1400px wide.
+    Caption text is in the <span> inside each slide's overlay div.
+  -->
+  <section id="building-hero" class="building-hero relative h-[80vh] flex items-end overflow-hidden" aria-label="New building hero">
+
+    <!-- Slide 1 -->
+    <div class="building-hero-slide active" aria-hidden="true">
+      <img src="images/b5.jpg" alt="New Makeni Central SDA Church building construction site"/>
       <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent"></div>
     </div>
-    <div class="relative z-10 w-full max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pb-section-gap">
+
+    <!-- Slide 2 -->
+    <div class="building-hero-slide" aria-hidden="true">
+      <img src="images/b6.jpg" alt="Foundation work in progress"/>
+      <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent"></div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="building-hero-slide" aria-hidden="true">
+      <img src="images/b7.jpg" alt="Church members supporting the building project"/>
+      <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent"></div>
+    </div>
+
+    <!-- Hero text (always on top) -->
+    <div class="relative z-10 w-full max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pb-16 md:pb-section-gap">
       <h1 class="font-display-lg text-display-lg text-on-primary mb-6 text-shadow-premium">Building Our Future Together</h1>
       <p class="font-body-lg text-body-lg text-on-primary/90 max-w-2xl mb-8">
         A sacred sanctuary designed to foster worship, community, and spiritual growth for generations to come.
       </p>
     </div>
+
+    <!-- Dot indicators -->
+    <div class="building-hero-dots" id="building-hero-dots" role="tablist" aria-label="Hero slideshow navigation">
+      <button class="building-hero-dot active" role="tab" aria-selected="true"  aria-label="Slide 1"></button>
+      <button class="building-hero-dot"        role="tab" aria-selected="false" aria-label="Slide 2"></button>
+      <button class="building-hero-dot"        role="tab" aria-selected="false" aria-label="Slide 3"></button>
+    </div>
+
   </section>
 
 
@@ -364,7 +470,6 @@
         <p class="font-headline-md text-headline-md text-primary" data-func="fund-donors">—</p>
       </div>
     </div>
-    <!-- Animated fund progress bar -->
     <div class="mb-4 flex justify-between items-center">
       <span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Fundraising Progress</span>
       <span class="font-label-md text-label-md text-primary" data-func="fund-percent">—%</span>
@@ -375,135 +480,106 @@
   </section>
 
   <!-- ══════════════ PROGRESS TRACKER ══════════════ -->
-<section class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
-  <div class="text-center mb-16">
-    <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Construction Progress</h2>
-    <div class="gold-divider mx-auto"></div>
-  </div>
-
-  <!-- DESKTOP: horizontal track (hidden on mobile) -->
-  <div class="hidden md:block relative pt-12 pb-8">
-    <div class="absolute top-[28px] left-0 w-full h-0.5 bg-surface-container-highest"></div>
-    <div class="absolute top-[28px] left-0 w-[20%] h-0.5 bg-secondary"></div>
-
-    <div class="relative flex justify-between">
-
-      <!-- Land Acquired (done) -->
-      <div class="flex flex-col items-center gap-4 text-center">
-        <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-lg z-10">
-          <span class="material-symbols-outlined !text-[20px]" style="font-variation-settings:'FILL' 1;">check</span>
-        </div>
-        <span class="font-label-md text-label-md text-primary">Land Acquired</span>
-      </div>
-
-      <!-- Foundation (current) -->
-      <div class="flex flex-col items-center gap-4 text-center">
-        <div class="w-12 h-12 rounded-full border-4 border-secondary bg-surface-container-lowest flex items-center justify-center text-secondary shadow-lg z-10 -mt-1 scale-110">
-          <span class="material-symbols-outlined !text-[24px]" style="font-variation-settings:'FILL' 1;">architecture</span>
-        </div>
-        <span class="font-label-md text-label-md text-secondary font-bold">Foundation</span>
-      </div>
-
-      <!-- Walls (pending) -->
-      <div class="flex flex-col items-center gap-4 text-center">
-        <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10"></div>
-        <span class="font-label-md text-label-md text-on-surface-variant">Walls</span>
-      </div>
-
-      <!-- Roofing (pending) -->
-      <div class="flex flex-col items-center gap-4 text-center">
-        <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10"></div>
-        <span class="font-label-md text-label-md text-on-surface-variant">Roofing</span>
-      </div>
-
-      <!-- Interior (pending) -->
-      <div class="flex flex-col items-center gap-4 text-center">
-        <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10"></div>
-        <span class="font-label-md text-label-md text-on-surface-variant">Interior</span>
-      </div>
-
-      <!-- Completion (pending) -->
-      <div class="flex flex-col items-center gap-4 text-center">
-        <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10"></div>
-        <span class="font-label-md text-label-md text-on-surface-variant">Completion</span>
-      </div>
-
+  <section class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="text-center mb-16">
+      <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Construction Progress</h2>
+      <div class="gold-divider mx-auto"></div>
     </div>
-  </div>
 
-  <!-- MOBILE: vertical track (hidden on desktop) -->
-  <div class="md:hidden relative pl-8">
-    <div class="absolute left-[19px] top-0 bottom-0 w-0.5 bg-surface-container-highest"></div>
-    <div class="absolute left-[19px] top-0 h-[20%] w-0.5 bg-secondary"></div>
-
-    <div class="flex flex-col gap-8">
-
-      <!-- Land Acquired (done) -->
-      <div class="flex items-center gap-4 relative">
-        <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-lg z-10 flex-shrink-0 -ml-8">
-          <span class="material-symbols-outlined !text-[20px]" style="font-variation-settings:'FILL' 1;">check</span>
+    <!-- DESKTOP: horizontal track -->
+    <div class="hidden md:block relative pt-12 pb-8">
+      <div class="absolute top-[28px] left-0 w-full h-0.5 bg-surface-container-highest"></div>
+      <div class="absolute top-[28px] left-0 w-[20%] h-0.5 bg-secondary"></div>
+      <div class="relative flex justify-between">
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-lg z-10">
+            <span class="material-symbols-outlined !text-[20px]" style="font-variation-settings:'FILL' 1;">check</span>
+          </div>
+          <span class="font-label-md text-label-md text-primary">Land Acquired</span>
         </div>
-        <div>
-          <span class="font-label-md text-label-md text-primary block">Land Acquired</span>
-          <span class="font-body-md text-body-md text-on-surface-variant text-sm">Completed</span>
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="w-12 h-12 rounded-full border-4 border-secondary bg-surface-container-lowest flex items-center justify-center text-secondary shadow-lg z-10 -mt-1 scale-110">
+            <span class="material-symbols-outlined !text-[24px]" style="font-variation-settings:'FILL' 1;">architecture</span>
+          </div>
+          <span class="font-label-md text-label-md text-secondary font-bold">Foundation</span>
         </div>
-      </div>
-
-      <!-- Foundation (current) -->
-      <div class="flex items-center gap-4 relative">
-        <div class="w-12 h-12 rounded-full border-4 border-secondary bg-surface-container-lowest flex items-center justify-center text-secondary shadow-lg z-10 flex-shrink-0 -ml-9 scale-110">
-          <span class="material-symbols-outlined !text-[24px]" style="font-variation-settings:'FILL' 1;">architecture</span>
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10"></div>
+          <span class="font-label-md text-label-md text-on-surface-variant">Walls</span>
         </div>
-        <div>
-          <span class="font-label-md text-label-md text-secondary font-bold block">Foundation</span>
-          <span class="font-body-md text-body-md text-secondary/70 text-sm">In Progress</span>
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10"></div>
+          <span class="font-label-md text-label-md text-on-surface-variant">Roofing</span>
         </div>
-      </div>
-
-      <!-- Walls (pending) -->
-      <div class="flex items-center gap-4 relative">
-        <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10 flex-shrink-0 -ml-8"></div>
-        <div>
-          <span class="font-label-md text-label-md text-on-surface-variant block">Walls</span>
-          <span class="font-body-md text-body-md text-on-surface-variant/60 text-sm">Upcoming</span>
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10"></div>
+          <span class="font-label-md text-label-md text-on-surface-variant">Interior</span>
+        </div>
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10"></div>
+          <span class="font-label-md text-label-md text-on-surface-variant">Completion</span>
         </div>
       </div>
-
-      <!-- Roofing (pending) -->
-      <div class="flex items-center gap-4 relative">
-        <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10 flex-shrink-0 -ml-8"></div>
-        <div>
-          <span class="font-label-md text-label-md text-on-surface-variant block">Roofing</span>
-          <span class="font-body-md text-body-md text-on-surface-variant/60 text-sm">Upcoming</span>
-        </div>
-      </div>
-
-      <!-- Interior (pending) -->
-      <div class="flex items-center gap-4 relative">
-        <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10 flex-shrink-0 -ml-8"></div>
-        <div>
-          <span class="font-label-md text-label-md text-on-surface-variant block">Interior</span>
-          <span class="font-body-md text-body-md text-on-surface-variant/60 text-sm">Upcoming</span>
-        </div>
-      </div>
-
-      <!-- Completion (pending) -->
-      <div class="flex items-center gap-4 relative">
-        <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10 flex-shrink-0 -ml-8"></div>
-        <div>
-          <span class="font-label-md text-label-md text-on-surface-variant block">Completion</span>
-          <span class="font-body-md text-body-md text-on-surface-variant/60 text-sm">Upcoming</span>
-        </div>
-      </div>
-
     </div>
-  </div>
-</section>
+
+    <!-- MOBILE: vertical track -->
+    <div class="md:hidden relative pl-8">
+      <div class="absolute left-[19px] top-0 bottom-0 w-0.5 bg-surface-container-highest"></div>
+      <div class="absolute left-[19px] top-0 h-[20%] w-0.5 bg-secondary"></div>
+      <div class="flex flex-col gap-8">
+        <div class="flex items-center gap-4 relative">
+          <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-lg z-10 flex-shrink-0 -ml-8">
+            <span class="material-symbols-outlined !text-[20px]" style="font-variation-settings:'FILL' 1;">check</span>
+          </div>
+          <div>
+            <span class="font-label-md text-label-md text-primary block">Land Acquired</span>
+            <span class="font-body-md text-body-md text-on-surface-variant text-sm">Completed</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 relative">
+          <div class="w-12 h-12 rounded-full border-4 border-secondary bg-surface-container-lowest flex items-center justify-center text-secondary shadow-lg z-10 flex-shrink-0 -ml-9 scale-110">
+            <span class="material-symbols-outlined !text-[24px]" style="font-variation-settings:'FILL' 1;">architecture</span>
+          </div>
+          <div>
+            <span class="font-label-md text-label-md text-secondary font-bold block">Foundation</span>
+            <span class="font-body-md text-body-md text-secondary/70 text-sm">In Progress</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 relative">
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10 flex-shrink-0 -ml-8"></div>
+          <div>
+            <span class="font-label-md text-label-md text-on-surface-variant block">Walls</span>
+            <span class="font-body-md text-body-md text-on-surface-variant/60 text-sm">Upcoming</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 relative">
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10 flex-shrink-0 -ml-8"></div>
+          <div>
+            <span class="font-label-md text-label-md text-on-surface-variant block">Roofing</span>
+            <span class="font-body-md text-body-md text-on-surface-variant/60 text-sm">Upcoming</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 relative">
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10 flex-shrink-0 -ml-8"></div>
+          <div>
+            <span class="font-label-md text-label-md text-on-surface-variant block">Interior</span>
+            <span class="font-body-md text-body-md text-on-surface-variant/60 text-sm">Upcoming</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 relative">
+          <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center z-10 flex-shrink-0 -ml-8"></div>
+          <div>
+            <span class="font-label-md text-label-md text-on-surface-variant block">Completion</span>
+            <span class="font-body-md text-body-md text-on-surface-variant/60 text-sm">Upcoming</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ══════════════ VISION ══════════════ -->
   <section class="bg-surface-container-low py-section-gap">
     <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
-
       <div class="order-2 md:order-1 space-y-8">
         <span class="font-label-md text-label-md text-secondary tracking-[0.2em] uppercase block">The Vision</span>
         <h2 class="font-headline-lg text-headline-lg text-primary leading-tight">A Sanctuary for Spiritual Growth and Community Service</h2>
@@ -517,16 +593,33 @@
         </p>
       </div>
 
+      <!--
+        VISION PHOTO
+        Replace src with a real interior/render photo.
+        Suggested: images/building-vision.jpg
+      -->
       <div class="order-1 md:order-2">
-        <img class="rounded-xl shadow-xl w-full h-[500px] object-cover"
-          alt="Architectural interior of a church with high vaulted ceilings and modern wooden pews"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrXG8FZbwMAXASUG-KEg0Psq53ZaL0anmgdFW8rMP9RuvAPCn6u02VhG7rsdRa_C53F3QjiLMwUq2bN2gI6gDFHRFi21seCIVsBTJF3V_liQaEZCzs_q-cZ9y7Qs5G0oyctl0A08tSeCc0I7k7PXQiKy_Dp4mgS57RDYe0nhog4APscufiqpRXy42JiLv2_486TGfDEqupgb0tm9Ahze2TnbX4bsbF7Pk1UBr2azmcMahT_ixefRmvQ3YWX1qy2KArFdnIfRe1x2Fk"/>
+        <img
+          class="rounded-xl shadow-xl w-full h-[500px] object-cover"
+          src="images/building-vision.jpg"
+          alt="Architectural interior of the new Makeni Central SDA Church"
+          onerror="this.parentElement.innerHTML='<div style=\'height:500px;background:#eeeeee;border-radius:12px;border:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px\'><span class=\'material-symbols-outlined\' style=\'font-size:48px;color:#c5c6cf\'>image</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/building-vision.jpg</span></div>'"
+        />
       </div>
-
     </div>
   </section>
 
   <!-- ══════════════ PHOTO GALLERY ══════════════ -->
+  <!--
+    CONSTRUCTION GALLERY
+    Replace each src below with your real construction photos.
+    Filenames suggested:
+      images/gallery-main.jpg      — large feature photo (left, spans 2 rows)
+      images/gallery-2.jpg         — top right
+      images/gallery-3.jpg         — bottom right, small
+      images/gallery-4.jpg         — bottom right, small
+    Captions are in the overlay <span> inside each tile.
+  -->
   <section class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
     <div class="flex justify-between items-end mb-12">
       <div>
@@ -539,36 +632,56 @@
     </div>
 
     <!-- Bento Grid Gallery -->
-    <div class="gallery-bento grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-[600px] md:h-[600px]">
+    <div class="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-auto md:h-[600px]">
 
-      <div class="md:col-span-2 md:row-span-2 relative overflow-hidden rounded-xl group">
-        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          alt="Wide angle construction site during foundation phase"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwmFSOdLKY-tOmmHBml9FNFJ7cPoUnURW6ycIVzvt_HmCFmZp8bTcu4ssMU7bSBOSi0nRxhY0ecyPHS4zFW8qotQSS3HyUR0nDs9houhLHfSmP9tmzPml8RWR3ZVflGsoi3_F03Qy5VGcsokPvqyFbn-ukoR7a_UqNxVzl_6QX9cpQ-s8mVi9un_RFj6uRUDaxb7-3T5iugvZqMAKbEth4oGOefKRUovKzy4Eg61PfJsvm7tB9z8BSvUhkyHxArqCz_7BMlHvY4ltm"/>
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-          <span class="font-label-md text-label-md text-white">Foundation Laying — June 2023</span>
+      <!-- Main large tile -->
+      <div class="md:col-span-2 md:row-span-2 relative overflow-hidden rounded-xl group h-64 md:h-auto">
+        <div class="gallery-img-wrap w-full h-full">
+          <img
+            src="images/b0.jpg"
+            alt="Foundation laying — construction site overview"
+            onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>domain</span><span class=\'ph-label\'>gallery-main.jpg</span>'"
+          />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6 z-10 pointer-events-none">
+          <span class="font-label-md text-label-md text-white">Foundation Laying — Phase 1</span>
         </div>
       </div>
 
-      <div class="md:col-span-2 relative overflow-hidden rounded-xl group">
-        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          alt="Close up detail of brickwork on the new church walls"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdl36Yxx8iYUnrIguBD-zZHTf6CK8ACKh1YY5KgFnX317DVLidRth2mMm2y_hzFj9sBIYkKXId1YV6xJKvNSeF6dc-7t_5FYF5MRnEyUdoxBUXCtUVAPlca7Wzxxp3o2rnxMw723t06zwc4V1bc78me-KjVtlyrLvQ91heuewD_hTec3RKCjYCepAUtGBnI8MS0Vv2Y3kxfHnGsKl6kzweV2J6XWe6J_Uqioo0-w-9C9ndPWdJ5isR-d5IcwSmMnJiymj9"/>
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-          <span class="font-label-md text-label-md text-white">Main Wall Progress</span>
+      <!-- Top right tile -->
+      <div class="md:col-span-2 relative overflow-hidden rounded-xl group h-48 md:h-auto">
+        <div class="gallery-img-wrap w-full h-full">
+          <img
+            src="images/b1.jpg"
+            alt="Wall construction in progress"
+            onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>wall</span><span class=\'ph-label\'>gallery-2.jpg</span>'"
+          />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6 z-10 pointer-events-none">
+          <span class="font-label-md text-label-md text-white"> Progress</span>
         </div>
       </div>
 
-      <div class="relative overflow-hidden rounded-xl group">
-        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          alt="Interior shot looking up at roof trusses and framework"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyRZlSCcLVFeAVnSzYJeDLa8_cdjVb90RpB8yqO-ZPOH1yO9Dl_FypWrprXilCX5P6_opircR_tdEw0H1j7VPE3nm-aonkeFrL1BHRv30PBVY4jdQ9JWbSpp8PvBO_uWmJ4vrDE4yRTiJyoSF3L44ARVPJBFEjrMh-RHyA8aVYxfAj1ArGSvX02NWcUrjOjRrJBcLBQeBFGm6eBVQN89wY2O9jwW0adJUTn0OT9FTVxPb8E5dlzQrmr3gphjedey-rSLLoWwIsgK_o"/>
+      <!-- Bottom right small tile 1 -->
+      <div class="relative overflow-hidden rounded-xl group h-48 md:h-auto">
+        <div class="gallery-img-wrap w-full h-full">
+          <img
+            src="images/b3.jpg"
+            alt="Roof framework and trusses"
+            onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>roofing</span><span class=\'ph-label\'>gallery-3.jpg</span>'"
+          />
+        </div>
       </div>
 
-      <div class="relative overflow-hidden rounded-xl group">
-        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          alt="Aerial drone photography showing the church footprint within the landscape"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBClmXFznLx_2spKx1EQ_fBUCcUyCxqzLvd4NAtCcMCxYLXYQdaOlaYb-SLeSaxuvgjCC2fHD06YN3JiDqWL1leq6-kOCMcv0GIPS_OWW0SHOb0nTxYU4yj1BmAxeCXsJwtprN9ehV642tSr6oL39vOEyBWiwFYrjYl8bH_0AMr3XxFVETDaQ0jOZ-j_IuOrX_cMGLJ8-40mc1lhs-i6WFBZp9zFmewq95LucWzQ4b2BI4IzCGTADyOGgAiHzHq05VVUNTvpASW1_FT"/>
+      <!-- Bottom right small tile 2 -->
+      <div class="relative overflow-hidden rounded-xl group h-48 md:h-auto">
+        <div class="gallery-img-wrap w-full h-full">
+          <img
+            src="images/b4.jpg"
+            alt="Aerial view of the construction site"
+            onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>landscape</span><span class=\'ph-label\'>gallery-4.jpg</span>'"
+          />
+        </div>
       </div>
 
     </div>
@@ -604,7 +717,6 @@
         <div class="gold-divider mx-auto"></div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-
         <div class="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 hover:border-secondary/50 transition-all">
           <span class="material-symbols-outlined text-secondary text-5xl mb-6">format_quote</span>
           <p class="font-body-md text-body-md text-on-primary/90 italic mb-8 leading-relaxed">
@@ -618,7 +730,6 @@
             </div>
           </div>
         </div>
-
         <div class="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 hover:border-secondary/50 transition-all">
           <span class="material-symbols-outlined text-secondary text-5xl mb-6">format_quote</span>
           <p class="font-body-md text-body-md text-on-primary/90 italic mb-8 leading-relaxed">
@@ -632,7 +743,6 @@
             </div>
           </div>
         </div>
-
         <div class="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 hover:border-secondary/50 transition-all">
           <span class="material-symbols-outlined text-secondary text-5xl mb-6">format_quote</span>
           <p class="font-body-md text-body-md text-on-primary/90 italic mb-8 leading-relaxed">
@@ -646,7 +756,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </section>
@@ -656,8 +765,6 @@
 <!-- ══════════════ FOOTER ══════════════ -->
 <footer class="bg-primary text-on-primary w-full py-12 border-t-4 border-secondary">
   <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
-
-    <!-- Brand block -->
     <div class="md:col-span-1">
       <div class="flex items-center gap-3 mb-6">
         <div class="logo-badge logo-badge-sm" style="background-color:#0a1a3a; border-color:#e6c364;">
@@ -669,8 +776,6 @@
         Proclaiming the everlasting gospel to every nation, kindred, tongue, and people.
       </p>
     </div>
-
-    <!-- Quick links -->
     <div>
       <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
       <ul class="space-y-3">
@@ -680,8 +785,6 @@
         <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#">New Building</a></li>
       </ul>
     </div>
-
-    <!-- Connect -->
     <div>
       <h4 class="font-title-lg text-title-lg mb-6">Connect</h4>
       <ul class="space-y-3">
@@ -690,8 +793,6 @@
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Prayer Requests</a></li>
       </ul>
     </div>
-
-    <!-- Legal -->
     <div>
       <h4 class="font-title-lg text-title-lg mb-6">Legal</h4>
       <ul class="space-y-3">
@@ -699,18 +800,66 @@
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Terms of Service</a></li>
       </ul>
     </div>
-
   </div>
-
-  <!-- Copyright bar -->
   <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 text-center">
     <p class="font-body-md text-body-md text-on-primary/60">
       © 2025 Makeni Central SDA Church. All rights reserved.
     </p>
   </div>
 </footer>
+
 <script src="sda.js" defer></script>
 <script src="func.js" defer></script>
+
+<!-- Building hero slideshow (self-contained, no dependency on func.js) -->
+<script>
+(function () {
+  document.addEventListener('DOMContentLoaded', function () {
+    const slides   = document.querySelectorAll('.building-hero-slide');
+    const dots     = document.querySelectorAll('#building-hero-dots .building-hero-dot');
+    if (!slides.length) return;
+
+    const INTERVAL     = 6000;
+    const RESUME_DELAY = 8000;
+    let current = 0, timer = null, resumeTimer = null;
+
+    function goTo(index) {
+      slides[current].classList.remove('active');
+      slides[current].classList.add('prev');
+      if (dots[current]) { dots[current].classList.remove('active'); dots[current].setAttribute('aria-selected','false'); }
+      const leaving = slides[current];
+      setTimeout(() => leaving.classList.remove('prev'), 1300);
+      current = (index + slides.length) % slides.length;
+      const incoming = slides[current];
+      incoming.style.animation = 'none';
+      incoming.offsetHeight;
+      incoming.style.animation = '';
+      incoming.classList.add('active');
+      if (dots[current]) { dots[current].classList.add('active'); dots[current].setAttribute('aria-selected','true'); }
+    }
+
+    function startAuto() { stopAuto(); timer = setInterval(() => goTo(current + 1), INTERVAL); }
+    function stopAuto()  { if (timer) { clearInterval(timer); timer = null; } }
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        if (i === current) return;
+        stopAuto(); clearTimeout(resumeTimer);
+        goTo(i);
+        resumeTimer = setTimeout(startAuto, RESUME_DELAY);
+      });
+    });
+
+    const hero = document.getElementById('building-hero');
+    if (hero) {
+      hero.addEventListener('mouseenter', stopAuto);
+      hero.addEventListener('mouseleave', startAuto);
+    }
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startAuto();
+  });
+})();
+</script>
 
 </body>
 </html>
