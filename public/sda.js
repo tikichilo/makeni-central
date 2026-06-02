@@ -259,6 +259,10 @@ function initNavbar() {
     });
     window.addEventListener('resize', () => {
       if (window.innerWidth >= 768 && drawerOpen) setDrawerOpen(false);
+      // Preserve overflow:hidden if any modal is open
+      if (document.body.dataset.visitModalOpen || document.body.dataset.giveModalOpen) {
+        document.body.style.overflow = 'hidden';
+      }
     }, { passive: true });
 
     // Watch class so scroll handler knows drawer state
