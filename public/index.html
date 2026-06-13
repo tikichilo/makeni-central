@@ -864,6 +864,86 @@
     .visit-modal-header { padding: 22px 20px 18px; }
     .visit-modal-body { padding: 20px 20px 24px; }
   }
+
+  /* ═══════════════════════════════════════════
+     MOBILE USABILITY IMPROVEMENTS
+  ═══════════════════════════════════════════ */
+
+  /* Anchor scroll offset so sections aren't hidden under fixed header */
+  #mission, #announcements, #find-us {
+    scroll-margin-top: 80px;
+  }
+
+  /* Hero text scaling for small screens */
+  @media (max-width: 480px) {
+    .hero-h1 {
+      font-size: 36px !important;
+      line-height: 1.15;
+    }
+    .hero-p {
+      font-size: 15px;
+    }
+  }
+
+  /* Stack hero CTAs full-width on very narrow screens */
+  @media (max-width: 360px) {
+    .hero-cta {
+      flex-direction: column;
+      width: 100%;
+    }
+    .hero-cta > * {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  /* Ticker: shrink edge fades so more text is readable on mobile */
+  @media (max-width: 480px) {
+    .ticker-wrap::before,
+    .ticker-wrap::after {
+      width: 24px;
+    }
+  }
+
+  /* Visit modal: tighter spacing on short/landscape screens */
+  @media (max-height: 700px) {
+    .visit-modal-body {
+      padding: 18px 20px 20px;
+    }
+    .service-option {
+      padding: 12px 16px;
+      margin-bottom: 8px;
+    }
+  }
+
+  /* Service option text sizing on very small screens */
+  @media (max-width: 380px) {
+    .service-option-label {
+      font-size: 14px;
+    }
+    .service-option-time {
+      font-size: 12px;
+    }
+  }
+
+  /* iOS date input fix */
+  .visit-date-input {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* Find Us section: prevent oversized map card on mobile */
+  @media (max-width: 640px) {
+    #find-us .rounded-xl.overflow-hidden.sacred-shadow {
+      min-height: auto;
+    }
+    #find-us .relative.flex-1 {
+      min-height: 280px;
+    }
+    #church-map {
+      min-height: 280px !important;
+    }
+  }
 </style>
 </head>
 
