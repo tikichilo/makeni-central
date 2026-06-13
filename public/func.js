@@ -386,12 +386,23 @@ function initYouthBoard() {
         return new Date(dateStr).toLocaleDateString();
       }
 
+      function wireReadMore(btn) {
+        if (btn.dataset.wired) return;
+        btn.dataset.wired = '1';
+        const p = btn.previousElementSibling;
+        if (!p) return;
+        btn.addEventListener('click', () => {
+          const expanded = p.classList.toggle('line-clamp-2');
+          btn.textContent = expanded ? 'Read more' : 'Show less';
+        });
+      }
+
       // Render newest-first (API already sorts by createdAt: -1)
       data.forEach(d => {
         const initials = d.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
         const card = document.createElement('article');
-        card.className       = 'discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow';
+        card.className        = 'discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow';
         card.dataset.category = d.category;
         card.dataset.id       = d._id;
 
@@ -406,8 +417,9 @@ function initYouthBoard() {
           </div>
           <span class="card-category">${esc(d.category)}</span>
           <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${esc(d.title)}</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-6">${esc(d.body)}</p>
-          <div class="flex items-center gap-6">
+          <p class="card-body font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-2">${esc(d.body)}</p>
+          <button class="read-more-btn">Read more</button>
+          <div class="flex items-center gap-6 mt-4">
             <div class="flex items-center gap-2 text-on-surface-variant">
               <span class="material-symbols-outlined text-[20px]">forum</span>
               <span class="font-label-md">${d.comments || 0} Comments</span>
@@ -428,6 +440,7 @@ function initYouthBoard() {
         }
 
         wireLikeBtn(card.querySelector('.like-btn'));
+        wireReadMore(card.querySelector('.read-more-btn'));
       });
 
       // Hide empty state since we have real cards
@@ -441,6 +454,20 @@ function initYouthBoard() {
   }
 
   loadDiscussions();
+  
+  function wireReadMore(btn) {
+  if (btn.dataset.wired) return;
+  btn.dataset.wired = '1';
+  const p = btn.previousElementSibling;
+  if (!p) return;
+
+  btn.addEventListener('click', () => {
+    const expanded = p.classList.toggle('expanded');
+    p.classList.toggle('line-clamp-2', !expanded);
+    btn.textContent = expanded ? 'Show less' : 'Read more';
+  });
+}
+document.querySelectorAll('.read-more-btn').forEach(wireReadMore);
 
   /* ── Filter buttons ── */
   document.querySelectorAll('.filter-btn').forEach(btn => {

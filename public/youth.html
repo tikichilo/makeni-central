@@ -237,6 +237,22 @@
     font-size: 36px; color: #041534;
   }
 
+  .read-more-btn {
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #755b00;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: -2px;
+  margin-bottom: 16px;
+  display: inline-block;
+}
+.read-more-btn:hover { text-decoration: underline; }
+.discussion-card .card-body.expanded { display: block; }
+
   /* ═══════════════════════════════════════════
      MOBILE USABILITY IMPROVEMENTS
   ═══════════════════════════════════════════ */
@@ -497,9 +513,11 @@
             </div>
             <span class="card-category">Christian Living</span>
             <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">Community Service Project: Next Steps</h3>
-            <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-6">
-              Thank you to everyone who joined our weekend clean-up! I've uploaded the draft proposal for our next outreach program in the central market...
-            </p>
+            
+            <p class="card-body font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-2">
+  ...text...
+</p>
+<button class="read-more-btn">Read more</button>
             <div class="flex items-center gap-6">
               <div class="flex items-center gap-2 text-on-surface-variant">
                 <span class="material-symbols-outlined text-[20px]">forum</span>
