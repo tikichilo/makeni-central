@@ -859,6 +859,50 @@
   }
   .visit-note .material-symbols-outlined { color: #755b00; font-size: 18px; flex-shrink: 0; margin-top: 1px; }
 
+  /* Calendar action buttons (replaces old confirm screen) */
+  .cal-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 2px solid #e2e2e2;
+    background: #fff;
+    cursor: pointer;
+    font-family: Inter, sans-serif;
+    text-align: left;
+    transition: all 0.2s ease;
+    margin-bottom: 12px;
+    text-decoration: none;
+  }
+  .cal-btn:hover { border-color: #755b00; background: #fffbee; transform: translateY(-1px); }
+  .cal-btn:active { transform: translateY(0) scale(0.99); }
+  .cal-btn-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .cal-btn-icon.primary-bg { background: #041534; }
+  .cal-btn-icon.google-bg  { background: #fffbee; border: 2px solid #755b00; }
+  .cal-btn-icon .material-symbols-outlined { font-size: 22px; }
+  .cal-btn-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #041534;
+    line-height: 1.2;
+  }
+  .cal-btn-sub {
+    font-size: 12.5px;
+    color: #75777f;
+    margin-top: 2px;
+  }
+  .cal-btn-arrow { margin-left: auto; color: #c5c6cf; flex-shrink: 0; }
+
   @media (max-width: 480px) {
     #visit-modal-box { border-radius: 16px; }
     .visit-modal-header { padding: 22px 20px 18px; }
@@ -1365,7 +1409,7 @@
 
         <div class="visit-section-label">Which service will you attend?</div>
 
-        <button class="service-option" data-service="Sabbath School" data-time="09:00 AM" aria-pressed="false">
+        <button class="service-option" data-service="Sabbath School" data-time="09:00 AM" data-start="09:00" data-end="10:30" aria-pressed="false">
           <div class="service-option-icon">
             <span class="material-symbols-outlined">school</span>
           </div>
@@ -1376,7 +1420,7 @@
           <div class="service-option-check"></div>
         </button>
 
-        <button class="service-option" data-service="Divine Service" data-time="11:00 AM" aria-pressed="false">
+        <button class="service-option" data-service="Divine Service" data-time="11:00 AM" data-start="11:00" data-end="13:00" aria-pressed="false">
           <div class="service-option-icon">
             <span class="material-symbols-outlined">church</span>
           </div>
@@ -1387,7 +1431,7 @@
           <div class="service-option-check"></div>
         </button>
 
-        <button class="service-option" data-service="Bible Study" data-time="03:00 PM" aria-pressed="false">
+        <button class="service-option" data-service="Bible Study" data-time="03:00 PM" data-start="15:00" data-end="16:30" aria-pressed="false">
           <div class="service-option-icon">
             <span class="material-symbols-outlined">menu_book</span>
           </div>
@@ -1398,7 +1442,7 @@
           <div class="service-option-check"></div>
         </button>
 
-        <button class="service-option" data-service="Full Day" data-time="09:00 AM – 04:00 PM" aria-pressed="false">
+        <button class="service-option" data-service="Full Day" data-time="09:00 AM – 04:00 PM" data-start="09:00" data-end="16:00" aria-pressed="false">
           <div class="service-option-icon">
             <span class="material-symbols-outlined">wb_sunny</span>
           </div>
@@ -1459,7 +1503,7 @@
         </div>
       </div>
 
-      <!-- ── STEP 3: Review + confirm ── -->
+      <!-- ── STEP 3: Review + Add to Calendar ── -->
       <div class="visit-step" id="visit-step-3">
         <div class="visit-confirm-card" id="confirm-card">
           <div class="visit-confirm-row">
@@ -1492,57 +1536,41 @@
           </div>
         </div>
 
-        <div class="visit-note" style="margin-bottom:20px;">
+        <div class="visit-section-label">Add a reminder to your calendar</div>
+
+        <!-- Google Calendar — works one-tap on Android + desktop -->
+        <a id="cal-google-btn" class="cal-btn" target="_blank" rel="noopener noreferrer">
+          <div class="cal-btn-icon google-bg">
+            <span class="material-symbols-outlined" style="color:#755b00;">event</span>
+          </div>
+          <div>
+            <div class="cal-btn-label">Add to Google Calendar</div>
+            <div class="cal-btn-sub">Opens in browser or Google Calendar app</div>
+          </div>
+          <span class="material-symbols-outlined cal-btn-arrow">arrow_forward_ios</span>
+        </a>
+
+        <!-- .ics download — works on iPhone (opens straight into Calendar) and Android (downloads, tap to open) -->
+        <button id="cal-ics-btn" class="cal-btn" type="button">
+          <div class="cal-btn-icon primary-bg">
+            <span class="material-symbols-outlined" style="color:#e6c364;">calendar_add_on</span>
+          </div>
+          <div>
+            <div class="cal-btn-label">Add to iPhone / Apple Calendar</div>
+            <div class="cal-btn-sub">Also works with Outlook &amp; most calendar apps</div>
+          </div>
+          <span class="material-symbols-outlined cal-btn-arrow">arrow_forward_ios</span>
+        </button>
+
+        <div class="visit-note" style="margin-top:8px;margin-bottom:20px;">
           <span class="material-symbols-outlined">info</span>
-          <span>We hold Sabbath services every Saturday. The church is at Plot 123, Makeni Road, Lusaka. <a href="https://www.google.com/maps/dir/?api=1&destination=Makeni+Central+Seventh-Day+Adventist+Church+Lusaka+Zambia" target="_blank" rel="noopener" style="color:#755b00;font-weight:600;">Get directions →</a></span>
+          <span>The church is at Plot 123, Makeni Road, Lusaka. <a href="https://www.google.com/maps/dir/?api=1&destination=Makeni+Central+Seventh-Day+Adventist+Church+Lusaka+Zambia" target="_blank" rel="noopener" style="color:#755b00;font-weight:600;">Get directions →</a></span>
         </div>
 
         <div style="display:flex;gap:10px;">
           <button class="visit-btn-back" id="step3-back">← Back</button>
-          <button class="visit-btn-primary" id="step3-confirm" style="flex:2;margin-top:0;">
+          <button class="visit-btn-primary" id="step3-done" style="flex:2;margin-top:0;">
             <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>
-            Confirm My Visit
-          </button>
-        </div>
-      </div>
-
-      <!-- ── SUCCESS ── -->
-      <div class="visit-step" id="visit-step-success">
-        <div class="visit-success">
-          <div class="visit-success-icon" id="success-icon">
-            <span class="material-symbols-outlined" style="color:#e6c364;font-size:36px;font-variation-settings:'FILL' 1;">check_circle</span>
-          </div>
-          <h3 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#041534;margin:0 0 8px;">See you there!</h3>
-          <p style="font-family:Inter,sans-serif;font-size:14px;color:#45464e;margin:0 0 24px;line-height:1.6;">
-            Your visit is planned. We're looking forward to worshipping with you.
-          </p>
-
-          <div class="visit-confirm-card" id="success-summary" style="text-align:left;">
-            <div class="visit-confirm-row">
-              <span class="material-symbols-outlined visit-confirm-icon">calendar_month</span>
-              <div>
-                <div class="visit-confirm-label">Date</div>
-                <div class="visit-confirm-value" id="success-date">—</div>
-              </div>
-            </div>
-            <div class="visit-confirm-row">
-              <span class="material-symbols-outlined visit-confirm-icon">schedule</span>
-              <div>
-                <div class="visit-confirm-label">Service</div>
-                <div class="visit-confirm-value" id="success-service">—</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="visit-note" style="margin-top:16px;margin-bottom:24px;text-align:left;">
-            <span class="material-symbols-outlined">location_on</span>
-            <span>Plot 123, Makeni Road, Lusaka, Zambia</span>
-          </div>
-
-          <button
-            class="visit-btn-primary"
-            id="visit-done-btn"
-            style="margin-top:0;">
             Done
           </button>
         </div>
@@ -1760,6 +1788,130 @@
     });
   }
 
+  /* ── Calendar event builders ──
+     Church address used as location on every event.
+
+     Timezone handling: rather than guessing a timezone from GPS/location
+     (which needs a permission prompt and a coordinates→zone lookup), we
+     read the device's OWN configured IANA timezone via Intl — this is
+     instant, needs no permission, and matches what the device's clock
+     and calendar app already believe "now" means. We treat the date/time
+     the visitor picked as wall-clock time in THAT zone, convert it to a
+     precise UTC instant for DTSTART/DTEND (avoids ambiguity across every
+     calendar app), and pass the zone name to Google Calendar's `ctz`
+     param so it also displays the event in the visitor's local time
+     instead of silently assuming UTC or Lusaka time.
+  ── */
+  const CHURCH_ADDRESS = 'Plot 123, Makeni Road, Lusaka, Zambia';
+  const CHURCH_NAME     = 'Makeni Central SDA Church';
+
+  // The visitor's device timezone, e.g. "Africa/Lusaka", "Europe/London".
+  // Falls back to Lusaka if the browser can't report one (very old browsers).
+  function getDeviceTimeZone() {
+    try {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Lusaka';
+    } catch (e) {
+      return 'Africa/Lusaka';
+    }
+  }
+
+  // Pad single digits: 9 -> "09"
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  // Build start/end Date objects from the visit date (YYYY-MM-DD) +
+  // service's data-start/data-end ("HH:MM" 24h). New Date(y,m,d,h,m) always
+  // constructs using the BROWSER'S OWN local timezone — which is exactly
+  // the device timezone we want, since the visitor is picking times as
+  // they see them on their own clock.
+  function buildEventTimes(dateIso, startHHMM, endHHMM) {
+    const [y, m, d]   = dateIso.split('-').map(Number);
+    const [sh, sm]    = startHHMM.split(':').map(Number);
+    const [eh, em]    = endHHMM.split(':').map(Number);
+    const start = new Date(y, m - 1, d, sh, sm, 0);
+    const end   = new Date(y, m - 1, d, eh, em, 0);
+    return { start, end };
+  }
+
+  // Format a Date as a UTC-stamped string for .ics / Google links: YYYYMMDDTHHMMSSZ
+  function toUtcStamp(date) {
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  }
+
+  function escIcsText(str) {
+    return String(str).replace(/\\/g, '\\\\').replace(/,/g, '\\,').replace(/;/g, '\\;').replace(/\n/g, '\\n');
+  }
+
+  // Build and trigger download of an .ics file.
+  // Two alarms: one ~24h before (lands Friday, same time of day as the
+  // service — a "get ready for Sabbath" nudge) and one 1h before (a
+  // "leaving soon" nudge). Both use absolute UTC trigger times rather than
+  // relative offsets, so they land correctly even across a DST boundary —
+  // a relative "-P1D" trigger can drift an hour in zones that observe DST,
+  // an absolute trigger never can.
+  function downloadIcsFile({ title, description, location, start, end }) {
+    const uid = 'visit-' + Date.now() + '@makenicentralsda.org';
+    const fridayAlarm = new Date(start.getTime() - 24 * 60 * 60 * 1000);
+    const hourAlarm    = new Date(start.getTime() - 60 * 60 * 1000);
+
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Makeni Central SDA//Visit Planner//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      'UID:' + uid,
+      'DTSTAMP:' + toUtcStamp(new Date()),
+      'DTSTART:' + toUtcStamp(start),
+      'DTEND:' + toUtcStamp(end),
+      'SUMMARY:' + escIcsText(title),
+      'DESCRIPTION:' + escIcsText(description),
+      'LOCATION:' + escIcsText(location),
+      'BEGIN:VALARM',
+      'TRIGGER;VALUE=DATE-TIME:' + toUtcStamp(fridayAlarm),
+      'ACTION:DISPLAY',
+      'DESCRIPTION:Sabbath is coming — get ready for ' + escIcsText(title),
+      'END:VALARM',
+      'BEGIN:VALARM',
+      'TRIGGER;VALUE=DATE-TIME:' + toUtcStamp(hourAlarm),
+      'ACTION:DISPLAY',
+      'DESCRIPTION:Leaving soon — ' + escIcsText(title),
+      'END:VALARM',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'makeni-central-visit.ics';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  // Build a Google Calendar "render" link (one-tap on Android / desktop).
+  // `ctz` tells Google which timezone to DISPLAY the event in on the
+  // visitor's calendar — without it Google would show the UTC time
+  // converted into whatever zone the visitor's Google account defaults to,
+  // which may not match their device. Google's own reminder picker only
+  // supports ONE default offset via this link, so we default it to the
+  // Friday-before nudge (the one specifically asked for); the .ics download
+  // carries both reminders since it supports multiple alarms.
+  function buildGoogleCalendarUrl({ title, description, location, start, end }) {
+    const params = new URLSearchParams({
+      action:  'TEMPLATE',
+      text:    title,
+      dates:   toUtcStamp(start) + '/' + toUtcStamp(end),
+      details: description,
+      location: location,
+      ctz: getDeviceTimeZone()
+    });
+    return 'https://calendar.google.com/calendar/render?' + params.toString();
+  }
+
   function initVisitPlanner() {
     const modal      = document.getElementById('visit-modal');
     const closeBtn   = document.getElementById('visit-modal-close');
@@ -1768,8 +1920,9 @@
     const step2Back  = document.getElementById('step2-back');
     const step2Next  = document.getElementById('step2-next');
     const step3Back  = document.getElementById('step3-back');
-    const step3Conf  = document.getElementById('step3-confirm');
-    const doneBtn    = document.getElementById('visit-done-btn');
+    const step3Done  = document.getElementById('step3-done');
+    const calGoogleBtn = document.getElementById('cal-google-btn');
+    const calIcsBtn     = document.getElementById('cal-ics-btn');
 
     if (!modal) return;
 
@@ -1777,6 +1930,8 @@
     let currentStep    = 1;
     let selectedService = null;
     let selectedTime    = null;
+    let selectedStart   = null; // "HH:MM"
+    let selectedEnd     = null; // "HH:MM"
 
     /* ── Open / close ── */
     function openModal() {
@@ -1787,6 +1942,8 @@
       // Also reset selections
       selectedService = null;
       selectedTime    = null;
+      selectedStart   = null;
+      selectedEnd     = null;
       document.querySelectorAll('.service-option').forEach(b => {
         b.classList.remove('selected');
         b.setAttribute('aria-pressed', 'false');
@@ -1812,28 +1969,24 @@
     function goToStep(n) {
       currentStep = n;
 
-      // Steps 1–3 + success
-      ['1','2','3','success'].forEach(function(id) {
+      // Steps 1–3
+      ['1','2','3'].forEach(function(id) {
         const el = document.getElementById('visit-step-' + id);
-        if (el) el.classList.toggle('active', id === String(n) || (n === 4 && id === 'success'));
+        if (el) el.classList.toggle('active', id === String(n));
       });
 
-      // Step indicator dots (steps 1–3 only)
+      // Step indicator dots
       for (let i = 1; i <= 3; i++) {
         const dot  = document.getElementById('dot-' + i);
         const line = document.getElementById('line-' + i);
         if (dot) {
-          dot.classList.toggle('done',   i < n && n <= 3);
-          dot.classList.toggle('active', i === n && n <= 3);
-          if (i < n && n <= 3) dot.innerHTML = '✓';
-          else                  dot.textContent = String(i);
+          dot.classList.toggle('done',   i < n);
+          dot.classList.toggle('active', i === n);
+          if (i < n) dot.innerHTML = '✓';
+          else        dot.textContent = String(i);
         }
-        if (line && i < 3) line.classList.toggle('done', i < n - 1 && n <= 3);
+        if (line && i < 3) line.classList.toggle('done', i < n - 1);
       }
-
-      // Hide indicator on success
-      var ind = document.getElementById('steps-indicator');
-      if (ind) ind.style.display = (n === 4) ? 'none' : 'flex';
     }
 
     /* ── Step 1: date + service selection ── */
@@ -1872,6 +2025,8 @@
         btn.setAttribute('aria-pressed', 'true');
         selectedService = btn.dataset.service;
         selectedTime    = btn.dataset.time;
+        selectedStart   = btn.dataset.start;
+        selectedEnd     = btn.dataset.end;
         checkStep1Valid();
       });
     });
@@ -1916,32 +2071,81 @@
         needsRow.style.display = 'none';
       }
 
+      // Wire up the calendar buttons now that we know the event details
+      wireCalendarButtons();
+
       goToStep(3);
     });
 
-    /* ── Step 3: confirm ── */
+    /* ── Step 3: calendar actions ── */
+    function buildCurrentEvent() {
+      const { start, end } = buildEventTimes(dateInput.value, selectedStart, selectedEnd);
+      const name  = document.getElementById('visit-name').value.trim();
+      const needs = [...document.querySelectorAll('.visit-need-check.checked')]
+        .map(function(l) { return l.textContent.trim(); });
+
+      let description = `Visiting Makeni Central SDA Church for ${selectedService}.`;
+      if (name)        description += `\\nName: ${name}`;
+      if (needs.length) description += `\\nRequests: ${needs.join(', ')}`;
+
+      return {
+        title:       `${selectedService} — ${CHURCH_NAME}`,
+        description,
+        location:    CHURCH_ADDRESS,
+        start,
+        end
+      };
+    }
+
+    function wireCalendarButtons() {
+      const event = buildCurrentEvent();
+
+      // Google Calendar link — just set the href, browser/OS handles the rest
+      calGoogleBtn.href = buildGoogleCalendarUrl(event);
+
+      // .ics download — rebuild on each click so it always reflects latest state
+      calIcsBtn.onclick = function() {
+        downloadIcsFile(event);
+        window.SDAToast?.('📅 Calendar file downloaded — open it to add the reminder.', 'success', 4000);
+      };
+    }
+
+    // Save the visit to the server. Fire-and-forget by design: the
+    // calendar buttons (Google Calendar / .ics) are the main thing the
+    // visitor came here for and already worked client-side with zero
+    // network dependency — saving to the church's visit log is a nice-to-have
+    // for the admin side, so a failed save should never block the visitor
+    // or show them a scary error for something they don't control.
+    async function saveVisitToServer() {
+      const { start } = buildCurrentEvent();
+      const name  = document.getElementById('visit-name').value.trim();
+      const needs = [...document.querySelectorAll('.visit-need-check.checked')]
+        .map(function(l) { return l.dataset.need; });
+
+      try {
+        await fetch('/api/visits', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            date:    dateInput.value,
+            service: selectedService,
+            time:    selectedTime,
+            name,
+            needs
+          })
+        });
+      } catch (e) {
+        console.warn('[visit planner] could not save visit to server:', e);
+      }
+    }
+
     step3Back.addEventListener('click', function() { goToStep(2); });
 
-    step3Conf.addEventListener('click', function() {
-      // Populate success summary
-      document.getElementById('success-date').textContent    = formatDate(dateInput.value);
-      document.getElementById('success-service').textContent = selectedService + ' · ' + selectedTime;
-
-      goToStep(4);
-
-      // Animate success icon
-      setTimeout(function() {
-        var icon = document.getElementById('success-icon');
-        if (icon) icon.classList.add('animate');
-      }, 50);
-
-      // Toast
-      if (window.SDAToast) {
-        window.SDAToast('✦ Visit planned — see you this Sabbath!', 'success', 4000);
-      }
+    step3Done.addEventListener('click', function() {
+      saveVisitToServer();
+      window.SDAToast?.('✦ See you this Sabbath!', 'success', 3000);
+      closeModal();
     });
-
-    doneBtn.addEventListener('click', closeModal);
 
     /* ── Close triggers ── */
     closeBtn.addEventListener('click', closeModal);

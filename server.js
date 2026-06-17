@@ -12,6 +12,7 @@
  *  GET  /api/theme                 — Theme of the month
  *  GET  /api/announcements         — Active announcements
  *  GET  /api/stories               — Kids bible stories
+ *  POST /api/visits                — Save a "Plan Your Visit" submission
  *
  *  — Admin endpoints —
  *  GET    /api/donations            — List all donations
@@ -24,6 +25,7 @@
  *  POST   /api/stories              — Publish a story
  *  POST   /api/stories/:id/feature  — Feature a story
  *  DELETE /api/stories/:id          — Delete a story
+ *  GET    /api/visits                — List planned visits
  */
 
 'use strict';
@@ -143,6 +145,22 @@ const storySchema = new mongoose.Schema({
   createdAt: { type: Date,   default: Date.now },
 });
 const Story = mongoose.model('Story', storySchema);
+
+
+// ── Visit — "Plan Your Visit" modal submissions ──
+const visitSchema = new mongoose.Schema({
+  date:      { type: Date,   required: true },
+  service:   { type: String, required: true, maxlength: 60  }, // e.g. "Divine Service"
+  time:      { type: String, default: '',    maxlength: 60  }, // e.g. "11:00 AM"
+  name:      { type: String, default: '',    maxlength: 100 },
+  needs:     { type: [String], default: [] },                  // e.g. ["prayer","welcome"]
+  createdAt: { type: Date,   default: Date.now },
+});
+const Visit = mongoose.model('Visit', visitSchema);
+
+// Allowed values, kept in sync with the service buttons in index.html
+const VISIT_SERVICES = ['Sabbath School', 'Divine Service', 'Bible Study', 'Full Day'];
+const VISIT_NEEDS     = ['prayer', 'welcome', 'kids', 'transport'];
 
 
 /* ═══════════════════════════════════════════════
@@ -326,6 +344,47 @@ app.get('/api/stories', async (req, res) => {
 });
 
 
+// ── POST /api/visits ──
+// Saves a "Plan Your Visit" submission: date, service, name, needs.
+app.post('/api/visits', async (req, res) => {
+  try {
+    const { date, service, time, name, needs } = req.body;
+
+    if (!date || !service) {
+      return res.status(400).json({ error: 'Date and service are required' });
+    }
+
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      return res.status(400).json({ error: 'Invalid date' });
+    }
+
+    if (!VISIT_SERVICES.includes(service)) {
+      return res.status(400).json({ error: 'Invalid service' });
+    }
+
+    // Drop any need values that aren't in our known list, just in case
+    const cleanNeeds = Array.isArray(needs)
+      ? needs.filter(n => VISIT_NEEDS.includes(n))
+      : [];
+
+    const visit = await Visit.create({
+      date:    parsedDate,
+      service,
+      time:    (time || '').slice(0, 60),
+      name:    (name || '').slice(0, 100),
+      needs:   cleanNeeds,
+    });
+
+    res.status(201).json({ success: true, id: visit._id });
+
+  } catch (err) {
+    console.error('POST /api/visits:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
 /* ═══════════════════════════════════════════════
    ROUTES — ADMIN
 ═══════════════════════════════════════════════ */
@@ -338,6 +397,26 @@ app.get('/api/donations', async (req, res) => {
 
   } catch (err) {
     console.error('GET /api/donations:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── GET /api/visits ──
+// Lists planned visits, soonest upcoming first; optional ?upcoming=true
+// filters out past dates so the admin only sees what's still ahead.
+app.get('/api/visits', async (req, res) => {
+  try {
+    const { upcoming } = req.query;
+    const filter = upcoming === 'true'
+      ? { date: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) } }
+      : {};
+
+    const visits = await Visit.find(filter).sort({ date: 1 }).lean();
+    res.json(visits);
+
+  } catch (err) {
+    console.error('GET /api/visits:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
