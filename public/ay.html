@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "secondary": "#755b00","on-surface": "#1a1c1c","error": "#ba1a1a","tertiary-container": "#1c2c40",
+          "on-primary": "#ffffff","on-primary-container": "#8392b7","inverse-surface": "#2f3131",
+          "secondary-container": "#fed977","secondary-fixed": "#ffe08f","on-tertiary-fixed-variant": "#38485d",
+          "on-primary-fixed": "#0a1a3a","primary-fixed": "#d9e2ff","inverse-on-surface": "#f0f1f1",
+          "surface-container": "#eeeeee","on-secondary-container": "#785d00","on-surface-variant": "#45464e",
+          "on-primary-fixed-variant": "#384668","surface-tint": "#4f5e81","primary-fixed-dim": "#b7c6ee",
+          "primary-container": "#1b2a4a","on-background": "#1a1c1c","surface": "#f9f9f9",
+          "on-secondary": "#ffffff","background": "#f9f9f9","surface-bright": "#f9f9f9",
+          "surface-container-lowest": "#ffffff","outline-variant": "#c5c6cf","on-tertiary": "#ffffff",
+          "on-tertiary-fixed": "#0b1c30","inverse-primary": "#b7c6ee","surface-container-high": "#e8e8e8",
+          "surface-container-low": "#f3f3f4","on-error": "#ffffff","secondary-fixed-dim": "#e6c364",
+          "on-secondary-fixed-variant": "#584400","surface-dim": "#dadada","on-secondary-fixed": "#241a00",
+          "outline": "#75777f","error-container": "#ffdad6","primary": "#041534","on-error-container": "#93000a",
+          "tertiary-fixed": "#d3e4fe","tertiary": "#06172a","on-tertiary-container": "#8393ac",
+          "tertiary-fixed-dim": "#b7c8e1","surface-variant": "#e2e2e2","surface-container-highest": "#e2e2e2"
+        },
+        "borderRadius": { "DEFAULT": "0.25rem","lg": "0.5rem","xl": "12px","full": "9999px" },
+        "spacing": { "section-gap": "120px","margin-desktop": "80px","margin-mobile": "20px","gutter": "32px","base": "4px" },
+        "fontFamily": {
+          "label-md": ["Inter"],"headline-lg": ["Playfair Display"],"display-lg": ["Playfair Display"],
+          "body-lg": ["Inter"],"title-lg": ["Inter"],"body-md": ["Inter"],
+          "headline-md": ["Playfair Display"],"headline-lg-mobile": ["Playfair Display"]
+        },
+        "fontSize": {
+          "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "600"}],
+          "headline-lg": ["40px", {"lineHeight": "1.2", "fontWeight": "700"}],
+          "display-lg": ["56px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+          "body-lg": ["18px", {"lineHeight": "1.7", "fontWeight": "400"}],
+          "title-lg": ["20px", {"lineHeight": "1.5", "letterSpacing": "0.01em", "fontWeight": "600"}],
+          "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+          "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+          "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}]
+        }
+      }
+    }
+  }
+</script>
+<link rel="stylesheet" href="../sda-shared.css"/>
+<style>
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .sacred-shadow { box-shadow: 0 10px 30px -10px rgba(4, 21, 52, 0.08); }
+  .gold-divider { height: 2px; background: #755b00; width: 60px; }
+  .logo-badge {
+    display: flex; align-items: center; justify-content: center;
+    width: 52px; height: 52px; border-radius: 50%;
+    background-color: #041534; border: 2px solid #755b00; flex-shrink: 0;
+  }
+  .logo-badge img { width: 38px; height: 38px; object-fit: contain; }
+  .logo-badge-sm { width: 44px; height: 44px; }
+  .logo-badge-sm img { width: 30px; height: 30px; }
+
+  /* ── MOBILE NAV ── */
+  @media (max-width: 767px) {
+    .logo-text { display: none !important; }
+    .nav-brand  { position: absolute; left: 50%; transform: translateX(-50%); z-index: 1; }
+    .hamburger-btn { position: relative; z-index: 2; }
+    .mobile-give { position: relative; z-index: 2; }
+    .mobile-hamburger { display: flex; }
+    .desktop-give { display: none !important; }
+    .mobile-give  { display: flex; }
+  }
+  @media (min-width: 768px) {
+    .mobile-hamburger { display: none !important; }
+    .mobile-give      { display: none !important; }
+    .desktop-give     { display: flex !important; }
+  }
+  .hamburger-btn {
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    width: 40px; height: 40px; gap: 5px; cursor: pointer; background: none; border: none;
+    padding: 6px 4px; border-radius: 8px; transition: background 0.2s; flex-shrink: 0; z-index: 60;
+  }
+  .hamburger-btn:hover { background: rgba(4,21,52,0.06); }
+  .hamburger-btn span {
+    display: block; height: 2px; border-radius: 2px; background: #041534;
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .hamburger-btn span:nth-child(1) { width: 24px; }
+  .hamburger-btn span:nth-child(2) { width: 18px; }
+  .hamburger-btn span:nth-child(3) { width: 22px; }
+  .hamburger-btn span:nth-child(4) { width: 14px; }
+  .hamburger-btn.open span:nth-child(1) { width: 22px; transform: translateY(10.5px) rotate(45deg); }
+  .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger-btn.open span:nth-child(3) { opacity: 0; transform: scaleX(0); }
+  .hamburger-btn.open span:nth-child(4) { width: 22px; transform: translateY(-10.5px) rotate(-45deg); }
+  .mobile-drawer {
+    position: fixed; top: 80px; left: 0; right: 0; z-index: 49;
+    background: rgba(249,249,249,0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 2px solid #fed977; box-shadow: 0 20px 40px -10px rgba(4,21,52,0.12);
+    transform: translateY(-110%); opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease; pointer-events: none;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+  .mobile-drawer.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .mobile-drawer nav a {
+    display: flex; align-items: center; gap: 12px; padding: 18px 24px;
+    font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.08em; font-weight: 600;
+    color: #45464e; text-transform: uppercase; text-decoration: none;
+    border-bottom: 1px solid rgba(197,198,207,0.3);
+    transition: background 0.2s, color 0.2s, padding-left 0.2s; position: relative;
+  }
+  .mobile-drawer nav a:hover { background: rgba(254,217,119,0.18); color: #041534; padding-left: 32px; }
+  .mobile-drawer nav a.active { color: #041534; }
+  .mobile-drawer nav a.active::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: #755b00; border-radius: 0 2px 2px 0;
+  }
+  .mobile-drawer nav a .nav-icon { color: #755b00; font-size: 20px; }
+  .mobile-drawer-inner { padding: 8px 0 20px; }
+  .mobile-give-row { padding: 16px 24px 4px; }
+  .mobile-give-btn {
+    width: 100%; background: #041534; color: #fff; padding: 14px 24px; border-radius: 12px;
+    font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.08em; font-weight: 600;
+    cursor: pointer; border: none; display: flex; align-items: center; justify-content: center;
+    gap: 8px; transition: background 0.2s, transform 0.15s;
+  }
+  .mobile-give-btn:active { transform: scale(0.97); }
+  .mobile-give-btn:hover { background: #755b00; }
+
+  /* ═══════════════════════════════════════════
+     DESKTOP DROPDOWN NAVIGATION
+     (shared behaviour lives in sda.js → initDropdownNav())
+  ═══════════════════════════════════════════ */
+  .nav-item { position: relative; }
+  .nav-item > a,
+  .nav-item > button.nav-trigger {
+    display: flex; align-items: center; gap: 4px;
+    background: none; border: none; cursor: pointer; font: inherit; padding: 0;
+  }
+  .nav-item .nav-caret {
+    font-size: 18px;
+    transition: transform 0.25s ease, color 0.25s ease;
+    color: #75777f;
+  }
+  .nav-item:hover .nav-caret,
+  .nav-item.nav-open .nav-caret { transform: rotate(180deg); color: #755b00; }
+  .nav-item > a,
+  .nav-item > button.nav-trigger {
+    color: #45464e; position: relative; padding-bottom: 4px; transition: color 0.25s ease;
+  }
+  .nav-item > a::after,
+  .nav-item > button.nav-trigger::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+    background: #755b00; transform: scaleX(0); transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+  .nav-item:hover > a,
+  .nav-item:hover > button.nav-trigger,
+  .nav-item.nav-open > a,
+  .nav-item.nav-open > button.nav-trigger,
+  .nav-item > a.active { color: #041534; }
+  .nav-item:hover > a::after,
+  .nav-item:hover > button.nav-trigger::after,
+  .nav-item.nav-open > a::after,
+  .nav-item.nav-open > button.nav-trigger::after,
+  .nav-item > a.active::after { transform: scaleX(1); }
+
+  .nav-dropdown {
+    position: absolute; top: calc(100% + 18px); left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    min-width: 240px; background: #ffffff; border-radius: 14px;
+    border: 1px solid #e2e2e2; box-shadow: 0 20px 45px -12px rgba(4,21,52,0.22);
+    padding: 10px; opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+    z-index: 40;
+  }
+  .nav-dropdown::before {
+    content: ''; position: absolute; top: -18px; left: 0; right: 0; height: 18px;
+  }
+  .nav-item:hover .nav-dropdown,
+  .nav-item.nav-open .nav-dropdown {
+    opacity: 1; visibility: visible; pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+  .nav-dropdown a {
+    display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 9px;
+    font-family: Inter, sans-serif; font-size: 14px; font-weight: 500; color: #45464e;
+    text-decoration: none; transition: background 0.18s ease, color 0.18s ease, padding-left 0.18s ease;
+    white-space: nowrap;
+  }
+  .nav-dropdown a:hover,
+  .nav-dropdown a:focus-visible { background: #fffbee; color: #041534; padding-left: 18px; }
+  .nav-dropdown a.active { color: #041534; background: #fffbee; }
+  .nav-dropdown a .dot {
+    width: 5px; height: 5px; border-radius: 50%; background: #755b00; flex-shrink: 0;
+    opacity: 0; transform: scale(0); transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .nav-dropdown a:hover .dot,
+  .nav-dropdown a:focus-visible .dot,
+  .nav-dropdown a.active .dot { opacity: 1; transform: scale(1); }
+
+  /* ═══════════════════════════════════════════
+     MOBILE ACCORDION SUBMENUS
+     (shared behaviour lives in sda.js → initMobileAccordion())
+  ═══════════════════════════════════════════ */
+  .mobile-drawer .accordion-item { border-bottom: 1px solid rgba(197,198,207,0.3); }
+  .mobile-drawer .accordion-trigger {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 18px 24px; background: none; border: none; cursor: pointer;
+    font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.08em; font-weight: 600;
+    color: #45464e; text-transform: uppercase; text-align: left;
+    transition: background 0.2s, color 0.2s;
+  }
+  .mobile-drawer .accordion-trigger:hover,
+  .mobile-drawer .accordion-trigger.open { background: rgba(254,217,119,0.18); color: #041534; }
+  .mobile-drawer .accordion-trigger .trigger-left { display: flex; align-items: center; gap: 12px; }
+  .mobile-drawer .accordion-trigger .nav-icon { color: #755b00; font-size: 20px; }
+  .mobile-drawer .accordion-trigger .accordion-caret {
+    font-size: 20px; color: #75777f; transition: transform 0.3s ease, color 0.3s ease;
+  }
+  .mobile-drawer .accordion-trigger.open .accordion-caret { transform: rotate(180deg); color: #755b00; }
+  .mobile-drawer .accordion-panel {
+    max-height: 0; overflow: hidden; transition: max-height 0.35s ease; background: #f6f6f4;
+  }
+  .mobile-drawer .accordion-panel a {
+    padding: 14px 24px 14px 56px; font-size: 13px; letter-spacing: 0.04em;
+    border-bottom: 1px solid rgba(197,198,207,0.25);
+  }
+  .mobile-drawer .accordion-panel a:last-child { border-bottom: none; }
+  .mobile-drawer .accordion-panel a:hover { padding-left: 62px; }
+
+  /* ── Image placeholder fallback ── */
+  .img-wrap { position: relative; width: 100%; height: 100%; overflow: hidden; }
+  .img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* ── Timeline ── */
+  .timeline-rail { position: relative; padding-left: 32px; }
+  .timeline-rail::before {
+    content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: #e2e2e2;
+  }
+  .timeline-item { position: relative; padding-bottom: 40px; }
+  .timeline-item:last-child { padding-bottom: 0; }
+  .timeline-dot {
+    position: absolute; left: -32px; top: 4px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #755b00; border: 3px solid #fed977;
+  }
+  .timeline-year {
+    font-family: Inter, sans-serif; font-weight: 700; font-size: 14px;
+    color: #755b00; letter-spacing: 0.06em; margin-bottom: 4px; display: block;
+  }
+
+  /* ── Age ladder ── */
+  .class-chip { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .class-chip .chip-circle {
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: #fff; background: #041534;
+    border: 3px solid #fed977;
+  }
+
+  /* ── Info table ── */
+  .info-table { width: 100%; border-collapse: collapse; }
+  .info-table th {
+    text-align: left; font-family: Inter, sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: #755b00;
+    padding: 14px 16px; border-bottom: 2px solid #e2e2e2;
+  }
+  .info-table td {
+    padding: 14px 16px; border-bottom: 1px solid #e2e2e2;
+    font-family: Inter, sans-serif; font-size: 14px; color: #45464e;
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  #history, #structure, #ages, #service, #join { scroll-margin-top: 90px; }
+
+  /* ═══════════════════════════════════════════
+     HERO SLIDESHOW (5 auto-rotating background slides)
+  ═══════════════════════════════════════════ */
+  .hero-slideshow {
+    position: absolute; inset: 0; background: #041534; overflow: hidden;
+  }
+  .hero-slide {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center; background-repeat: no-repeat;
+    opacity: 0; transform: scale(1);
+    transition: opacity 1.8s ease-in-out;
+  }
+  .hero-slide.active {
+    opacity: 1;
+    animation: heroKenBurns 7s ease-in-out forwards;
+  }
+  @keyframes heroKenBurns {
+    from { transform: scale(1); }
+    to   { transform: scale(1.1); }
+  }
+  .hero-slideshow-dots {
+    position: absolute; z-index: 15; bottom: 22px; right: 24px;
+    display: flex; gap: 8px;
+  }
+  .hero-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.45); cursor: pointer;
+    transition: all 0.3s ease; border: none; padding: 0;
+  }
+  .hero-dot.active { background: #fed977; width: 26px; border-radius: 4px; }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-slide.active { animation: none; }
+  }
+</style>
+</head>
+
+<body data-page="ay" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+
+<!-- ══════════════ TOP NAV ══════════════ -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-2 border-secondary-container shadow-sm">
+  <div class="nav-inner relative flex items-center justify-between h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+    <button class="hamburger-btn mobile-hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-drawer">
+      <span></span><span></span><span></span><span></span>
+    </button>
+    <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
+      <div class="logo-badge">
+        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+      </div>
+      <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
+    </div>
+
+    <!-- Desktop: Nav links with dropdowns -->
+    <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
+
+      <div class="nav-item">
+        <a class="font-label-md text-label-md" href="index.html">Home</a>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          About
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="About submenu">
+          <a href="leaders.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Leaders</a>
+          <a href="history.html" role="menuitem"><span class="dot" aria-hidden="true"></span>History</a>
+          <a href="beliefs.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Our Beliefs</a>
+          <a href="departments.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Departments</a>
+          <a href="building.html" role="menuitem"><span class="dot" aria-hidden="true"></span>New Building</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a class="font-label-md text-label-md" href="news.html">News</a>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Youth
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Youth submenu">
+          <a href="adventurers.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Adventurers</a>
+          <a href="pathfinders.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Pathfinders</a>
+          <a href="ay.html" class="active" aria-current="page" role="menuitem"><span class="dot" aria-hidden="true"></span>AY (Adventist Youth)</a>
+          <a href="youth.html#discussion" role="menuitem"><span class="dot" aria-hidden="true"></span>Discussion</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Ministries
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
+          <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
+          <a href="ministries.html#dorcas" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
+          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Quick Links
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Quick Links submenu">
+          <a href="https://adventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>General Conference</a>
+          <a href="https://sidadventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>SID (Southern Africa-Indian Ocean Division)</a>
+          <a href="https://szu.adventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>Southern Zambia Union Conference</a>
+          <a href="https://lusakaconference.adventisthost.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>Lusaka Conference</a>
+        </div>
+      </div>
+
+    </nav>
+
+    <button class="desktop-give bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md hover:bg-primary/90 transition-all active:scale-95">Give</button>
+    <button class="mobile-give bg-primary text-on-primary px-4 py-2 rounded-xl font-label-md text-[13px] hover:bg-primary/90 transition-all active:scale-95">Give</button>
+  </div>
+</header>
+
+<!-- Mobile Drawer -->
+<div class="mobile-drawer" id="mobile-drawer" role="dialog" aria-label="Navigation menu" aria-hidden="true">
+  <div class="mobile-drawer-inner">
+    <nav aria-label="Mobile navigation">
+      <a href="index.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">home</span>Home</a>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">info</span>About</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="leaders.html">Leaders</a>
+          <a href="history.html">History</a>
+          <a href="beliefs.html">Our Beliefs</a>
+          <a href="departments.html">Departments</a>
+          <a href="building.html">New Building</a>
+        </div>
+      </div>
+
+      <a href="news.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">newspaper</span>News</a>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger open" aria-expanded="true">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span>Youth</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="adventurers.html">Adventurers</a>
+          <a href="pathfinders.html">Pathfinders</a>
+          <a href="ay.html" class="active" aria-current="page">AY (Adventist Youth)</a>
+          <a href="youth.html#discussion">Discussion</a>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">volunteer_activism</span>Ministries</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="kids.html">Children's Ministry</a>
+          <a href="ministries.html#dorcas">Dorcas</a>
+          <a href="ministries.html#womens-ministries">Women's Ministries</a>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">link</span>Quick Links</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="https://adventist.org" target="_blank" rel="noopener noreferrer">General Conference</a>
+          <a href="https://sidadventist.org" target="_blank" rel="noopener noreferrer">SID (Southern Africa-Indian Ocean Division)</a>
+          <a href="https://szu.adventist.org" target="_blank" rel="noopener noreferrer">Southern Zambia Union Conference</a>
+          <a href="https://lusakaconference.adventisthost.org" target="_blank" rel="noopener noreferrer">Lusaka Conference</a>
+        </div>
+      </div>
+
+    </nav>
+    <div class="mobile-give-row">
+      <button class="mobile-give-btn">
+        <span class="material-symbols-outlined" style="font-size:18px;">volunteer_activism</span>
+        Give to the Church
+      </button>
+    </div>
+  </div>
+</div>
+
+<main class="pt-20">
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="relative h-[60vh] min-h-[420px] flex items-end overflow-hidden">
+    <div class="hero-slideshow" id="ay-hero-slideshow">
+      <div class="hero-slide active" style="background-image:url('images/ay-hero-1.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('images/ay-hero-2.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('images/ay-hero-3.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('images/ay-hero-4.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('images/ay-hero-5.jpg');"></div>
+    </div>
+    <div class="hero-slideshow-dots" id="ay-hero-dots" aria-hidden="true">
+      <button class="hero-dot active" data-index="0" aria-label="Slide 1"></button>
+      <button class="hero-dot" data-index="1" aria-label="Slide 2"></button>
+      <button class="hero-dot" data-index="2" aria-label="Slide 3"></button>
+      <button class="hero-dot" data-index="3" aria-label="Slide 4"></button>
+      <button class="hero-dot" data-index="4" aria-label="Slide 5"></button>
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/50 to-primary/10"></div>
+    <div class="relative z-10 w-full max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pb-14">
+      <div class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full mb-6 shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">groups_3</span>
+        <span class="font-label-md text-label-md uppercase tracking-widest">Ages 16 &amp; Up · Senior Youth</span>
+      </div>
+      <h1 class="font-display-lg text-display-lg text-on-primary mb-4">AY — Adventist Youth</h1>
+      <p class="font-body-lg text-body-lg text-on-primary/85 max-w-2xl">
+        The senior youth ministry of the Seventh-day Adventist Church, leading teens and young adults into a saving relationship with Jesus Christ and an active role in His mission.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════ QUICK FACTS ══════════════ -->
+  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-16">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <p class="font-headline-md text-headline-md text-primary">1907</p>
+        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-2">Society Formalized</p>
+      </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <p class="font-headline-md text-headline-md text-primary">10M+</p>
+        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-2">Young People Worldwide</p>
+      </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <p class="font-headline-md text-headline-md text-primary">16+</p>
+        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-2">Ages Served</p>
+      </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <p class="font-headline-md text-headline-md text-primary">1852</p>
+        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-2">Youth's Instructor Founded</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ MISSION · AIM · MOTTO · PLEDGE ══════════════ -->
+  <section class="bg-surface-container-low py-section-gap">
+    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="text-center mb-14">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Mission, Aim, Motto &amp; Pledge</h2>
+        <div class="gold-divider mx-auto"></div>
+      </div>
+
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow border-l-4 border-secondary mb-10">
+        <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-3">Mission</span>
+        <p class="font-headline-md text-headline-md text-primary leading-snug">To lead young people into a saving relationship with Jesus Christ and help them embrace His call to discipleship.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-10">
+        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow border-l-4 border-secondary">
+          <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-3">Aim</span>
+          <p class="font-headline-md text-headline-md text-primary leading-snug">The Advent message to all the world in my generation.</p>
+        </div>
+        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow border-l-4 border-secondary">
+          <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-3">Motto</span>
+          <p class="font-headline-md text-headline-md text-primary leading-snug">The love of Christ compels me.</p>
+        </div>
+      </div>
+
+      <div class="bg-primary text-on-primary rounded-xl p-10 md:p-14 relative overflow-hidden sacred-shadow">
+        <div class="absolute top-0 right-0 w-56 h-56 bg-secondary/10 rounded-full -translate-y-1/3 translate-x-1/3"></div>
+        <span class="font-label-md text-label-md text-secondary-fixed uppercase tracking-widest block mb-4 relative z-10">Pledge</span>
+        <p class="font-headline-md text-headline-md italic relative z-10 max-w-2xl">
+          "Loving the Lord Jesus, I promise to take an active part in the work of the Adventist Youth Society, doing what I can to help others and to finish the work of the Gospel in all the world."
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ HISTORY TIMELINE ══════════════ -->
+  <section id="history" class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="text-center mb-16">
+      <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Over a Century of Youth Ministry</h2>
+      <div class="gold-divider mx-auto"></div>
+    </div>
+
+    <div class="timeline-rail max-w-3xl mx-auto">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <span class="timeline-year">1852</span>
+        <p class="font-body-md text-body-md text-on-surface-variant">James White publishes the first edition of The Youth's Instructor, the church's earliest dedicated outreach to young people.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <span class="timeline-year">Late 1800s</span>
+        <p class="font-body-md text-body-md text-on-surface-variant">Local youth societies begin forming in churches across the United States, including early efforts by Luther Warren and Harry Fenner, laying the groundwork for organized youth ministry.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <span class="timeline-year">1907</span>
+        <p class="font-body-md text-body-md text-on-surface-variant">At a meeting in Mount Vernon, Ohio, more than 100 delegates adopt the name "Seventh-day Adventist Young People's Society of Missionary Volunteers" (MV), along with an aim, motto, and pledge.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <span class="timeline-year">1909</span>
+        <p class="font-body-md text-body-md text-on-surface-variant">The General Conference session votes to create a separate Junior Missionary Volunteer Society (JMV) for children 10 to 16, distinguishing junior ministry from senior youth work.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <span class="timeline-year">Mid-1900s</span>
+        <p class="font-body-md text-body-md text-on-surface-variant">The senior society becomes widely known as the Adventist Youth (AY) Society, continuing to serve teens and young adults beyond Pathfinder age with its own Aim, Motto, and Pledge.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <span class="timeline-year">Today</span>
+        <p class="font-body-md text-body-md text-on-surface-variant">Adventist Youth Ministries now links more than ten million young people worldwide through AY societies, campus ministry, young adult programs, and mission initiatives such as "I Will Go."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ WHERE AY FITS ══════════════ -->
+  <section id="ages" class="bg-surface-container-low py-section-gap">
+    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="text-center mb-16">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Where AY Fits in Youth Ministry</h2>
+        <div class="gold-divider mx-auto mb-6"></div>
+        <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+          Adventist Youth Ministries spans every age, from early childhood through young adulthood.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-14">
+        <div class="class-chip">
+          <div class="chip-circle"><span class="material-symbols-outlined">explore</span></div>
+          <span class="font-label-md text-[13px] text-primary block">Adventurers</span>
+          <span class="font-body-md text-[12px] text-on-surface-variant">Ages 4–9</span>
+        </div>
+        <div class="class-chip">
+          <div class="chip-circle"><span class="material-symbols-outlined">hiking</span></div>
+          <span class="font-label-md text-[13px] text-primary block">Pathfinders</span>
+          <span class="font-body-md text-[12px] text-on-surface-variant">Ages 10–15</span>
+        </div>
+        <div class="class-chip">
+          <div class="chip-circle"><span class="material-symbols-outlined">groups_3</span></div>
+          <span class="font-label-md text-[13px] text-primary block">AY / Ambassadors</span>
+          <span class="font-body-md text-[12px] text-on-surface-variant">Ages 16–21</span>
+        </div>
+        <div class="class-chip">
+          <div class="chip-circle"><span class="material-symbols-outlined">school</span></div>
+          <span class="font-label-md text-[13px] text-primary block">Young Adults</span>
+          <span class="font-body-md text-[12px] text-on-surface-variant">Ages 22–30+</span>
+        </div>
+      </div>
+
+      <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden overflow-x-auto">
+        <table class="info-table min-w-[560px]">
+          <thead>
+            <tr>
+              <th>Ministry</th>
+              <th>Ages</th>
+              <th>Focus</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold text-primary">Adventurer Club</td>
+              <td>4–9</td>
+              <td>Family-based discovery and early faith formation</td>
+            </tr>
+            <tr>
+              <td class="font-semibold text-primary">Pathfinder Club</td>
+              <td>10–15</td>
+              <td>Outdoor adventure, skill-building honors, character</td>
+            </tr>
+            <tr>
+              <td class="font-semibold text-primary">AY / Ambassadors</td>
+              <td>16–21</td>
+              <td>Discipleship, service, leadership development</td>
+            </tr>
+            <tr>
+              <td class="font-semibold text-primary">Young Adults</td>
+              <td>22–30+</td>
+              <td>Mentoring, mission, campus and career-stage ministry</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ LEGION OF HONOR ══════════════ -->
+  <section class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
+    <div class="img-wrap rounded-xl overflow-hidden sacred-shadow h-[340px] order-2 md:order-1">
+      <img src="images/ay-legion.jpg" alt="Adventist Youth in personal devotion and study"
+        onerror="this.parentElement.outerHTML='<div style=\'height:340px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>military_tech</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/ay-legion.jpg</span></div>'"/>
+    </div>
+    <div class="space-y-6 order-1 md:order-2">
+      <span class="font-label-md text-label-md text-secondary tracking-[0.2em] uppercase block">A Deeper Commitment</span>
+      <h2 class="font-headline-lg text-headline-lg text-primary leading-tight">The AY Legion of Honor</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        Beyond the Aim, Motto, and Pledge, many AY societies invite members into a further voluntary commitment known as the Legion of Honor — a set of six personal resolutions to honor Christ in what one chooses to behold, listen to, the places one goes, one's associations, one's speech, and the care given to the body.
+      </p>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        It reflects the heart of AY ministry: not a badge to be earned, but a daily discipleship that shapes how young people live, long after any meeting ends.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════ ACTIVITIES / SERVICE ══════════════ -->
+  <section id="service" class="bg-surface-container-low py-section-gap">
+    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="text-center mb-16">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">What AY Members Do</h2>
+        <div class="gold-divider mx-auto"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center">
+          <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">menu_book</span>
+          <h3 class="font-title-lg text-title-lg text-primary mb-2">Discipleship</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Bible study, Sabbath School classes, and Weeks of Prayer that ground faith in Scripture.</p>
+        </div>
+        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center">
+          <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">campaign</span>
+          <h3 class="font-title-lg text-title-lg text-primary mb-2">Evangelism &amp; Missions</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Local outreach and mission trips carrying the Advent message into communities near and far.</p>
+        </div>
+        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center">
+          <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">supervisor_account</span>
+          <h3 class="font-title-lg text-title-lg text-primary mb-2">Leadership Training</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Preparing young people to serve as Sabbath School leaders, Pathfinder staff, and church officers.</p>
+        </div>
+        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center">
+          <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">workspace_premium</span>
+          <h3 class="font-title-lg text-title-lg text-primary mb-2">AY Silver &amp; Gold Awards</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Recognition for young adults who demonstrate exceptional physical, mental, and cultural development.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ JOIN CTA ══════════════ -->
+  <section id="join" class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mb-section-gap mt-section-gap">
+    <div class="bg-primary rounded-[2rem] p-12 md:p-20 text-center relative overflow-hidden sacred-shadow">
+      <div class="absolute top-0 right-0 w-64 h-64 bg-secondary/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+      <div class="absolute bottom-0 left-0 w-32 h-32 bg-secondary/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+      <div class="relative z-10">
+        <h2 class="font-headline-lg text-headline-lg text-on-primary mb-6">Take an Active Part</h2>
+        <p class="font-body-lg text-body-lg text-on-primary/80 max-w-2xl mx-auto mb-10">
+          Whether you're stepping up from Pathfinders or joining for the first time, our AY Society meets weekly for worship, fellowship, and service — teens and young adults are always welcome.
+        </p>
+        <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+          <button class="bg-secondary text-white px-10 py-4 rounded-xl font-title-lg text-title-lg hover:bg-secondary/90 transition-all active:scale-95 flex items-center gap-3">
+            Contact the AY Leader <span class="material-symbols-outlined">forum</span>
+          </button>
+          <a href="youth.html" class="border-2 border-on-primary/20 text-on-primary px-10 py-4 rounded-xl font-title-lg text-title-lg hover:bg-on-primary/10 transition-all">
+            Explore Youth Board
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="bg-primary text-on-primary w-full py-12 border-t-4 border-secondary">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+    <div class="md:col-span-1">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="logo-badge logo-badge-sm" style="background-color:#0a1a3a; border-color:#e6c364;">
+          <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        </div>
+        <span class="font-headline-md text-headline-md text-on-primary">Makeni Central</span>
+      </div>
+      <p class="font-body-md text-body-md text-on-primary/80">Proclaiming the everlasting gospel to every nation, kindred, tongue, and people.</p>
+    </div>
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
+       <ul class="space-y-3" role="list">
+        <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#" aria-current="page">Home</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="adventures.html">Adventures</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="news.html">News</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="youth.html">Youth Board</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="building.html">New Building</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Resources</h4>
+      <ul class="space-y-3">
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Sermon Archive</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Study Guides</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Privacy Policy</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Contact</h4>
+      <p class="font-body-md text-body-md text-on-primary/80 mb-4">123 Makeni Road<br/>Lusaka, Zambia</p>
+      <div class="flex gap-4">
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
+          <span class="material-symbols-outlined">public</span>
+        </a>
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
+          <span class="material-symbols-outlined">mail</span>
+        </a>
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
+          <span class="material-symbols-outlined">call</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 text-center">
+    <p class="font-body-md text-body-md text-on-primary/60">© 2026 Makeni Central SDA Church. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="sda.js" defer></script>
+<script src="func.js" defer></script>
+<script>
+  // ── AY hero slideshow: auto-rotates 5 background slides ──
+  (function () {
+    var root = document.getElementById('ay-hero-slideshow');
+    if (!root) return;
+    var slides = root.querySelectorAll('.hero-slide');
+    var dots = document.querySelectorAll('#ay-hero-dots .hero-dot');
+    var current = 0;
+    var intervalMs = 6000;
+    var timer = null;
+
+    function goTo(index) {
+      slides[current].classList.remove('active');
+      if (dots[current]) dots[current].classList.remove('active');
+      current = index;
+      slides[current].classList.add('active');
+      if (dots[current]) dots[current].classList.add('active');
+    }
+
+    function next() {
+      goTo((current + 1) % slides.length);
+    }
+
+    function start() {
+      stop();
+      timer = setInterval(next, intervalMs);
+    }
+    function stop() {
+      if (timer) clearInterval(timer);
+    }
+
+    if (slides.length > 1) {
+      dots.forEach(function (dot) {
+        dot.addEventListener('click', function () {
+          var idx = parseInt(dot.getAttribute('data-index'), 10);
+          if (!isNaN(idx) && idx !== current) {
+            goTo(idx);
+            start(); // reset the timer after manual navigation
+          }
+        });
+      });
+      start();
+    }
+  })();
+</script>
+
+</body>
+</html>

@@ -232,6 +232,8 @@
     opacity: 0;
     transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
     pointer-events: none;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
   }
   .mobile-drawer.open {
     transform: translateY(0);
@@ -287,6 +289,188 @@
   }
   .mobile-give-btn:active { transform: scale(0.97); }
   .mobile-give-btn:hover { background: #755b00; }
+
+  /* ═══════════════════════════════════════════
+     DESKTOP DROPDOWN NAVIGATION
+  ═══════════════════════════════════════════ */
+  .nav-item {
+    position: relative;
+  }
+  .nav-item > a,
+  .nav-item > button.nav-trigger {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+  }
+  .nav-item .nav-caret {
+    font-size: 18px;
+    transition: transform 0.25s ease, color 0.25s ease;
+    color: #75777f;
+  }
+  .nav-item:hover .nav-caret,
+  .nav-item.nav-open .nav-caret {
+    transform: rotate(180deg);
+    color: #755b00;
+  }
+  /* Hover-lights-up underline glow, matches existing active-link style */
+  .nav-item > a,
+  .nav-item > button.nav-trigger {
+    color: #45464e;
+    position: relative;
+    padding-bottom: 4px;
+    transition: color 0.25s ease;
+  }
+  .nav-item > a::after,
+  .nav-item > button.nav-trigger::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 2px;
+    background: #755b00;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+  .nav-item:hover > a,
+  .nav-item:hover > button.nav-trigger,
+  .nav-item.nav-open > a,
+  .nav-item.nav-open > button.nav-trigger,
+  .nav-item > a.active {
+    color: #041534;
+  }
+  .nav-item:hover > a::after,
+  .nav-item:hover > button.nav-trigger::after,
+  .nav-item.nav-open > a::after,
+  .nav-item.nav-open > button.nav-trigger::after,
+  .nav-item > a.active::after {
+    transform: scaleX(1);
+  }
+
+  /* Dropdown panel */
+  .nav-dropdown {
+    position: absolute;
+    top: calc(100% + 18px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    min-width: 240px;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e2e2e2;
+    box-shadow: 0 20px 45px -12px rgba(4,21,52,0.22);
+    padding: 10px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+    z-index: 40;
+  }
+  /* invisible bridge so the pointer can travel from link to panel without the hover gap closing it */
+  .nav-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -18px;
+    left: 0;
+    right: 0;
+    height: 18px;
+  }
+  .nav-item:hover .nav-dropdown,
+  .nav-item.nav-open .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+  .nav-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 9px;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #45464e;
+    text-decoration: none;
+    transition: background 0.18s ease, color 0.18s ease, padding-left 0.18s ease;
+    white-space: nowrap;
+  }
+  .nav-dropdown a:hover,
+  .nav-dropdown a:focus-visible {
+    background: #fffbee;
+    color: #041534;
+    padding-left: 18px;
+  }
+  .nav-dropdown a .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #755b00;
+    flex-shrink: 0;
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .nav-dropdown a:hover .dot,
+  .nav-dropdown a:focus-visible .dot {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* ═══════════════════════════════════════════
+     MOBILE ACCORDION SUBMENUS
+  ═══════════════════════════════════════════ */
+  .mobile-drawer .accordion-item { border-bottom: 1px solid rgba(197,198,207,0.3); }
+  .mobile-drawer .accordion-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: #45464e;
+    text-transform: uppercase;
+    text-align: left;
+    transition: background 0.2s, color 0.2s;
+  }
+  .mobile-drawer .accordion-trigger:hover,
+  .mobile-drawer .accordion-trigger.open { background: rgba(254,217,119,0.18); color: #041534; }
+  .mobile-drawer .accordion-trigger .trigger-left { display: flex; align-items: center; gap: 12px; }
+  .mobile-drawer .accordion-trigger .nav-icon { color: #755b00; font-size: 20px; }
+  .mobile-drawer .accordion-trigger .accordion-caret {
+    font-size: 20px;
+    color: #75777f;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+  .mobile-drawer .accordion-trigger.open .accordion-caret {
+    transform: rotate(180deg);
+    color: #755b00;
+  }
+  .mobile-drawer .accordion-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    background: #f6f6f4;
+  }
+  .mobile-drawer .accordion-panel a {
+    padding: 14px 24px 14px 56px;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid rgba(197,198,207,0.25);
+  }
+  .mobile-drawer .accordion-panel a:last-child { border-bottom: none; }
+  .mobile-drawer .accordion-panel a:hover { padding-left: 62px; }
 
   /* ── Hero Slideshow ── */
   .hero-slide {
@@ -409,17 +593,6 @@
     50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
   }
   #pin-dot { animation: pulse 1.8s ease-in-out infinite; }
-
-  /* ── Scroll-reveal for value tiles ── */
-  .reveal {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.55s ease, transform 0.55s ease;
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
 
   /* ── Lesson card button ── */
   .lesson-btn {
@@ -605,6 +778,8 @@
     outline: none;
     transition: border-color 0.2s;
     box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
   }
   .visit-date-input:focus { border-color: #755b00; }
 
@@ -970,12 +1145,6 @@
     }
   }
 
-  /* iOS date input fix */
-  .visit-date-input {
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
   /* Find Us section: prevent oversized map card on mobile */
   @media (max-width: 640px) {
     #find-us .rounded-xl.overflow-hidden.sacred-shadow {
@@ -987,6 +1156,120 @@
     #church-map {
       min-height: 280px !important;
     }
+  }
+
+   /* ══════════════ QUICK CONTACT — click-to-call (modal) ══════════════ */
+  .visit-quick-contact {
+    padding: 16px 24px 4px;
+  }
+  .quick-contact-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: Inter, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 10px;
+  }
+  .quick-contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 420px) {
+    .quick-contact-grid { grid-template-columns: 1fr; }
+  }
+  .quick-contact-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 10px 12px;
+    text-decoration: none;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  }
+  .quick-contact-btn:hover {
+    background: rgba(230,195,100,0.14);
+    border-color: rgba(230,195,100,0.4);
+  }
+  .quick-contact-btn:active { transform: scale(0.97); }
+  .quick-contact-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: rgba(230,195,100,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .quick-contact-icon .material-symbols-outlined {
+    color: #e6c364;
+    font-size: 18px;
+  }
+  .quick-contact-text { flex-grow: 1; min-width: 0; }
+  .quick-contact-name {
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.3;
+  }
+  .quick-contact-number {
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.3;
+  }
+  .quick-contact-arrow {
+    color: #e6c364;
+    font-size: 16px !important;
+    flex-shrink: 0;
+  }
+
+  /* ── Contact Us card (Find Us section) — click-to-call ── */
+  .contact-call-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+  .contact-call-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid #e2e2e2;
+    background: #fff;
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+  }
+  .contact-call-btn:hover { border-color: #755b00; background: #fffbee; }
+  .contact-call-btn:active { transform: scale(0.98); }
+  .contact-call-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #041534;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .contact-call-icon .material-symbols-outlined { color: #e6c364; font-size: 18px; }
+  .contact-call-name {
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #041534;
+    line-height: 1.3;
+  }
+  .contact-call-number {
+    font-family: Inter, sans-serif;
+    font-size: 13px;
+    color: #75777f;
+    line-height: 1.3;
   }
 </style>
 </head>
@@ -1010,12 +1293,69 @@
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </a>
 
-    <!-- Desktop: Nav links -->
+    <!-- Desktop: Nav links with dropdowns -->
     <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
-      <a class="font-label-md text-label-md text-primary border-b-2 border-secondary pb-1" href="#" aria-current="page">Home</a>
-      <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="kids.html">Kids Corner</a>
-      <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="youth.html">Youth Board</a>
-      <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="building.html">New Building</a>
+
+      <div class="nav-item">
+        <a class="font-label-md text-label-md active" href="#" aria-current="page">Home</a>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          About
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="About submenu">
+          <a href="leaders.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Leaders</a>
+          <a href="history.html" role="menuitem"><span class="dot" aria-hidden="true"></span>History</a>
+          <a href="beliefs.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Our Beliefs</a>
+          <a href="departments.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Departments</a>
+          <a href="building.html" role="menuitem"><span class="dot" aria-hidden="true"></span>New Building</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a class="font-label-md text-label-md" href="news.html">News</a>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Youth
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Youth submenu">
+          <a href="adventurers.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Adventurers</a>
+          <a href="pathfinders.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Pathfinders</a>
+          <a href="ay.html" role="menuitem"><span class="dot" aria-hidden="true"></span>AY (Adventist Youth)</a>
+          <a href="youth.html#discussion" role="menuitem"><span class="dot" aria-hidden="true"></span>Discussion</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Ministries
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
+          <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
+          <a href="ministries.html#dorcas" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
+          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Quick Links
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Quick Links submenu">
+          <a href="https://adventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>General Conference</a>
+          <a href="https://sidadventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>SID (Southern Africa-Indian Ocean Division)</a>
+          <a href="https://szu.adventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>Southern Zambia Union Conference</a>
+          <a href="https://lusakaconference.adventisthost.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>Lusaka Conference</a>
+        </div>
+      </div>
+
     </nav>
 
     <!-- Desktop: Give button -->
@@ -1036,9 +1376,61 @@
   <div class="mobile-drawer-inner">
     <nav aria-label="Mobile navigation">
       <a class="active" href="#" aria-current="page"><span class="material-symbols-outlined nav-icon" aria-hidden="true">home</span>Home</a>
-      <a href="kids.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">child_care</span>Kids Corner</a>
-      <a href="youth.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span>Youth Board</a>
-      <a href="building.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">domain</span>New Building</a>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">info</span>About</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="leaders.html">Leaders</a>
+          <a href="history.html">History</a>
+          <a href="beliefs.html">Our Beliefs</a>
+          <a href="departments.html">Departments</a>
+          <a href="building.html">New Building</a>
+        </div>
+      </div>
+
+      <a href="news.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">newspaper</span>News</a>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span>Youth</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="adventurers.html">Adventurers</a>
+          <a href="pathfinders.html">Pathfinders</a>
+          <a href="ay.html">AY (Adventist Youth)</a>
+          <a href="youth.html#discussion">Discussion</a>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">volunteer_activism</span>Ministries</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="kids.html">Children's Ministry</a>
+          <a href="ministries.html#dorcas">Dorcas</a>
+          <a href="ministries.html#womens-ministries">Women's Ministries</a>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">link</span>Quick Links</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="https://adventist.org" target="_blank" rel="noopener noreferrer">General Conference</a>
+          <a href="https://sidadventist.org" target="_blank" rel="noopener noreferrer">SID (Southern Africa-Indian Ocean Division)</a>
+          <a href="https://szu.adventist.org" target="_blank" rel="noopener noreferrer">Southern Zambia Union Conference</a>
+          <a href="https://lusakaconference.adventisthost.org" target="_blank" rel="noopener noreferrer">Lusaka Conference</a>
+        </div>
+      </div>
+
     </nav>
     <div class="mobile-give-row">
       <button class="mobile-give-btn" aria-label="Give to the church">
@@ -1056,9 +1448,9 @@
     <!-- Hero Slideshow backgrounds -->
     <div id="hero-slideshow" aria-hidden="true">
       <div class="hero-slide active" style="background-image: url('images/church.jpg');"></div>
-      <div class="hero-slide" style="background-image: url('images/gate\ 2.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('images/gate 2.jpg');"></div>
       <div class="hero-slide" style="background-image: url('images/church3.jpg');"></div>
-      <div class="hero-slide" style="background-image: url('images/church\ gate.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('images/church gate.jpg');"></div>
     </div>
     <!-- Overlay -->
     <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(4,21,52,0.55) 0%, rgba(4,21,52,0.35) 60%, rgba(4,21,52,0.65) 100%);"></div>
@@ -1186,19 +1578,19 @@
 
         <!-- Right: value tiles -->
         <div class="grid grid-cols-2 gap-6">
-          <div class="reveal bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:0ms;">
+          <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:0ms;">
             <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block transition-colors" aria-hidden="true">groups</span>
             <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary transition-colors">Community</h4>
           </div>
-          <div class="reveal bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:80ms;">
+          <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:80ms;">
             <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block transition-colors" aria-hidden="true">auto_awesome</span>
             <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary transition-colors">Faith</h4>
           </div>
-          <div class="reveal bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:160ms;">
+          <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:160ms;">
             <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block transition-colors" aria-hidden="true">volunteer_activism</span>
             <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary transition-colors">Service</h4>
           </div>
-          <div class="reveal bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:240ms;">
+          <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:240ms;">
             <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block transition-colors" aria-hidden="true">trending_up</span>
             <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary transition-colors">Growth</h4>
           </div>
@@ -1281,13 +1673,30 @@
 
           <div class="flex items-start gap-4">
             <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">mail</span>
+              <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">call</span>
             </div>
-            <div>
-              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Contact Us</h5>
-              <a href="mailto:info@makenicentralsda.org" class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors">
-                info@makenicentralsda.org
-              </a>
+            <div class="w-full">
+              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-2">Contact Us</h5>
+              <div class="contact-call-list">
+                <a href="tel:+260977695623" class="contact-call-btn">
+                  <div class="contact-call-icon">
+                    <span class="material-symbols-outlined">support_agent</span>
+                  </div>
+                  <div>
+                    <div class="contact-call-name">Admin Elder</div>
+                    <div class="contact-call-number">0977 695 623</div>
+                  </div>
+                </a>
+                <a href="tel:+260979992444" class="contact-call-btn">
+                  <div class="contact-call-icon">
+                    <span class="material-symbols-outlined">church</span>
+                  </div>
+                  <div>
+                    <div class="contact-call-name">Pastor</div>
+                    <div class="contact-call-number">0979 992 444</div>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
 
@@ -1327,7 +1736,8 @@
       <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
       <ul class="space-y-3" role="list">
         <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#" aria-current="page">Home</a></li>
-        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="kids.html">Kids Corner</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="adventures.html">Adventures</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="news.html">News</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="youth.html">Youth Board</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="building.html">New Building</a></li>
       </ul>
@@ -1365,7 +1775,6 @@
   </div>
 </footer>
 
-
 <!-- ══════════════ PLAN YOUR VISIT MODAL ══════════════ -->
 <div id="visit-modal" role="dialog" aria-modal="true" aria-labelledby="visit-modal-title">
 
@@ -1382,6 +1791,37 @@
       </div>
       <h2 id="visit-modal-title" style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#fff;margin:0 0 4px;">Plan Your Visit</h2>
       <p style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.55);margin:0;">We'd love to see you this Sabbath.</p>
+    </div>
+
+    <!-- ══ QUICK CONTACT — click-to-call, visible on every step ══ -->
+    <div class="visit-quick-contact" id="visit-quick-contact">
+      <div class="quick-contact-label">
+        <span class="material-symbols-outlined" style="font-size:16px;">call</span>
+        Need to reach us directly?
+      </div>
+      <div class="quick-contact-grid">
+        <a class="quick-contact-btn" href="tel:+260977695623">
+          <div class="quick-contact-icon">
+            <span class="material-symbols-outlined">support_agent</span>
+          </div>
+          <div class="quick-contact-text">
+            <div class="quick-contact-name">Admin Elder</div>
+            <div class="quick-contact-number">0977 695 623</div>
+          </div>
+          <span class="material-symbols-outlined quick-contact-arrow">call</span>
+        </a>
+
+        <a class="quick-contact-btn" href="tel:+260979992444">
+          <div class="quick-contact-icon">
+            <span class="material-symbols-outlined">church</span>
+          </div>
+          <div class="quick-contact-text">
+            <div class="quick-contact-name">Pastor</div>
+            <div class="quick-contact-number">0979 992 444</div>
+          </div>
+          <span class="material-symbols-outlined quick-contact-arrow">call</span>
+        </a>
+      </div>
     </div>
 
     <!-- Body -->
@@ -1423,6 +1863,10 @@
         <button class="service-option" data-service="Divine Service" data-time="11:00 AM" data-start="11:00" data-end="13:00" aria-pressed="false">
           <div class="service-option-icon">
             <span class="material-symbols-outlined">church</span>
+          </div>
+          <div>
+            <div class="service-option-label">Friday</div>
+            <div class="service-option-time">17:40 PM · Vespers</div>
           </div>
           <div>
             <div class="service-option-label">Divine Service</div>
@@ -1579,8 +2023,6 @@
     </div><!-- /visit-modal-body -->
   </div><!-- /visit-modal-box -->
 </div><!-- /visit-modal -->
-
-
 <!-- ══════════════ SCRIPTS ══════════════ -->
 <script src="sda.js" defer></script>
 <script src="func.js" defer></script>
@@ -1593,34 +2035,78 @@
 ══════════════════════════════════════════════════════ */
 (function () {
 
-  /* ── Mobile nav toggle ── */
-  var btn    = document.getElementById('hamburger-btn');
-  var drawer = document.getElementById('mobile-drawer');
-  var isOpen = false;
+  /* Mobile hamburger/drawer (#hamburger-btn / #mobile-drawer) is wired by
+     sda.js → initNavbar(). Do NOT re-wire it here — two handlers on the
+     same button/state cause the drawer to flicker or fail to close. */
 
-  function setOpen(state) {
-    isOpen = state;
-    btn.classList.toggle('open', isOpen);
-    btn.setAttribute('aria-expanded', isOpen);
-    drawer.classList.toggle('open', isOpen);
-    drawer.setAttribute('aria-hidden', !isOpen);
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-  }
+  /* ── Desktop dropdown nav (hover + keyboard + touch fallback) ── */
+  (function () {
+    var navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(function (item) {
+      var trigger = item.querySelector('.nav-trigger');
+      if (!trigger) return; // plain links (Home, News) have no dropdown
 
-  if (btn && drawer) {
-    btn.addEventListener('click', function () { setOpen(!isOpen); });
+      // Click toggles (covers touch devices where :hover doesn't apply)
+      trigger.addEventListener('click', function (e) {
+        e.preventDefault();
+        var willOpen = !item.classList.contains('nav-open');
+        navItems.forEach(function (other) {
+          other.classList.remove('nav-open');
+          var t = other.querySelector('.nav-trigger');
+          if (t) t.setAttribute('aria-expanded', 'false');
+        });
+        if (willOpen) {
+          item.classList.add('nav-open');
+          trigger.setAttribute('aria-expanded', 'true');
+        }
+      });
+
+      // Keyboard: Escape closes
+      item.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          item.classList.remove('nav-open');
+          trigger.setAttribute('aria-expanded', 'false');
+          trigger.focus();
+        }
+      });
+    });
+
+    // Click outside closes any open dropdown
     document.addEventListener('click', function (e) {
-      if (isOpen && !btn.contains(e.target) && !drawer.contains(e.target)) setOpen(false);
+      navItems.forEach(function (item) {
+        if (!item.contains(e.target)) {
+          item.classList.remove('nav-open');
+          var t = item.querySelector('.nav-trigger');
+          if (t) t.setAttribute('aria-expanded', 'false');
+        }
+      });
     });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && isOpen) setOpen(false);
-    });
-    window.addEventListener('resize', function () {
-      if (window.innerWidth >= 768 && isOpen) setOpen(false);
-    });
-  }
+  })();
 
-  /* ── Header scroll-shrink ── */
+  /* ── Mobile accordion submenus ── */
+  (function () {
+    var triggers = document.querySelectorAll('.mobile-drawer .accordion-trigger');
+    triggers.forEach(function (trigger) {
+      var panel = trigger.nextElementSibling;
+      trigger.addEventListener('click', function () {
+        var isOpen = trigger.classList.contains('open');
+        // Close all other panels (accordion behaviour)
+        triggers.forEach(function (t) {
+          t.classList.remove('open');
+          t.setAttribute('aria-expanded', 'false');
+          if (t.nextElementSibling) t.nextElementSibling.style.maxHeight = null;
+        });
+        if (!isOpen) {
+          trigger.classList.add('open');
+          trigger.setAttribute('aria-expanded', 'true');
+          panel.style.maxHeight = panel.scrollHeight + 'px';
+        }
+      });
+    });
+  })();
+
+  /* ── Header scroll-shrink (nav-inner height only; box-shadow/hide-on-scroll
+     is handled by sda.js → initNavbar()) ── */
   var header = document.getElementById('main-header');
   if (header) {
     window.addEventListener('scroll', function () {
@@ -1628,21 +2114,9 @@
     }, { passive: true });
   }
 
-  /* ── Scroll-reveal for value tiles ── */
-  var reveals = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window && reveals.length) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          io.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.15 });
-    reveals.forEach(function (el) { io.observe(el); });
-  } else {
-    reveals.forEach(function (el) { el.classList.add('visible'); });
-  }
+  /* Value-tile fade-in is handled automatically by sda.js → initScrollReveal(),
+     which picks up any .sacred-shadow element — the tiles below already carry
+     that class, so no separate observer is wired here. */
 
   /* ── Footer year ── */
   var fy = document.getElementById('footer-year');

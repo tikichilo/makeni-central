@@ -259,6 +259,190 @@
   .mobile-give-btn:active { transform: scale(0.97); }
   .mobile-give-btn:hover { background: #755b00; }
 
+  /* ═══════════════════════════════════════════
+     DESKTOP DROPDOWN NAVIGATION
+  ═══════════════════════════════════════════ */
+  .nav-item {
+    position: relative;
+  }
+  .nav-item > a,
+  .nav-item > button.nav-trigger {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+  }
+  .nav-item .nav-caret {
+    font-size: 18px;
+    transition: transform 0.25s ease, color 0.25s ease;
+    color: #75777f;
+  }
+  .nav-item:hover .nav-caret,
+  .nav-item.nav-open .nav-caret {
+    transform: rotate(180deg);
+    color: #755b00;
+  }
+  /* Hover-lights-up underline glow, matches existing active-link style */
+  .nav-item > a,
+  .nav-item > button.nav-trigger {
+    color: #45464e;
+    position: relative;
+    padding-bottom: 4px;
+    transition: color 0.25s ease;
+  }
+  .nav-item > a::after,
+  .nav-item > button.nav-trigger::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 2px;
+    background: #755b00;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+  .nav-item:hover > a,
+  .nav-item:hover > button.nav-trigger,
+  .nav-item.nav-open > a,
+  .nav-item.nav-open > button.nav-trigger,
+  .nav-item > a.active {
+    color: #041534;
+  }
+  .nav-item:hover > a::after,
+  .nav-item:hover > button.nav-trigger::after,
+  .nav-item.nav-open > a::after,
+  .nav-item.nav-open > button.nav-trigger::after,
+  .nav-item > a.active::after {
+    transform: scaleX(1);
+  }
+
+  /* Dropdown panel */
+  .nav-dropdown {
+    position: absolute;
+    top: calc(100% + 18px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    min-width: 240px;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e2e2e2;
+    box-shadow: 0 20px 45px -12px rgba(4,21,52,0.22);
+    padding: 10px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+    z-index: 40;
+  }
+  /* invisible bridge so the pointer can travel from link to panel without the hover gap closing it */
+  .nav-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -18px;
+    left: 0;
+    right: 0;
+    height: 18px;
+  }
+  .nav-item:hover .nav-dropdown,
+  .nav-item.nav-open .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+  .nav-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 9px;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #45464e;
+    text-decoration: none;
+    transition: background 0.18s ease, color 0.18s ease, padding-left 0.18s ease;
+    white-space: nowrap;
+  }
+  .nav-dropdown a:hover,
+  .nav-dropdown a:focus-visible {
+    background: #fffbee;
+    color: #041534;
+    padding-left: 18px;
+  }
+  .nav-dropdown a.active { color: #041534; background: #fffbee; }
+  .nav-dropdown a .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #755b00;
+    flex-shrink: 0;
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .nav-dropdown a:hover .dot,
+  .nav-dropdown a:focus-visible .dot,
+  .nav-dropdown a.active .dot {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* ═══════════════════════════════════════════
+     MOBILE ACCORDION SUBMENUS
+  ═══════════════════════════════════════════ */
+  .mobile-drawer .accordion-item { border-bottom: 1px solid rgba(197,198,207,0.3); }
+  .mobile-drawer .accordion-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: #45464e;
+    text-transform: uppercase;
+    text-align: left;
+    transition: background 0.2s, color 0.2s;
+  }
+  .mobile-drawer .accordion-trigger:hover,
+  .mobile-drawer .accordion-trigger.open { background: rgba(254,217,119,0.18); color: #041534; }
+  .mobile-drawer .accordion-trigger .trigger-left { display: flex; align-items: center; gap: 12px; }
+  .mobile-drawer .accordion-trigger .nav-icon { color: #755b00; font-size: 20px; }
+  .mobile-drawer .accordion-trigger .accordion-caret {
+    font-size: 20px;
+    color: #75777f;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+  .mobile-drawer .accordion-trigger.open .accordion-caret {
+    transform: rotate(180deg);
+    color: #755b00;
+  }
+  .mobile-drawer .accordion-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    background: #f6f6f4;
+  }
+  .mobile-drawer .accordion-panel a {
+    padding: 14px 24px 14px 56px;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid rgba(197,198,207,0.25);
+  }
+  .mobile-drawer .accordion-panel a:last-child { border-bottom: none; }
+  .mobile-drawer .accordion-panel a:hover { padding-left: 62px; }
+
   /* ── Hero Slideshow ── */
   .building-hero-slide {
     position: absolute;
@@ -438,7 +622,7 @@
 <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-2 border-secondary-container shadow-sm">
   <div class="nav-inner relative flex items-center justify-between h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
 
-    <button class="hamburger-btn mobile-hamburger" id="hamburger-btn" aria-label="Open navigation menu">
+    <button class="hamburger-btn mobile-hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-drawer">
       <span></span><span></span><span></span><span></span>
     </button>
 
@@ -449,11 +633,69 @@
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </div>
 
-    <nav class="hidden md:flex items-center gap-8">
-      <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="index.html">Home</a>
-      <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="kids.html">Kids Corner</a>
-      <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="youth.html">Youth Board</a>
-      <a class="font-label-md text-label-md text-primary border-b-2 border-secondary pb-1" href="#">New Building</a>
+    <!-- Desktop: Nav links with dropdowns -->
+    <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
+
+      <div class="nav-item">
+        <a class="font-label-md text-label-md" href="index.html">Home</a>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          About
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="About submenu">
+          <a href="leaders.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Leaders</a>
+          <a href="history.html" role="menuitem"><span class="dot" aria-hidden="true"></span>History</a>
+          <a href="beliefs.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Our Beliefs</a>
+          <a href="departments.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Departments</a>
+          <a href="building.html" class="active" aria-current="page" role="menuitem"><span class="dot" aria-hidden="true"></span>New Building</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a class="font-label-md text-label-md" href="news.html">News</a>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Youth
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Youth submenu">
+          <a href="youth.html#adventurers" role="menuitem"><span class="dot" aria-hidden="true"></span>Adventurers</a>
+          <a href="youth.html#pathfinders" role="menuitem"><span class="dot" aria-hidden="true"></span>Pathfinders</a>
+          <a href="ay.html#ay" role="menuitem"><span class="dot" aria-hidden="true"></span>AY (Adventist Youth)</a>
+          <a href="youth.html#discussion" role="menuitem"><span class="dot" aria-hidden="true"></span>Discussion</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Ministries
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
+          <a href="ministries.html#childrens-ministry" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
+          <a href="ministries.html#dorcas" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
+          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Quick Links
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Quick Links submenu">
+          <a href="https://adventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>General Conference</a>
+          <a href="https://sidadventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>SID (Southern Africa-Indian Ocean Division)</a>
+          <a href="https://szu.adventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>Southern Zambia Union Conference</a>
+          <a href="https://lusakaconference.adventisthost.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>Lusaka Conference</a>
+        </div>
+      </div>
+
     </nav>
 
     <button class="desktop-give bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md hover:bg-primary/90 transition-all active:scale-95">
@@ -467,13 +709,65 @@
 </header>
 
 <!-- Mobile Drawer -->
-<div class="mobile-drawer" id="mobile-drawer">
+<div class="mobile-drawer" id="mobile-drawer" role="dialog" aria-label="Navigation menu" aria-hidden="true">
   <div class="mobile-drawer-inner">
-    <nav>
-        <a href="index.html"><span class="material-symbols-outlined nav-icon">home</span>Home</a>
-        <a href="kids.html"><span class="material-symbols-outlined nav-icon">child_care</span>Kids Corner</a>
-        <a href="youth.html"><span class="material-symbols-outlined nav-icon">groups</span>Youth Board</a>
-        <a class="active" href="#"><span class="material-symbols-outlined nav-icon">domain</span>New Building</a>
+    <nav aria-label="Mobile navigation">
+        <a href="index.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">home</span>Home</a>
+
+        <div class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">
+            <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">info</span>About</span>
+            <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+          </button>
+          <div class="accordion-panel">
+            <a href="leaders.html">Leaders</a>
+            <a href="history.html">History</a>
+            <a href="beliefs.html">Our Beliefs</a>
+            <a href="departments.html">Departments</a>
+            <a href="building.html" class="active" aria-current="page">New Building</a>
+          </div>
+        </div>
+
+        <a href="news.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">newspaper</span>News</a>
+
+        <div class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">
+            <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span>Youth</span>
+            <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+          </button>
+          <div class="accordion-panel">
+            <a href="adventurers.html#adventurers">Adventurers</a>
+            <a href="pathfinders.html#pathfinders">Pathfinders</a>
+            <a href="youth.html#ay">AY (Adventist Youth)</a>
+            <a href="youth.html#discussion">Discussion</a>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">
+            <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">volunteer_activism</span>Ministries</span>
+            <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+          </button>
+          <div class="accordion-panel">
+            <a href="ministries.html#childrens-ministry">Children's Ministry</a>
+            <a href="ministries.html#dorcas">Dorcas</a>
+            <a href="ministries.html#womens-ministries">Women's Ministries</a>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">
+            <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">link</span>Quick Links</span>
+            <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+          </button>
+          <div class="accordion-panel">
+            <a href="https://adventist.org" target="_blank" rel="noopener noreferrer">General Conference</a>
+            <a href="https://sidadventist.org" target="_blank" rel="noopener noreferrer">SID (Southern Africa-Indian Ocean Division)</a>
+            <a href="https://szu.adventist.org" target="_blank" rel="noopener noreferrer">Southern Zambia Union Conference</a>
+            <a href="https://lusakaconference.adventisthost.org" target="_blank" rel="noopener noreferrer">Lusaka Conference</a>
+          </div>
+        </div>
+
     </nav>
     <div class="mobile-give-row">
       <button class="mobile-give-btn">
@@ -859,11 +1153,12 @@
     </div>
     <div>
       <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
-      <ul class="space-y-3">
-        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="index.html">Home</a></li>
-        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="kids.html">Kids Corner</a></li>
+       <ul class="space-y-3" role="list">
+        <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#" aria-current="page">Home</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="adventures.html">Adventures</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="news.html">News</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="youth.html">Youth Board</a></li>
-        <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#">New Building</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="building.html">New Building</a></li>
       </ul>
     </div>
     <div>

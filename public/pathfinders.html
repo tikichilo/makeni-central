@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "secondary": "#755b00","on-surface": "#1a1c1c","error": "#ba1a1a","tertiary-container": "#1c2c40",
+          "on-primary": "#ffffff","on-primary-container": "#8392b7","inverse-surface": "#2f3131",
+          "secondary-container": "#fed977","secondary-fixed": "#ffe08f","on-tertiary-fixed-variant": "#38485d",
+          "on-primary-fixed": "#0a1a3a","primary-fixed": "#d9e2ff","inverse-on-surface": "#f0f1f1",
+          "surface-container": "#eeeeee","on-secondary-container": "#785d00","on-surface-variant": "#45464e",
+          "on-primary-fixed-variant": "#384668","surface-tint": "#4f5e81","primary-fixed-dim": "#b7c6ee",
+          "primary-container": "#1b2a4a","on-background": "#1a1c1c","surface": "#f9f9f9",
+          "on-secondary": "#ffffff","background": "#f9f9f9","surface-bright": "#f9f9f9",
+          "surface-container-lowest": "#ffffff","outline-variant": "#c5c6cf","on-tertiary": "#ffffff",
+          "on-tertiary-fixed": "#0b1c30","inverse-primary": "#b7c6ee","surface-container-high": "#e8e8e8",
+          "surface-container-low": "#f3f3f4","on-error": "#ffffff","secondary-fixed-dim": "#e6c364",
+          "on-secondary-fixed-variant": "#584400","surface-dim": "#dadada","on-secondary-fixed": "#241a00",
+          "outline": "#75777f","error-container": "#ffdad6","primary": "#041534","on-error-container": "#93000a",
+          "tertiary-fixed": "#d3e4fe","tertiary": "#06172a","on-tertiary-container": "#8393ac",
+          "tertiary-fixed-dim": "#b7c8e1","surface-variant": "#e2e2e2","surface-container-highest": "#e2e2e2"
+        },
+        "borderRadius": { "DEFAULT": "0.25rem","lg": "0.5rem","xl": "12px","full": "9999px" },
+        "spacing": { "section-gap": "120px","margin-desktop": "80px","margin-mobile": "20px","gutter": "32px","base": "4px" },
+        "fontFamily": {
+          "label-md": ["Inter"],"headline-lg": ["Playfair Display"],"display-lg": ["Playfair Display"],
+          "body-lg": ["Inter"],"title-lg": ["Inter"],"body-md": ["Inter"],
+          "headline-md": ["Playfair Display"],"headline-lg-mobile": ["Playfair Display"]
+        },
+        "fontSize": {
+          "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "600"}],
+          "headline-lg": ["40px", {"lineHeight": "1.2", "fontWeight": "700"}],
+          "display-lg": ["56px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+          "body-lg": ["18px", {"lineHeight": "1.7", "fontWeight": "400"}],
+          "title-lg": ["20px", {"lineHeight": "1.5", "letterSpacing": "0.01em", "fontWeight": "600"}],
+          "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+          "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+          "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}]
+        }
+      }
+    }
+  }
+</script>
+<link rel="stylesheet" href="../sda-shared.css"/>
+<style>
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .sacred-shadow { box-shadow: 0 10px 30px -10px rgba(4, 21, 52, 0.08); }
+  .gold-divider { height: 2px; background: #755b00; width: 60px; }
+  .logo-badge {
+    display: flex; align-items: center; justify-content: center;
+    width: 52px; height: 52px; border-radius: 50%;
+    background-color: #041534; border: 2px solid #755b00; flex-shrink: 0;
+  }
+  .logo-badge img { width: 38px; height: 38px; object-fit: contain; }
+  .logo-badge-sm { width: 44px; height: 44px; }
+  .logo-badge-sm img { width: 30px; height: 30px; }
+
+  /* ── MOBILE NAV ── */
+  @media (max-width: 767px) {
+    .logo-text { display: none !important; }
+    .nav-brand  { position: absolute; left: 50%; transform: translateX(-50%); z-index: 1; }
+    .hamburger-btn { position: relative; z-index: 2; }
+    .mobile-give { position: relative; z-index: 2; }
+    .mobile-hamburger { display: flex; }
+    .desktop-give { display: none !important; }
+    .mobile-give  { display: flex; }
+  }
+  @media (min-width: 768px) {
+    .mobile-hamburger { display: none !important; }
+    .mobile-give      { display: none !important; }
+    .desktop-give     { display: flex !important; }
+  }
+  .hamburger-btn {
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    width: 40px; height: 40px; gap: 5px; cursor: pointer; background: none; border: none;
+    padding: 6px 4px; border-radius: 8px; transition: background 0.2s; flex-shrink: 0; z-index: 60;
+  }
+  .hamburger-btn:hover { background: rgba(4,21,52,0.06); }
+  .hamburger-btn span {
+    display: block; height: 2px; border-radius: 2px; background: #041534;
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .hamburger-btn span:nth-child(1) { width: 24px; }
+  .hamburger-btn span:nth-child(2) { width: 18px; }
+  .hamburger-btn span:nth-child(3) { width: 22px; }
+  .hamburger-btn span:nth-child(4) { width: 14px; }
+  .hamburger-btn.open span:nth-child(1) { width: 22px; transform: translateY(10.5px) rotate(45deg); }
+  .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger-btn.open span:nth-child(3) { opacity: 0; transform: scaleX(0); }
+  .hamburger-btn.open span:nth-child(4) { width: 22px; transform: translateY(-10.5px) rotate(-45deg); }
+  .mobile-drawer {
+    position: fixed; top: 80px; left: 0; right: 0; z-index: 49;
+    background: rgba(249,249,249,0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 2px solid #fed977; box-shadow: 0 20px 40px -10px rgba(4,21,52,0.12);
+    transform: translateY(-110%); opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease; pointer-events: none;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+  .mobile-drawer.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .mobile-drawer nav a {
+    display: flex; align-items: center; gap: 12px; padding: 18px 24px;
+    font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.08em; font-weight: 600;
+    color: #45464e; text-transform: uppercase; text-decoration: none;
+    border-bottom: 1px solid rgba(197,198,207,0.3);
+    transition: background 0.2s, color 0.2s, padding-left 0.2s; position: relative;
+  }
+  .mobile-drawer nav a:hover { background: rgba(254,217,119,0.18); color: #041534; padding-left: 32px; }
+  .mobile-drawer nav a.active { color: #041534; }
+  .mobile-drawer nav a.active::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: #755b00; border-radius: 0 2px 2px 0;
+  }
+  .mobile-drawer nav a .nav-icon { color: #755b00; font-size: 20px; }
+  .mobile-drawer-inner { padding: 8px 0 20px; }
+  .mobile-give-row { padding: 16px 24px 4px; }
+  .mobile-give-btn {
+    width: 100%; background: #041534; color: #fff; padding: 14px 24px; border-radius: 12px;
+    font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.08em; font-weight: 600;
+    cursor: pointer; border: none; display: flex; align-items: center; justify-content: center;
+    gap: 8px; transition: background 0.2s, transform 0.15s;
+  }
+  .mobile-give-btn:active { transform: scale(0.97); }
+  .mobile-give-btn:hover { background: #755b00; }
+
+  /* ═══════════════════════════════════════════
+     DESKTOP DROPDOWN NAVIGATION
+     (shared behaviour lives in sda.js → initDropdownNav())
+  ═══════════════════════════════════════════ */
+  .nav-item { position: relative; }
+  .nav-item > a,
+  .nav-item > button.nav-trigger {
+    display: flex; align-items: center; gap: 4px;
+    background: none; border: none; cursor: pointer; font: inherit; padding: 0;
+  }
+  .nav-item .nav-caret {
+    font-size: 18px;
+    transition: transform 0.25s ease, color 0.25s ease;
+    color: #75777f;
+  }
+  .nav-item:hover .nav-caret,
+  .nav-item.nav-open .nav-caret { transform: rotate(180deg); color: #755b00; }
+  .nav-item > a,
+  .nav-item > button.nav-trigger {
+    color: #45464e; position: relative; padding-bottom: 4px; transition: color 0.25s ease;
+  }
+  .nav-item > a::after,
+  .nav-item > button.nav-trigger::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+    background: #755b00; transform: scaleX(0); transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+  .nav-item:hover > a,
+  .nav-item:hover > button.nav-trigger,
+  .nav-item.nav-open > a,
+  .nav-item.nav-open > button.nav-trigger,
+  .nav-item > a.active { color: #041534; }
+  .nav-item:hover > a::after,
+  .nav-item:hover > button.nav-trigger::after,
+  .nav-item.nav-open > a::after,
+  .nav-item.nav-open > button.nav-trigger::after,
+  .nav-item > a.active::after { transform: scaleX(1); }
+
+  .nav-dropdown {
+    position: absolute; top: calc(100% + 18px); left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    min-width: 240px; background: #ffffff; border-radius: 14px;
+    border: 1px solid #e2e2e2; box-shadow: 0 20px 45px -12px rgba(4,21,52,0.22);
+    padding: 10px; opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+    z-index: 40;
+  }
+  .nav-dropdown::before {
+    content: ''; position: absolute; top: -18px; left: 0; right: 0; height: 18px;
+  }
+  .nav-item:hover .nav-dropdown,
+  .nav-item.nav-open .nav-dropdown {
+    opacity: 1; visibility: visible; pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+  .nav-dropdown a {
+    display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 9px;
+    font-family: Inter, sans-serif; font-size: 14px; font-weight: 500; color: #45464e;
+    text-decoration: none; transition: background 0.18s ease, color 0.18s ease, padding-left 0.18s ease;
+    white-space: nowrap;
+  }
+  .nav-dropdown a:hover,
+  .nav-dropdown a:focus-visible { background: #fffbee; color: #041534; padding-left: 18px; }
+  .nav-dropdown a.active { color: #041534; background: #fffbee; }
+  .nav-dropdown a .dot {
+    width: 5px; height: 5px; border-radius: 50%; background: #755b00; flex-shrink: 0;
+    opacity: 0; transform: scale(0); transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .nav-dropdown a:hover .dot,
+  .nav-dropdown a:focus-visible .dot,
+  .nav-dropdown a.active .dot { opacity: 1; transform: scale(1); }
+
+  /* ═══════════════════════════════════════════
+     MOBILE ACCORDION SUBMENUS
+     (shared behaviour lives in sda.js → initMobileAccordion())
+  ═══════════════════════════════════════════ */
+  .mobile-drawer .accordion-item { border-bottom: 1px solid rgba(197,198,207,0.3); }
+  .mobile-drawer .accordion-trigger {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 18px 24px; background: none; border: none; cursor: pointer;
+    font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.08em; font-weight: 600;
+    color: #45464e; text-transform: uppercase; text-align: left;
+    transition: background 0.2s, color 0.2s;
+  }
+  .mobile-drawer .accordion-trigger:hover,
+  .mobile-drawer .accordion-trigger.open { background: rgba(254,217,119,0.18); color: #041534; }
+  .mobile-drawer .accordion-trigger .trigger-left { display: flex; align-items: center; gap: 12px; }
+  .mobile-drawer .accordion-trigger .nav-icon { color: #755b00; font-size: 20px; }
+  .mobile-drawer .accordion-trigger .accordion-caret {
+    font-size: 20px; color: #75777f; transition: transform 0.3s ease, color 0.3s ease;
+  }
+  .mobile-drawer .accordion-trigger.open .accordion-caret { transform: rotate(180deg); color: #755b00; }
+  .mobile-drawer .accordion-panel {
+    max-height: 0; overflow: hidden; transition: max-height 0.35s ease; background: #f6f6f4;
+  }
+  .mobile-drawer .accordion-panel a {
+    padding: 14px 24px 14px 56px; font-size: 13px; letter-spacing: 0.04em;
+    border-bottom: 1px solid rgba(197,198,207,0.25);
+  }
+  .mobile-drawer .accordion-panel a:last-child { border-bottom: none; }
+  .mobile-drawer .accordion-panel a:hover { padding-left: 62px; }
+
+  /* ── Image placeholder fallback ── */
+  .img-wrap { position: relative; width: 100%; height: 100%; overflow: hidden; }
+  .img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* ── Timeline ── */
+  .timeline-rail {
+    position: relative;
+    padding-left: 32px;
+  }
+  .timeline-rail::before {
+    content: '';
+    position: absolute;
+    left: 7px; top: 6px; bottom: 6px;
+    width: 2px;
+    background: #e2e2e2;
+  }
+  .timeline-item { position: relative; padding-bottom: 40px; }
+  .timeline-item:last-child { padding-bottom: 0; }
+  .timeline-dot {
+    position: absolute; left: -32px; top: 4px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #755b00; border: 3px solid #fed977;
+  }
+  .timeline-year {
+    font-family: Inter, sans-serif; font-weight: 700; font-size: 14px;
+    color: #755b00; letter-spacing: 0.06em; margin-bottom: 4px; display: block;
+  }
+
+  /* ── Class ladder ── */
+  .class-chip {
+    display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+  }
+  .class-chip .chip-circle {
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: #fff; background: #041534;
+    border: 3px solid #fed977;
+  }
+
+  /* ── Info table ── */
+  .info-table { width: 100%; border-collapse: collapse; }
+  .info-table th {
+    text-align: left; font-family: Inter, sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: #755b00;
+    padding: 14px 16px; border-bottom: 2px solid #e2e2e2;
+  }
+  .info-table td {
+    padding: 14px 16px; border-bottom: 1px solid #e2e2e2;
+    font-family: Inter, sans-serif; font-size: 14px; color: #45464e;
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  #history, #structure, #classes, #honors, #join { scroll-margin-top: 90px; }
+
+  /* ═══════════════════════════════════════════
+     HERO SLIDESHOW (5 auto-rotating background slides)
+  ═══════════════════════════════════════════ */
+  .hero-slideshow {
+    position: absolute; inset: 0; background: #041534; overflow: hidden;
+  }
+  .hero-slide {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center; background-repeat: no-repeat;
+    opacity: 0; transform: scale(1);
+    transition: opacity 1.8s ease-in-out;
+  }
+  .hero-slide.active {
+    opacity: 1;
+    animation: heroKenBurns 7s ease-in-out forwards;
+  }
+  @keyframes heroKenBurns {
+    from { transform: scale(1); }
+    to   { transform: scale(1.1); }
+  }
+  .hero-slideshow-dots {
+    position: absolute; z-index: 15; bottom: 22px; right: 24px;
+    display: flex; gap: 8px;
+  }
+  .hero-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.45); cursor: pointer;
+    transition: all 0.3s ease; border: none; padding: 0;
+  }
+  .hero-dot.active { background: #fed977; width: 26px; border-radius: 4px; }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-slide.active { animation: none; }
+  }
+</style>
+</head>
+
+<body data-page="pathfinders" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+
+<!-- ══════════════ TOP NAV ══════════════ -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-2 border-secondary-container shadow-sm">
+  <div class="nav-inner relative flex items-center justify-between h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+    <button class="hamburger-btn mobile-hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-drawer">
+      <span></span><span></span><span></span><span></span>
+    </button>
+    <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
+      <div class="logo-badge">
+        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+      </div>
+      <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
+    </div>
+
+    <!-- Desktop: Nav links with dropdowns -->
+    <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
+
+      <div class="nav-item">
+        <a class="font-label-md text-label-md" href="index.html">Home</a>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          About
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="About submenu">
+          <a href="leaders.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Leaders</a>
+          <a href="history.html" role="menuitem"><span class="dot" aria-hidden="true"></span>History</a>
+          <a href="beliefs.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Our Beliefs</a>
+          <a href="departments.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Departments</a>
+          <a href="building.html" role="menuitem"><span class="dot" aria-hidden="true"></span>New Building</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a class="font-label-md text-label-md" href="news.html">News</a>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Youth
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Youth submenu">
+          <a href="adventurers.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Adventurers</a>
+          <a href="pathfinders.html" class="active" aria-current="page" role="menuitem"><span class="dot" aria-hidden="true"></span>Pathfinders</a>
+          <a href="ay.html#ay" role="menuitem"><span class="dot" aria-hidden="true"></span>AY (Adventist Youth)</a>
+          <a href="youth.html#discussion" role="menuitem"><span class="dot" aria-hidden="true"></span>Discussion</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Ministries
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
+          <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
+          <a href="ministries.html#dorcas" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
+          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Quick Links
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Quick Links submenu">
+          <a href="https://adventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>General Conference</a>
+          <a href="https://sidadventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>SID (Southern Africa-Indian Ocean Division)</a>
+          <a href="https://szu.adventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>Southern Zambia Union Conference</a>
+          <a href="https://lusakaconference.adventisthost.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>Lusaka Conference</a>
+        </div>
+      </div>
+
+    </nav>
+
+    <button class="desktop-give bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md hover:bg-primary/90 transition-all active:scale-95">Give</button>
+    <button class="mobile-give bg-primary text-on-primary px-4 py-2 rounded-xl font-label-md text-[13px] hover:bg-primary/90 transition-all active:scale-95">Give</button>
+  </div>
+</header>
+
+<!-- Mobile Drawer -->
+<div class="mobile-drawer" id="mobile-drawer" role="dialog" aria-label="Navigation menu" aria-hidden="true">
+  <div class="mobile-drawer-inner">
+    <nav aria-label="Mobile navigation">
+      <a href="index.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">home</span>Home</a>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">info</span>About</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="leaders.html">Leaders</a>
+          <a href="history.html">History</a>
+          <a href="beliefs.html">Our Beliefs</a>
+          <a href="departments.html">Departments</a>
+          <a href="building.html">New Building</a>
+        </div>
+      </div>
+
+      <a href="news.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">newspaper</span>News</a>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger open" aria-expanded="true">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span>Youth</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="adventurers.html">Adventurers</a>
+          <a href="pathfinders.html" class="active" aria-current="page">Pathfinders</a>
+          <a href="ay.html">AY (Adventist Youth)</a>
+          <a href="youth.html#discussion">Discussion</a>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">volunteer_activism</span>Ministries</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="kids.html">Children's Ministry</a>
+          <a href="ministries.html#dorcas">Dorcas</a>
+          <a href="ministries.html#womens-ministries">Women's Ministries</a>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">link</span>Quick Links</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="https://adventist.org" target="_blank" rel="noopener noreferrer">General Conference</a>
+          <a href="https://sidadventist.org" target="_blank" rel="noopener noreferrer">SID (Southern Africa-Indian Ocean Division)</a>
+          <a href="https://szu.adventist.org" target="_blank" rel="noopener noreferrer">Southern Zambia Union Conference</a>
+          <a href="https://lusakaconference.adventisthost.org" target="_blank" rel="noopener noreferrer">Lusaka Conference</a>
+        </div>
+      </div>
+
+    </nav>
+    <div class="mobile-give-row">
+      <button class="mobile-give-btn">
+        <span class="material-symbols-outlined" style="font-size:18px;">volunteer_activism</span>
+        Give to the Church
+      </button>
+    </div>
+  </div>
+</div>
+
+<main class="pt-20">
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="relative h-[60vh] min-h-[420px] flex items-end overflow-hidden">
+    <div class="hero-slideshow" id="pathfinders-hero-slideshow">
+      <div class="hero-slide active" style="background-image:url('images/pathfinders-hero-1.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('images/pathfinders-hero-2.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('images/pathfinders-hero-3.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('images/pathfinders-hero-4.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('images/pathfinders-hero-5.jpg');"></div>
+    </div>
+    <div class="hero-slideshow-dots" id="pathfinders-hero-dots" aria-hidden="true">
+      <button class="hero-dot active" data-index="0" aria-label="Slide 1"></button>
+      <button class="hero-dot" data-index="1" aria-label="Slide 2"></button>
+      <button class="hero-dot" data-index="2" aria-label="Slide 3"></button>
+      <button class="hero-dot" data-index="3" aria-label="Slide 4"></button>
+      <button class="hero-dot" data-index="4" aria-label="Slide 5"></button>
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/50 to-primary/10"></div>
+    <div class="relative z-10 w-full max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pb-14">
+      <div class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full mb-6 shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">hiking</span>
+        <span class="font-label-md text-label-md uppercase tracking-widest">Ages 10–15 · Grades 5–10</span>
+      </div>
+      <h1 class="font-display-lg text-display-lg text-on-primary mb-4">Pathfinder Club</h1>
+      <p class="font-body-lg text-body-lg text-on-primary/85 max-w-2xl">
+        A worldwide Seventh-day Adventist Church youth ministry combining outdoor adventure, skill-building, and spiritual growth for young people ages 10 to 15.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════ QUICK FACTS ══════════════ -->
+  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-16">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <p class="font-headline-md text-headline-md text-primary">1950</p>
+        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-2">Officially Adopted</p>
+      </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <p class="font-headline-md text-headline-md text-primary">~2M</p>
+        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-2">Members Worldwide</p>
+      </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <p class="font-headline-md text-headline-md text-primary">400+</p>
+        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-2">Honors Offered</p>
+      </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <p class="font-headline-md text-headline-md text-primary">6</p>
+        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-2">Class Levels</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ AIM · MOTTO · PLEDGE · LAW ══════════════ -->
+  <section class="bg-surface-container-low py-section-gap">
+    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="text-center mb-14">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Aim, Motto, Pledge &amp; Law</h2>
+        <div class="gold-divider mx-auto"></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-10">
+        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow border-l-4 border-secondary">
+          <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-3">Aim</span>
+          <p class="font-headline-md text-headline-md text-primary leading-snug">The Advent message to all the world in my generation.</p>
+        </div>
+        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow border-l-4 border-secondary">
+          <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-3">Motto</span>
+          <p class="font-headline-md text-headline-md text-primary leading-snug">The love of Christ compels us.</p>
+        </div>
+      </div>
+
+      <div class="bg-primary text-on-primary rounded-xl p-10 md:p-14 relative overflow-hidden sacred-shadow mb-10">
+        <div class="absolute top-0 right-0 w-56 h-56 bg-secondary/10 rounded-full -translate-y-1/3 translate-x-1/3"></div>
+        <span class="font-label-md text-label-md text-secondary-fixed uppercase tracking-widest block mb-4 relative z-10">Pledge</span>
+        <p class="font-headline-md text-headline-md italic relative z-10 max-w-2xl">
+          "By the grace of God, I will be pure and kind and true. I will keep the Pathfinder Law. I will be a servant of God and a friend to man."
+        </p>
+      </div>
+
+      <div class="bg-surface-container-lowest p-8 md:p-10 rounded-xl sacred-shadow">
+        <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-6">The Pathfinder Law — I will:</span>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4">
+          <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]">check</span>Keep the morning watch</p>
+          <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]">check</span>Do my honest part</p>
+          <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]">check</span>Care for my body</p>
+          <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]">check</span>Keep a level eye</p>
+          <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]">check</span>Be courteous and obedient</p>
+          <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]">check</span>Walk softly in the sanctuary</p>
+          <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]">check</span>Keep a song in my heart</p>
+          <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[18px]">check</span>Go on God's errands</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ EMBLEM ══════════════ -->
+  <section class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
+    <div class="img-wrap rounded-xl overflow-hidden sacred-shadow h-[340px] order-2 md:order-1">
+      <img src="images/pathfinders-emblem.jpg" alt="Pathfinder Club triangular emblem and flag"
+        onerror="this.parentElement.outerHTML='<div style=\'height:340px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>change_history</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/pathfinders-emblem.jpg</span></div>'"/>
+    </div>
+    <div class="space-y-6 order-1 md:order-2">
+      <span class="font-label-md text-label-md text-secondary tracking-[0.2em] uppercase block">The Emblem</span>
+      <h2 class="font-headline-lg text-headline-lg text-primary leading-tight">A Triangle With Meaning</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        The Pathfinder emblem is built around a triangle — a symbol of the Trinity, and of the "tripod" balance the program aims for in every member: mental growth through honors and study, physical development through camping and outdoor life, and spiritual maturity through outreach and personal devotion.
+      </p>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        The triangle is deliberately inverted, a quiet reminder of Christ's teaching that greatness is found in service — putting others first rather than self. The club flag carries this same emblem and is flown at local and conference Pathfinder events.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════ HISTORY TIMELINE ══════════════ -->
+  <section id="history" class="bg-surface-container-low py-section-gap">
+    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="text-center mb-16">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">A Century in the Making</h2>
+        <div class="gold-divider mx-auto"></div>
+      </div>
+
+      <div class="timeline-rail max-w-3xl mx-auto">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-year">1907</span>
+          <p class="font-body-md text-body-md text-on-surface-variant">The General Conference establishes the Young People's Department, the first formal step toward organized Adventist youth ministry.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-year">1919</span>
+          <p class="font-body-md text-body-md text-on-surface-variant">Arthur W. Spalding organizes a small boys' club in Tennessee called the "Mission Scouts," combining camping and handicrafts with community service — and drafts the pledge and law that would later shape the Pathfinder Pledge and Law.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-year">1929</span>
+          <p class="font-body-md text-body-md text-on-surface-variant">The name "Pathfinder" is used for the first time on a schedule of Adventist youth activities in Southern California.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-year">1950</span>
+          <p class="font-body-md text-body-md text-on-surface-variant">The General Conference formally adopts the Pathfinder Club as a worldwide program at its session in San Francisco, complete with a uniform, flag, and hymn.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-year">1953</span>
+          <p class="font-body-md text-body-md text-on-surface-variant">The first Pathfinder Camporee is held in Ashburnham, Massachusetts — the beginning of the large camporee gatherings that continue worldwide today.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-year">1982</span>
+          <p class="font-body-md text-body-md text-on-surface-variant">The Pathfinder world emblem replaces the older Missionary Volunteer insignia, giving the club the triangular logo still used today.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-year">1988</span>
+          <p class="font-body-md text-body-md text-on-surface-variant">A major curriculum overhaul modernizes teaching methods across Pathfinder clubs worldwide.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-year">Today</span>
+          <p class="font-body-md text-body-md text-on-surface-variant">Pathfinders remains one of the largest youth ministries in the Adventist Church, welcoming young people of any background who commit to the Pledge and Law.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ CLASS LEVELS ══════════════ -->
+  <section id="classes" class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="text-center mb-16">
+      <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Six Class Levels</h2>
+      <div class="gold-divider mx-auto mb-6"></div>
+      <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+        Pathfinders progress through six grade-based classes, each recognized with a class pin, pocket strip, and chevron at an Investiture ceremony.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-6 mb-14">
+      <div class="class-chip">
+        <div class="chip-circle"><span class="material-symbols-outlined">looks_one</span></div>
+        <span class="font-label-md text-[13px] text-primary block">Friend</span>
+        <span class="font-body-md text-[12px] text-on-surface-variant">Grade 5</span>
+      </div>
+      <div class="class-chip">
+        <div class="chip-circle"><span class="material-symbols-outlined">looks_two</span></div>
+        <span class="font-label-md text-[13px] text-primary block">Companion</span>
+        <span class="font-body-md text-[12px] text-on-surface-variant">Grade 6</span>
+      </div>
+      <div class="class-chip">
+        <div class="chip-circle"><span class="material-symbols-outlined">looks_3</span></div>
+        <span class="font-label-md text-[13px] text-primary block">Explorer</span>
+        <span class="font-body-md text-[12px] text-on-surface-variant">Grade 7</span>
+      </div>
+      <div class="class-chip">
+        <div class="chip-circle"><span class="material-symbols-outlined">looks_4</span></div>
+        <span class="font-label-md text-[13px] text-primary block">Ranger</span>
+        <span class="font-body-md text-[12px] text-on-surface-variant">Grade 8</span>
+      </div>
+      <div class="class-chip">
+        <div class="chip-circle"><span class="material-symbols-outlined">looks_5</span></div>
+        <span class="font-label-md text-[13px] text-primary block">Voyager</span>
+        <span class="font-body-md text-[12px] text-on-surface-variant">Grade 9</span>
+      </div>
+      <div class="class-chip">
+        <div class="chip-circle"><span class="material-symbols-outlined">looks_6</span></div>
+        <span class="font-label-md text-[13px] text-primary block">Guide</span>
+        <span class="font-body-md text-[12px] text-on-surface-variant">Grade 10</span>
+      </div>
+    </div>
+
+    <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden overflow-x-auto">
+      <table class="info-table min-w-[640px]">
+        <thead>
+          <tr>
+            <th>Class</th>
+            <th>Grade</th>
+            <th>Recites</th>
+            <th>Sample Honors</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="font-semibold text-primary">Friend</td>
+            <td>5th</td>
+            <td>Pathfinder Pledge &amp; Law</td>
+            <td>Camping Skills I, Basic Sewing, Beginning Swimming</td>
+          </tr>
+          <tr>
+            <td class="font-semibold text-primary">Companion</td>
+            <td>6th</td>
+            <td>Pathfinder Pledge &amp; Law</td>
+            <td>Drilling and Marching, Leather Craft, Camping Skills II</td>
+          </tr>
+          <tr>
+            <td class="font-semibold text-primary">Explorer</td>
+            <td>7th</td>
+            <td>Pathfinder Pledge (meaning)</td>
+            <td>Family Life, Track and Field, Basic Rescue</td>
+          </tr>
+          <tr>
+            <td class="font-semibold text-primary">Ranger</td>
+            <td>8th</td>
+            <td>Pathfinder Pledge &amp; Law (meaning)</td>
+            <td>First Aid, Photography, Camping Skills IV</td>
+          </tr>
+          <tr>
+            <td class="font-semibold text-primary">Voyager</td>
+            <td>9th</td>
+            <td>Adventist Youth Aim, Motto &amp; Pledge</td>
+            <td>Advanced Communications, Outdoor Leadership</td>
+          </tr>
+          <tr>
+            <td class="font-semibold text-primary">Guide</td>
+            <td>10th</td>
+            <td>Adventist Youth Aim, Motto &amp; Pledge</td>
+            <td>Christian Drama, Pioneering, Junior Youth Leadership</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════ HONORS ══════════════ -->
+  <section id="honors" class="bg-surface-container-low py-section-gap">
+    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
+      <div class="img-wrap rounded-xl overflow-hidden sacred-shadow h-[360px]">
+        <img src="images/pathfinders-honors.jpg" alt="Pathfinder honor sash with earned patches"
+          onerror="this.parentElement.outerHTML='<div style=\'height:360px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>workspace_premium</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/pathfinders-honors.jpg</span></div>'"/>
+      </div>
+      <div class="space-y-6">
+        <span class="font-label-md text-label-md text-secondary tracking-[0.2em] uppercase block">Honors System</span>
+        <h2 class="font-headline-lg text-headline-lg text-primary leading-tight">Over 400 Ways to Learn</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+          Each honor is a short course of study in a practical subject — arts and crafts, health and science, household skills, nature and conservation, outdoor industries, outreach, recreation, and vocational trades. Honors are organized into three skill levels, from introductory knowledge to advanced proficiency.
+        </p>
+        <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+          Completed honors are displayed as patches on the Pathfinder's sash and awarded formally at an Investiture ceremony alongside class pins and chevrons — a visible record of every subject a young person has mastered along the way.
+        </p>
+        <div class="grid grid-cols-2 gap-4 pt-2">
+          <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/30 text-center">
+            <span class="material-symbols-outlined text-secondary text-2xl block mb-1">forest</span>
+            <span class="font-label-md text-[13px] text-primary">Nature &amp; Outdoor</span>
+          </div>
+          <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/30 text-center">
+            <span class="material-symbols-outlined text-secondary text-2xl block mb-1">science</span>
+            <span class="font-label-md text-[13px] text-primary">Health &amp; Science</span>
+          </div>
+          <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/30 text-center">
+            <span class="material-symbols-outlined text-secondary text-2xl block mb-1">construction</span>
+            <span class="font-label-md text-[13px] text-primary">Vocational Skills</span>
+          </div>
+          <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/30 text-center">
+            <span class="material-symbols-outlined text-secondary text-2xl block mb-1">volunteer_activism</span>
+            <span class="font-label-md text-[13px] text-primary">Outreach</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ STRUCTURE ══════════════ -->
+  <section id="structure" class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="text-center mb-16">
+      <h2 class="font-headline-lg text-headline-lg text-primary mb-4">How the Club Is Run</h2>
+      <div class="gold-divider mx-auto mb-6"></div>
+      <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+        Pathfinders is a worldwide program directed by the General Conference Youth Department, operated locally under the oversight of the conference youth director.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow border-t-4 border-secondary">
+        <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">badge</span>
+        <h3 class="font-title-lg text-title-lg text-primary mb-2">Leadership Team</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">Each club is led by a club director, deputy directors, counselors, instructors, a chaplain, secretary, and treasurer — all trained volunteers.</p>
+      </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow border-t-4 border-secondary">
+        <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">groups</span>
+        <h3 class="font-title-lg text-title-lg text-primary mb-2">Units</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">Members are organized into small units of six to eight Pathfinders, each with its own captain and scribe, keeping mentorship close and personal.</p>
+      </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow border-t-4 border-secondary">
+        <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">military_tech</span>
+        <h3 class="font-title-lg text-title-lg text-primary mb-2">Investiture</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">A formal ceremony marks the completion of each class level, where members receive their pin, pocket strip, and chevron.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ ACTIVITIES ══════════════ -->
+  <section class="bg-surface-container-low py-section-gap">
+    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="text-center mb-16">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">What Pathfinders Do</h2>
+        <div class="gold-divider mx-auto"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center">
+          <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">cabin</span>
+          <h3 class="font-title-lg text-title-lg text-primary mb-2">Camporees</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Large multi-club camping gatherings held at conference and division level, featuring drill, honors, and worship.</p>
+        </div>
+        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center">
+          <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">soup_kitchen</span>
+          <h3 class="font-title-lg text-title-lg text-primary mb-2">Community Service</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Soup kitchens, food collection drives, park clean-ups, and visits to the elderly — service is central to Pathfindering.</p>
+        </div>
+        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center">
+          <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">school</span>
+          <h3 class="font-title-lg text-title-lg text-primary mb-2">Honors &amp; Skills</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Interactive training across recreational, artistic, nature, vocational, and outreach subjects.</p>
+        </div>
+        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center">
+          <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">supervisor_account</span>
+          <h3 class="font-title-lg text-title-lg text-primary mb-2">Mentorship</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">A ratio of at least one trained staff member for every five Pathfinders ensures close, personal guidance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ JOIN CTA ══════════════ -->
+  <section id="join" class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mb-section-gap mt-section-gap">
+    <div class="bg-primary rounded-[2rem] p-12 md:p-20 text-center relative overflow-hidden sacred-shadow">
+      <div class="absolute top-0 right-0 w-64 h-64 bg-secondary/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+      <div class="absolute bottom-0 left-0 w-32 h-32 bg-secondary/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+      <div class="relative z-10">
+        <h2 class="font-headline-lg text-headline-lg text-on-primary mb-6">Ready to Join Pathfinders?</h2>
+        <p class="font-body-lg text-body-lg text-on-primary/80 max-w-2xl mx-auto mb-10">
+          The Pathfinder Club welcomes young people ages 10–15 of any background who agree to keep the Pledge and Law. Speak with our club director to find out about meeting times and registration.
+        </p>
+        <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+          <button class="bg-secondary text-white px-10 py-4 rounded-xl font-title-lg text-title-lg hover:bg-secondary/90 transition-all active:scale-95 flex items-center gap-3">
+            Contact the Club Director <span class="material-symbols-outlined">forum</span>
+          </button>
+          <a href="youth.html" class="border-2 border-on-primary/20 text-on-primary px-10 py-4 rounded-xl font-title-lg text-title-lg hover:bg-on-primary/10 transition-all">
+            Explore Youth Board
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="bg-primary text-on-primary w-full py-12 border-t-4 border-secondary">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+    <div class="md:col-span-1">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="logo-badge logo-badge-sm" style="background-color:#0a1a3a; border-color:#e6c364;">
+          <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        </div>
+        <span class="font-headline-md text-headline-md text-on-primary">Makeni Central</span>
+      </div>
+      <p class="font-body-md text-body-md text-on-primary/80">Proclaiming the everlasting gospel to every nation, kindred, tongue, and people.</p>
+    </div>
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
+      <ul class="space-y-3" role="list">
+        <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#" aria-current="page">Home</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="adventures.html">Adventures</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="news.html">News</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="youth.html">Youth Board</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="building.html">New Building</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Resources</h4>
+      <ul class="space-y-3">
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Sermon Archive</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Study Guides</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Privacy Policy</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Contact</h4>
+      <p class="font-body-md text-body-md text-on-primary/80 mb-4">123 Makeni Road<br/>Lusaka, Zambia</p>
+      <div class="flex gap-4">
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
+          <span class="material-symbols-outlined">public</span>
+        </a>
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
+          <span class="material-symbols-outlined">mail</span>
+        </a>
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
+          <span class="material-symbols-outlined">call</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 text-center">
+    <p class="font-body-md text-body-md text-on-primary/60">© 2026 Makeni Central SDA Church. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="sda.js" defer></script>
+<script src="func.js" defer></script>
+<script>
+  // ── Pathfinders hero slideshow: auto-rotates 5 background slides ──
+  (function () {
+    var root = document.getElementById('pathfinders-hero-slideshow');
+    if (!root) return;
+    var slides = root.querySelectorAll('.hero-slide');
+    var dots = document.querySelectorAll('#pathfinders-hero-dots .hero-dot');
+    var current = 0;
+    var intervalMs = 6000;
+    var timer = null;
+
+    function goTo(index) {
+      slides[current].classList.remove('active');
+      if (dots[current]) dots[current].classList.remove('active');
+      current = index;
+      slides[current].classList.add('active');
+      if (dots[current]) dots[current].classList.add('active');
+    }
+
+    function next() {
+      goTo((current + 1) % slides.length);
+    }
+
+    function start() {
+      stop();
+      timer = setInterval(next, intervalMs);
+    }
+    function stop() {
+      if (timer) clearInterval(timer);
+    }
+
+    if (slides.length > 1) {
+      dots.forEach(function (dot) {
+        dot.addEventListener('click', function () {
+          var idx = parseInt(dot.getAttribute('data-index'), 10);
+          if (!isNaN(idx) && idx !== current) {
+            goTo(idx);
+            start(); // reset the timer after manual navigation
+          }
+        });
+      });
+      start();
+    }
+  })();
+</script>
+
+</body>
+</html>
