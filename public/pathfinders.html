@@ -80,10 +80,12 @@
   }
   .hamburger-btn {
     display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
-    width: 40px; height: 40px; gap: 5px; cursor: pointer; background: none; border: none;
+    width: 44px; height: 44px; gap: 5px; cursor: pointer; background: none; border: none;
     padding: 6px 4px; border-radius: 8px; transition: background 0.2s; flex-shrink: 0; z-index: 60;
   }
-  .hamburger-btn:hover { background: rgba(4,21,52,0.06); }
+  @media (hover: hover) and (pointer: fine) {
+    .hamburger-btn:hover { background: rgba(4,21,52,0.06); }
+  }
   .hamburger-btn span {
     display: block; height: 2px; border-radius: 2px; background: #041534;
     transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
@@ -104,6 +106,8 @@
     transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease; pointer-events: none;
     max-height: calc(100vh - 80px);
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
   .mobile-drawer.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
   .mobile-drawer nav a {
@@ -113,7 +117,10 @@
     border-bottom: 1px solid rgba(197,198,207,0.3);
     transition: background 0.2s, color 0.2s, padding-left 0.2s; position: relative;
   }
-  .mobile-drawer nav a:hover { background: rgba(254,217,119,0.18); color: #041534; padding-left: 32px; }
+  @media (hover: hover) and (pointer: fine) {
+    .mobile-drawer nav a:hover { background: rgba(254,217,119,0.18); color: #041534; padding-left: 32px; }
+  }
+  .mobile-drawer nav a:active { background: rgba(254,217,119,0.18); color: #041534; }
   .mobile-drawer nav a.active { color: #041534; }
   .mobile-drawer nav a.active::before {
     content: ''; position: absolute; left: 0; top: 0; bottom: 0;
@@ -128,12 +135,17 @@
     cursor: pointer; border: none; display: flex; align-items: center; justify-content: center;
     gap: 8px; transition: background 0.2s, transform 0.15s;
   }
-  .mobile-give-btn:active { transform: scale(0.97); }
-  .mobile-give-btn:hover { background: #755b00; }
+  .mobile-give-btn:active { transform: scale(0.97); background: #755b00; }
+  @media (hover: hover) and (pointer: fine) {
+    .mobile-give-btn:hover { background: #755b00; }
+  }
 
   /* ═══════════════════════════════════════════
      DESKTOP DROPDOWN NAVIGATION
-     (shared behaviour lives in sda.js → initDropdownNav())
+     (shown only at md+ widths — hover effects are
+     gated to mouse/trackpad devices below so a tap
+     on a touchscreen never leaves a dropdown "stuck"
+     open the way :hover normally would)
   ═══════════════════════════════════════════ */
   .nav-item { position: relative; }
   .nav-item > a,
@@ -146,7 +158,6 @@
     transition: transform 0.25s ease, color 0.25s ease;
     color: #75777f;
   }
-  .nav-item:hover .nav-caret,
   .nav-item.nav-open .nav-caret { transform: rotate(180deg); color: #755b00; }
   .nav-item > a,
   .nav-item > button.nav-trigger {
@@ -158,13 +169,9 @@
     background: #755b00; transform: scaleX(0); transform-origin: left;
     transition: transform 0.25s ease;
   }
-  .nav-item:hover > a,
-  .nav-item:hover > button.nav-trigger,
   .nav-item.nav-open > a,
   .nav-item.nav-open > button.nav-trigger,
   .nav-item > a.active { color: #041534; }
-  .nav-item:hover > a::after,
-  .nav-item:hover > button.nav-trigger::after,
   .nav-item.nav-open > a::after,
   .nav-item.nav-open > button.nav-trigger::after,
   .nav-item > a.active::after { transform: scaleX(1); }
@@ -181,7 +188,6 @@
   .nav-dropdown::before {
     content: ''; position: absolute; top: -18px; left: 0; right: 0; height: 18px;
   }
-  .nav-item:hover .nav-dropdown,
   .nav-item.nav-open .nav-dropdown {
     opacity: 1; visibility: visible; pointer-events: auto;
     transform: translateX(-50%) translateY(0);
@@ -192,20 +198,33 @@
     text-decoration: none; transition: background 0.18s ease, color 0.18s ease, padding-left 0.18s ease;
     white-space: nowrap;
   }
-  .nav-dropdown a:hover,
+  @media (hover: hover) and (pointer: fine) {
+    .nav-item:hover .nav-caret { transform: rotate(180deg); color: #755b00; }
+    .nav-item:hover > a,
+    .nav-item:hover > button.nav-trigger { color: #041534; }
+    .nav-item:hover > a::after,
+    .nav-item:hover > button.nav-trigger::after { transform: scaleX(1); }
+    .nav-item:hover .nav-dropdown {
+      opacity: 1; visibility: visible; pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+    .nav-dropdown a:hover { background: #fffbee; color: #041534; padding-left: 18px; }
+    .nav-dropdown a:hover .dot { opacity: 1; transform: scale(1); }
+  }
   .nav-dropdown a:focus-visible { background: #fffbee; color: #041534; padding-left: 18px; }
   .nav-dropdown a.active { color: #041534; background: #fffbee; }
   .nav-dropdown a .dot {
     width: 5px; height: 5px; border-radius: 50%; background: #755b00; flex-shrink: 0;
     opacity: 0; transform: scale(0); transition: opacity 0.18s ease, transform 0.18s ease;
   }
-  .nav-dropdown a:hover .dot,
   .nav-dropdown a:focus-visible .dot,
   .nav-dropdown a.active .dot { opacity: 1; transform: scale(1); }
 
   /* ═══════════════════════════════════════════
      MOBILE ACCORDION SUBMENUS
-     (shared behaviour lives in sda.js → initMobileAccordion())
+     Toggled purely by JS adding/removing .open and
+     setting an explicit max-height (see script at
+     the bottom of this file) — no reliance on hover.
   ═══════════════════════════════════════════ */
   .mobile-drawer .accordion-item { border-bottom: 1px solid rgba(197,198,207,0.3); }
   .mobile-drawer .accordion-trigger {
@@ -215,8 +234,10 @@
     color: #45464e; text-transform: uppercase; text-align: left;
     transition: background 0.2s, color 0.2s;
   }
-  .mobile-drawer .accordion-trigger:hover,
   .mobile-drawer .accordion-trigger.open { background: rgba(254,217,119,0.18); color: #041534; }
+  @media (hover: hover) and (pointer: fine) {
+    .mobile-drawer .accordion-trigger:hover { background: rgba(254,217,119,0.18); color: #041534; }
+  }
   .mobile-drawer .accordion-trigger .trigger-left { display: flex; align-items: center; gap: 12px; }
   .mobile-drawer .accordion-trigger .nav-icon { color: #755b00; font-size: 20px; }
   .mobile-drawer .accordion-trigger .accordion-caret {
@@ -231,7 +252,9 @@
     border-bottom: 1px solid rgba(197,198,207,0.25);
   }
   .mobile-drawer .accordion-panel a:last-child { border-bottom: none; }
-  .mobile-drawer .accordion-panel a:hover { padding-left: 62px; }
+  @media (hover: hover) and (pointer: fine) {
+    .mobile-drawer .accordion-panel a:hover { padding-left: 62px; }
+  }
 
   /* ── Image placeholder fallback ── */
   .img-wrap { position: relative; width: 100%; height: 100%; overflow: hidden; }
@@ -371,7 +394,7 @@
         <div class="nav-dropdown" role="menu" aria-label="Youth submenu">
           <a href="adventurers.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Adventurers</a>
           <a href="pathfinders.html" class="active" aria-current="page" role="menuitem"><span class="dot" aria-hidden="true"></span>Pathfinders</a>
-          <a href="ay.html#ay" role="menuitem"><span class="dot" aria-hidden="true"></span>AY (Adventist Youth)</a>
+          <a href="ay.html" role="menuitem"><span class="dot" aria-hidden="true"></span>AY (Adventist Youth)</a>
           <a href="youth.html#discussion" role="menuitem"><span class="dot" aria-hidden="true"></span>Discussion</a>
         </div>
       </div>
@@ -431,7 +454,7 @@
       <a href="news.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">newspaper</span>News</a>
 
       <div class="accordion-item">
-        <button class="accordion-trigger open" aria-expanded="true">
+        <button class="accordion-trigger" aria-expanded="false">
           <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span>Youth</span>
           <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
         </button>
@@ -483,11 +506,11 @@
   <!-- ══════════════ HERO ══════════════ -->
   <section class="relative h-[60vh] min-h-[420px] flex items-end overflow-hidden">
     <div class="hero-slideshow" id="pathfinders-hero-slideshow">
-      <div class="hero-slide active" style="background-image:url('images/pathfinders-hero-1.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('images/pathfinders-hero-2.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('images/pathfinders-hero-3.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('images/pathfinders-hero-4.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('images/pathfinders-hero-5.jpg');"></div>
+      <div class="hero-slide active" style="background-image:url('images/path5.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('images/path1.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('images/path2.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('images/path3.jpg');"></div>
+      <div class="hero-slide" style="background-image:url('images/path4.jpg');"></div>
     </div>
     <div class="hero-slideshow-dots" id="pathfinders-hero-dots" aria-hidden="true">
       <button class="hero-dot active" data-index="0" aria-label="Slide 1"></button>
@@ -576,8 +599,9 @@
 
   <!-- ══════════════ EMBLEM ══════════════ -->
   <section class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
-    <div class="img-wrap rounded-xl overflow-hidden sacred-shadow h-[340px] order-2 md:order-1">
-      <img src="images/pathfinders-emblem.jpg" alt="Pathfinder Club triangular emblem and flag"
+    <div class="img-wrap relative rounded-xl overflow-hidden sacred-shadow h-[340px] w-full order-2 md:order-1">
+      <img src="https://i.pinimg.com/736x/ea/3a/3e/ea3a3e7d184d98efa9e5eb5e6670c201.jpg" alt="Pathfinder Club triangular emblem and flag"
+        class="absolute inset-0 w-full h-full object-cover"
         onerror="this.parentElement.outerHTML='<div style=\'height:340px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>change_history</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/pathfinders-emblem.jpg</span></div>'"/>
     </div>
     <div class="space-y-6 order-1 md:order-2">
@@ -743,10 +767,29 @@
   <!-- ══════════════ HONORS ══════════════ -->
   <section id="honors" class="bg-surface-container-low py-section-gap">
     <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
-      <div class="img-wrap rounded-xl overflow-hidden sacred-shadow h-[360px]">
-        <img src="images/pathfinders-honors.jpg" alt="Pathfinder honor sash with earned patches"
-          onerror="this.parentElement.outerHTML='<div style=\'height:360px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>workspace_premium</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/pathfinders-honors.jpg</span></div>'"/>
+
+      <div class="img-wrap relative rounded-xl overflow-hidden sacred-shadow h-[360px]" data-slideshow>
+        <div class="slide-track absolute inset-0">
+          <img src="images/path2.jpg" alt="Pathfinder honor sash with earned patches"
+            class="slide absolute inset-0 w-full h-full object-cover opacity-100 transition-opacity duration-700 ease-in-out"
+            onerror="this.parentElement.parentElement.outerHTML='<div style=\'height:360px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>workspace_premium</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/pathfinders-honors.jpg</span></div>'"/>
+          <img src="images/path3.jpg" alt="Pathfinders working together on an honor activity"
+            class="slide absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 ease-in-out"/>
+          <img src="images/path4.jpg" alt="Pathfinder honor patches displayed on a sash"
+            class="slide absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 ease-in-out"/>
+          <img src="images/path5.jpg" alt="Pathfinders receiving honors at Investiture"
+            class="slide absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 ease-in-out"/>
+        </div>
+
+        <!-- dots -->
+        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          <button type="button" class="slide-dot w-2 h-2 rounded-full bg-white/50 transition-all" aria-label="Show slide 1"></button>
+          <button type="button" class="slide-dot w-2 h-2 rounded-full bg-white/50 transition-all" aria-label="Show slide 2"></button>
+          <button type="button" class="slide-dot w-2 h-2 rounded-full bg-white/50 transition-all" aria-label="Show slide 3"></button>
+          <button type="button" class="slide-dot w-2 h-2 rounded-full bg-white/50 transition-all" aria-label="Show slide 4"></button>
+        </div>
       </div>
+
       <div class="space-y-6">
         <span class="font-label-md text-label-md text-secondary tracking-[0.2em] uppercase block">Honors System</span>
         <h2 class="font-headline-lg text-headline-lg text-primary leading-tight">Over 400 Ways to Learn</h2>
@@ -878,8 +921,8 @@
     <div>
       <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
       <ul class="space-y-3" role="list">
-        <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#" aria-current="page">Home</a></li>
-        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="adventures.html">Adventures</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="index.html">Home</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="adventurers.html">Adventurers</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="news.html">News</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="youth.html">Youth Board</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="building.html">New Building</a></li>
@@ -917,8 +960,133 @@
 <script src="sda.js" defer></script>
 <script src="func.js" defer></script>
 <script>
-  // ── Pathfinders hero slideshow: auto-rotates 5 background slides ──
-  (function () {
+/* ══════════════════════════════════════════════════════
+   NAVIGATION — self-contained, no dependency on sda.js
+   Wires: hamburger/drawer open-close, desktop dropdown
+   toggle (About/Youth/Ministries/Quick Links), and the
+   mobile accordion submenus. Runs after DOMContentLoaded
+   so it's safe even if sda.js loads in a different order.
+══════════════════════════════════════════════════════ */
+(function () {
+  document.addEventListener('DOMContentLoaded', function () {
+
+    /* ── Hamburger + mobile drawer ── */
+    var hamburgerBtn = document.getElementById('hamburger-btn');
+    var drawer        = document.getElementById('mobile-drawer');
+
+    function closeDrawer() {
+      if (!drawer) return;
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden', 'true');
+      if (hamburgerBtn) {
+        hamburgerBtn.classList.remove('open');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    if (hamburgerBtn && drawer) {
+      hamburgerBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var willOpen = !drawer.classList.contains('open');
+        drawer.classList.toggle('open', willOpen);
+        drawer.setAttribute('aria-hidden', willOpen ? 'false' : 'true');
+        hamburgerBtn.classList.toggle('open', willOpen);
+        hamburgerBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      });
+
+      // Tapping a real link inside the drawer should close it
+      drawer.querySelectorAll('nav > a').forEach(function (link) {
+        link.addEventListener('click', closeDrawer);
+      });
+
+      document.addEventListener('click', function (e) {
+        if (drawer.classList.contains('open') &&
+            !drawer.contains(e.target) &&
+            e.target !== hamburgerBtn &&
+            !hamburgerBtn.contains(e.target)) {
+          closeDrawer();
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeDrawer();
+      });
+    }
+
+    /* ── Desktop dropdown nav (About / Youth / Ministries / Quick Links) ──
+       Purely click/tap driven — the CSS :hover rules above are gated to
+       "(hover: hover) and (pointer: fine)" so touchscreens never get stuck
+       in a fake hover state; this click handler is what actually opens/
+       closes the panel on every device. ── */
+    var navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(function (item) {
+      var trigger = item.querySelector('.nav-trigger');
+      if (!trigger) return; // plain links (Home, News) have no dropdown
+
+      trigger.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var willOpen = !item.classList.contains('nav-open');
+        navItems.forEach(function (other) {
+          other.classList.remove('nav-open');
+          var t = other.querySelector('.nav-trigger');
+          if (t) t.setAttribute('aria-expanded', 'false');
+        });
+        if (willOpen) {
+          item.classList.add('nav-open');
+          trigger.setAttribute('aria-expanded', 'true');
+        }
+      });
+
+      item.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          item.classList.remove('nav-open');
+          trigger.setAttribute('aria-expanded', 'false');
+          trigger.focus();
+        }
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      navItems.forEach(function (item) {
+        if (!item.contains(e.target)) {
+          item.classList.remove('nav-open');
+          var t = item.querySelector('.nav-trigger');
+          if (t) t.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+
+    /* ── Mobile accordion submenus (About / Youth / Ministries / Quick Links
+       inside the drawer) — this is the piece that was "stuck": without this
+       handler, tapping a trigger had nothing to expand the panel with. ── */
+    var accordionTriggers = document.querySelectorAll('.mobile-drawer .accordion-trigger');
+    accordionTriggers.forEach(function (trigger) {
+      var panel = trigger.nextElementSibling;
+      trigger.addEventListener('click', function () {
+        var isOpen = trigger.classList.contains('open');
+
+        // Close every other panel first (accordion behaviour)
+        accordionTriggers.forEach(function (t) {
+          t.classList.remove('open');
+          t.setAttribute('aria-expanded', 'false');
+          if (t.nextElementSibling) t.nextElementSibling.style.maxHeight = null;
+        });
+
+        if (!isOpen) {
+          trigger.classList.add('open');
+          trigger.setAttribute('aria-expanded', 'true');
+          if (panel) panel.style.maxHeight = panel.scrollHeight + 'px';
+        }
+      });
+    });
+
+  });
+})();
+
+// ── Pathfinders hero slideshow: auto-rotates 5 background slides ──
+(function () {
+  document.addEventListener('DOMContentLoaded', function () {
     var root = document.getElementById('pathfinders-hero-slideshow');
     if (!root) return;
     var slides = root.querySelectorAll('.hero-slide');
@@ -959,7 +1127,53 @@
       });
       start();
     }
-  })();
+  });
+})();
+
+// Generic slideshow initializer — safe to reuse on every [data-slideshow] block on a page
+  document.querySelectorAll('[data-slideshow]').forEach((wrap) => {
+    const slides = wrap.querySelectorAll('.slide');
+    const dots = wrap.querySelectorAll('.slide-dot');
+    if (slides.length < 2) return;
+
+    let current = 0;
+    const INTERVAL = 4500;
+    let timer;
+
+    function goTo(index) {
+      slides[current].classList.remove('opacity-100');
+      slides[current].classList.add('opacity-0');
+      dots[current].classList.remove('bg-white', 'w-5');
+      dots[current].classList.add('bg-white/50', 'w-2');
+
+      current = index;
+
+      slides[current].classList.remove('opacity-0');
+      slides[current].classList.add('opacity-100');
+      dots[current].classList.remove('bg-white/50', 'w-2');
+      dots[current].classList.add('bg-white', 'w-5');
+    }
+
+    function next() {
+      goTo((current + 1) % slides.length);
+    }
+
+    function restart() {
+      clearInterval(timer);
+      timer = setInterval(next, INTERVAL);
+    }
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        goTo(i);
+        restart();
+      });
+    });
+
+    goTo(0);
+    restart();
+  });
+
 </script>
 
 </body>
