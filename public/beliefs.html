@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Our Beliefs | Makeni Central SDA Church</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "secondary": "#755b00","on-surface": "#1a1c1c","error": "#ba1a1a","tertiary-container": "#1c2c40",
+          "on-primary": "#ffffff","on-primary-container": "#8392b7","inverse-surface": "#2f3131",
+          "secondary-container": "#fed977","secondary-fixed": "#ffe08f","on-tertiary-fixed-variant": "#38485d",
+          "on-primary-fixed": "#0a1a3a","primary-fixed": "#d9e2ff","inverse-on-surface": "#f0f1f1",
+          "surface-container": "#eeeeee","on-secondary-container": "#785d00","on-surface-variant": "#45464e",
+          "on-primary-fixed-variant": "#384668","surface-tint": "#4f5e81","primary-fixed-dim": "#b7c6ee",
+          "primary-container": "#1b2a4a","on-background": "#1a1c1c","surface": "#f9f9f9",
+          "on-secondary": "#ffffff","background": "#f9f9f9","surface-bright": "#f9f9f9",
+          "surface-container-lowest": "#ffffff","outline-variant": "#c5c6cf","on-tertiary": "#ffffff",
+          "on-tertiary-fixed": "#0b1c30","inverse-primary": "#b7c6ee","surface-container-high": "#e8e8e8",
+          "surface-container-low": "#f3f3f4","on-error": "#ffffff","secondary-fixed-dim": "#e6c364",
+          "on-secondary-fixed-variant": "#584400","surface-dim": "#dadada","on-secondary-fixed": "#241a00",
+          "outline": "#75777f","error-container": "#ffdad6","primary": "#041534","on-error-container": "#93000a",
+          "tertiary-fixed": "#d3e4fe","tertiary": "#06172a","on-tertiary-container": "#8393ac",
+          "tertiary-fixed-dim": "#b7c8e1","surface-variant": "#e2e2e2","surface-container-highest": "#e2e2e2"
+        },
+        "borderRadius": { "DEFAULT": "0.25rem","lg": "0.5rem","xl": "12px","full": "9999px" },
+        "spacing": { "section-gap": "120px","margin-desktop": "80px","margin-mobile": "20px","gutter": "32px","base": "4px" },
+        "fontFamily": {
+          "label-md": ["Inter"],"headline-lg": ["Playfair Display"],"display-lg": ["Playfair Display"],
+          "body-lg": ["Inter"],"title-lg": ["Inter"],"body-md": ["Inter"],
+          "headline-md": ["Playfair Display"],"headline-lg-mobile": ["Playfair Display"]
+        },
+        "fontSize": {
+          "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.08em", "fontWeight": "600"}],
+          "headline-lg": ["40px", {"lineHeight": "1.2", "fontWeight": "700"}],
+          "display-lg": ["56px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+          "body-lg": ["18px", {"lineHeight": "1.7", "fontWeight": "400"}],
+          "title-lg": ["20px", {"lineHeight": "1.5", "letterSpacing": "0.01em", "fontWeight": "600"}],
+          "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+          "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+          "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .sacred-shadow { box-shadow: 0 10px 30px -10px rgba(4, 21, 52, 0.08); }
+  .gold-divider { height: 2px; background: #755b00; width: 60px; }
+  .logo-badge {
+    display: flex; align-items: center; justify-content: center;
+    width: 52px; height: 52px; border-radius: 50%;
+    background-color: #041534; border: 2px solid #755b00; flex-shrink: 0;
+  }
+  .logo-badge img { width: 38px; height: 38px; object-fit: contain; }
+  .logo-badge-sm { width: 44px; height: 44px; }
+  .logo-badge-sm img { width: 30px; height: 30px; }
+
+  /* ── MOBILE NAV ── */
+  @media (max-width: 767px) {
+    .logo-text { display: none !important; }
+    .nav-brand  { position: absolute; left: 50%; transform: translateX(-50%); z-index: 1; }
+    .hamburger-btn { position: relative; z-index: 2; }
+    .mobile-give { position: relative; z-index: 2; }
+    .mobile-hamburger { display: flex; }
+    .desktop-give { display: none !important; }
+    .mobile-give  { display: flex; }
+  }
+  @media (min-width: 768px) {
+    .mobile-hamburger { display: none !important; }
+    .mobile-give      { display: none !important; }
+    .desktop-give     { display: flex !important; }
+  }
+  .hamburger-btn {
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    width: 40px; height: 40px; gap: 5px; cursor: pointer; background: none; border: none;
+    padding: 6px 4px; border-radius: 8px; transition: background 0.2s; flex-shrink: 0; z-index: 60;
+  }
+  .hamburger-btn:hover { background: rgba(4,21,52,0.06); }
+  .hamburger-btn span {
+    display: block; height: 2px; border-radius: 2px; background: #041534;
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .hamburger-btn span:nth-child(1) { width: 24px; }
+  .hamburger-btn span:nth-child(2) { width: 18px; }
+  .hamburger-btn span:nth-child(3) { width: 22px; }
+  .hamburger-btn span:nth-child(4) { width: 14px; }
+  .hamburger-btn.open span:nth-child(1) { width: 22px; transform: translateY(10.5px) rotate(45deg); }
+  .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger-btn.open span:nth-child(3) { opacity: 0; transform: scaleX(0); }
+  .hamburger-btn.open span:nth-child(4) { width: 22px; transform: translateY(-10.5px) rotate(-45deg); }
+  .mobile-drawer {
+    position: fixed; top: 80px; left: 0; right: 0; z-index: 49;
+    background: rgba(249,249,249,0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 2px solid #fed977; box-shadow: 0 20px 40px -10px rgba(4,21,52,0.12);
+    transform: translateY(-110%); opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease; pointer-events: none;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+  .mobile-drawer.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .mobile-drawer nav a {
+    display: flex; align-items: center; gap: 12px; padding: 18px 24px;
+    font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.08em; font-weight: 600;
+    color: #45464e; text-transform: uppercase; text-decoration: none;
+    border-bottom: 1px solid rgba(197,198,207,0.3);
+    transition: background 0.2s, color 0.2s, padding-left 0.2s; position: relative;
+  }
+  .mobile-drawer nav a:hover { background: rgba(254,217,119,0.18); color: #041534; padding-left: 32px; }
+  .mobile-drawer nav a.active { color: #041534; }
+  .mobile-drawer nav a.active::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: #755b00; border-radius: 0 2px 2px 0;
+  }
+  .mobile-drawer nav a .nav-icon { color: #755b00; font-size: 20px; }
+  .mobile-drawer-inner { padding: 8px 0 20px; }
+  .mobile-give-row { padding: 16px 24px 4px; }
+  .mobile-give-btn {
+    width: 100%; background: #041534; color: #fff; padding: 14px 24px; border-radius: 12px;
+    font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.08em; font-weight: 600;
+    cursor: pointer; border: none; display: flex; align-items: center; justify-content: center;
+    gap: 8px; transition: background 0.2s, transform 0.15s;
+  }
+  .mobile-give-btn:active { transform: scale(0.97); }
+  .mobile-give-btn:hover { background: #755b00; }
+
+  /* ═══════════════════════════════════════════
+     DESKTOP DROPDOWN NAVIGATION
+     (shared behaviour lives in sda.js → initDropdownNav())
+  ═══════════════════════════════════════════ */
+  .nav-item { position: relative; }
+  .nav-item > a,
+  .nav-item > button.nav-trigger {
+    display: flex; align-items: center; gap: 4px;
+    background: none; border: none; cursor: pointer; font: inherit; padding: 0;
+  }
+  .nav-item .nav-caret {
+    font-size: 18px;
+    transition: transform 0.25s ease, color 0.25s ease;
+    color: #75777f;
+  }
+  .nav-item:hover .nav-caret,
+  .nav-item.nav-open .nav-caret { transform: rotate(180deg); color: #755b00; }
+  .nav-item > a,
+  .nav-item > button.nav-trigger {
+    color: #45464e; position: relative; padding-bottom: 4px; transition: color 0.25s ease;
+  }
+  .nav-item > a::after,
+  .nav-item > button.nav-trigger::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+    background: #755b00; transform: scaleX(0); transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+  .nav-item:hover > a,
+  .nav-item:hover > button.nav-trigger,
+  .nav-item.nav-open > a,
+  .nav-item.nav-open > button.nav-trigger,
+  .nav-item > a.active { color: #041534; }
+  .nav-item:hover > a::after,
+  .nav-item:hover > button.nav-trigger::after,
+  .nav-item.nav-open > a::after,
+  .nav-item.nav-open > button.nav-trigger::after,
+  .nav-item > a.active::after { transform: scaleX(1); }
+
+  .nav-dropdown {
+    position: absolute; top: calc(100% + 18px); left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    min-width: 240px; background: #ffffff; border-radius: 14px;
+    border: 1px solid #e2e2e2; box-shadow: 0 20px 45px -12px rgba(4,21,52,0.22);
+    padding: 10px; opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+    z-index: 40;
+  }
+  .nav-dropdown::before {
+    content: ''; position: absolute; top: -18px; left: 0; right: 0; height: 18px;
+  }
+  .nav-item:hover .nav-dropdown,
+  .nav-item.nav-open .nav-dropdown {
+    opacity: 1; visibility: visible; pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+  .nav-dropdown a {
+    display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 9px;
+    font-family: Inter, sans-serif; font-size: 14px; font-weight: 500; color: #45464e;
+    text-decoration: none; transition: background 0.18s ease, color 0.18s ease, padding-left 0.18s ease;
+    white-space: nowrap;
+  }
+  .nav-dropdown a:hover,
+  .nav-dropdown a:focus-visible { background: #fffbee; color: #041534; padding-left: 18px; }
+  .nav-dropdown a.active { color: #041534; background: #fffbee; }
+  .nav-dropdown a .dot {
+    width: 5px; height: 5px; border-radius: 50%; background: #755b00; flex-shrink: 0;
+    opacity: 0; transform: scale(0); transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .nav-dropdown a:hover .dot,
+  .nav-dropdown a:focus-visible .dot,
+  .nav-dropdown a.active .dot { opacity: 1; transform: scale(1); }
+
+  /* ═══════════════════════════════════════════
+     MOBILE ACCORDION SUBMENUS
+     (shared behaviour lives in sda.js → initMobileAccordion())
+  ═══════════════════════════════════════════ */
+  .mobile-drawer .accordion-item { border-bottom: 1px solid rgba(197,198,207,0.3); }
+  .mobile-drawer .accordion-trigger {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 18px 24px; background: none; border: none; cursor: pointer;
+    font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.08em; font-weight: 600;
+    color: #45464e; text-transform: uppercase; text-align: left;
+    transition: background 0.2s, color 0.2s;
+  }
+  .mobile-drawer .accordion-trigger:hover,
+  .mobile-drawer .accordion-trigger.open { background: rgba(254,217,119,0.18); color: #041534; }
+  .mobile-drawer .accordion-trigger .trigger-left { display: flex; align-items: center; gap: 12px; }
+  .mobile-drawer .accordion-trigger .nav-icon { color: #755b00; font-size: 20px; }
+  .mobile-drawer .accordion-trigger .accordion-caret {
+    font-size: 20px; color: #75777f; transition: transform 0.3s ease, color 0.3s ease;
+  }
+  .mobile-drawer .accordion-trigger.open .accordion-caret { transform: rotate(180deg); color: #755b00; }
+  .mobile-drawer .accordion-panel {
+    max-height: 0; overflow: hidden; transition: max-height 0.35s ease; background: #f6f6f4;
+  }
+  .mobile-drawer .accordion-panel a {
+    padding: 14px 24px 14px 56px; font-size: 13px; letter-spacing: 0.04em;
+    border-bottom: 1px solid rgba(197,198,207,0.25);
+  }
+  .mobile-drawer .accordion-panel a:last-child { border-bottom: none; }
+  .mobile-drawer .accordion-panel a:hover { padding-left: 62px; }
+
+  /* ── Image placeholder fallback ── */
+  .img-wrap { position: relative; width: 100%; height: 100%; overflow: hidden; }
+  .img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .img-placeholder {
+    display: flex; width: 100%; height: 100%;
+    background: #eeeeee; border: 2px dashed #c5c6cf; border-radius: 12px;
+    align-items: center; justify-content: center; flex-direction: column; gap: 8px;
+  }
+  .img-placeholder .ph-icon { font-size: 36px; color: #c5c6cf; }
+  .img-placeholder .ph-label {
+    font-family: Inter, sans-serif; font-size: 11px; font-weight: 600;
+    color: #75777f; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  /* ── Category filter pills ── */
+  .belief-cat-pill {
+    padding: 10px 24px; border-radius: 9999px;
+    font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.08em; font-weight: 600;
+    background: #ffffff; color: #041534; border: 2px solid #755b00;
+    cursor: pointer; transition: all 0.2s ease; text-decoration: none; display: inline-block;
+  }
+  .belief-cat-pill:hover { background: #041534; color: #fff; border-color: #041534; }
+  .belief-cat-pill.active { background: #041534; color: #ffffff; border-color: #041534; }
+
+  /* ── Belief card ── */
+  .belief-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+  .belief-card:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -15px rgba(4,21,52,0.14); }
+
+  /* ── Navy gradient for hero overlay ── */
+  .navy-gradient { background: linear-gradient(to bottom, transparent 0%, rgba(4, 21, 52, 0.85) 100%); }
+</style>
+</head>
+
+<body data-page="beliefs" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+
+<!-- ══════════════ TOP NAV ══════════════ -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-2 border-secondary-container shadow-sm">
+  <div class="nav-inner relative flex items-center justify-between h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+    <button class="hamburger-btn mobile-hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-drawer">
+      <span></span><span></span><span></span><span></span>
+    </button>
+    <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
+      <div class="logo-badge">
+        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+      </div>
+      <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
+    </div>
+
+    <!-- Desktop: Nav links with dropdowns -->
+    <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
+
+      <div class="nav-item">
+        <a class="font-label-md text-label-md" href="index.html">Home</a>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          About
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="About submenu">
+          <a href="leaders.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Leaders</a>
+          <a href="history.html" role="menuitem"><span class="dot" aria-hidden="true"></span>History</a>
+          <a href="beliefs.html" class="active" aria-current="page" role="menuitem"><span class="dot" aria-hidden="true"></span>Our Beliefs</a>
+          <a href="departments.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Departments</a>
+          <a href="building.html" role="menuitem"><span class="dot" aria-hidden="true"></span>New Building</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a class="font-label-md text-label-md" href="news.html">News</a>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Youth
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Youth submenu">
+          <a href="adventurers.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Adventurers</a>
+          <a href="pathfinders.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Pathfinders</a>
+          <a href="ay.html" role="menuitem"><span class="dot" aria-hidden="true"></span>AY (Adventist Youth)</a>
+          <a href="youth.html#discussion" role="menuitem"><span class="dot" aria-hidden="true"></span>Discussion</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Ministries
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
+          <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
+          <a href="ministries.html#dorcas" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
+          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-trigger font-label-md text-label-md" aria-haspopup="true" aria-expanded="false">
+          Quick Links
+          <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="nav-dropdown" role="menu" aria-label="Quick Links submenu">
+          <a href="https://adventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>General Conference</a>
+          <a href="https://sidadventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>SID (Southern Africa-Indian Ocean Division)</a>
+          <a href="https://szu.adventist.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>Southern Zambia Union Conference</a>
+          <a href="https://lusakaconference.adventisthost.org" target="_blank" rel="noopener noreferrer" role="menuitem"><span class="dot" aria-hidden="true"></span>Lusaka Conference</a>
+        </div>
+      </div>
+
+    </nav>
+
+    <button class="desktop-give bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md hover:bg-primary/90 transition-all active:scale-95">Give</button>
+    <button class="mobile-give bg-primary text-on-primary px-4 py-2 rounded-xl font-label-md text-[13px] hover:bg-primary/90 transition-all active:scale-95">Give</button>
+  </div>
+</header>
+
+<!-- Mobile Drawer -->
+<div class="mobile-drawer" id="mobile-drawer" role="dialog" aria-label="Navigation menu" aria-hidden="true">
+  <div class="mobile-drawer-inner">
+    <nav aria-label="Mobile navigation">
+      <a href="index.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">home</span>Home</a>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger open" aria-expanded="true">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">info</span>About</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="leaders.html">Leaders</a>
+          <a href="history.html">History</a>
+          <a href="beliefs.html" class="active" aria-current="page">Our Beliefs</a>
+          <a href="departments.html">Departments</a>
+          <a href="building.html">New Building</a>
+        </div>
+      </div>
+
+      <a href="news.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">newspaper</span>News</a>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span>Youth</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="adventurers.html">Adventurers</a>
+          <a href="pathfinders.html">Pathfinders</a>
+          <a href="ay.html">AY (Adventist Youth)</a>
+          <a href="youth.html#discussion">Discussion</a>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">volunteer_activism</span>Ministries</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="kids.html">Children's Ministry</a>
+          <a href="ministries.html#dorcas">Dorcas</a>
+          <a href="ministries.html#womens-ministries">Women's Ministries</a>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" aria-expanded="false">
+          <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">link</span>Quick Links</span>
+          <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="accordion-panel">
+          <a href="https://adventist.org" target="_blank" rel="noopener noreferrer">General Conference</a>
+          <a href="https://sidadventist.org" target="_blank" rel="noopener noreferrer">SID (Southern Africa-Indian Ocean Division)</a>
+          <a href="https://szu.adventist.org" target="_blank" rel="noopener noreferrer">Southern Zambia Union Conference</a>
+          <a href="https://lusakaconference.adventisthost.org" target="_blank" rel="noopener noreferrer">Lusaka Conference</a>
+        </div>
+      </div>
+
+    </nav>
+    <div class="mobile-give-row">
+      <button class="mobile-give-btn">
+        <span class="material-symbols-outlined" style="font-size:18px;">volunteer_activism</span>
+        Give to the Church
+      </button>
+    </div>
+  </div>
+</div>
+
+<main class="pt-20">
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="relative h-[70vh] w-full flex items-end overflow-hidden">
+    <div class="absolute inset-0 z-0">
+      <div class="img-wrap">
+        <img alt="Open Bible on a wooden pulpit" src="images/beliefs-hero.jpg"
+          onerror="this.parentElement.parentElement.style.background='#041534'; this.remove();"/>
+      </div>
+      <div class="absolute inset-0 navy-gradient"></div>
+    </div>
+    <div class="relative z-10 w-full max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pb-20 text-center flex flex-col items-center">
+      <h1 class="font-display-lg text-display-lg text-white mb-4">Our Beliefs</h1>
+      <p class="font-body-lg text-body-lg text-white/90 max-w-2xl mb-8">
+        Founded on the Holy Scriptures, our faith is built upon the Word of God.
+      </p>
+      <div class="gold-divider"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════ INTRO STATEMENT ══════════════ -->
+  <section class="py-section-gap px-margin-mobile md:px-margin-desktop">
+    <div class="max-w-[700px] mx-auto text-center">
+      <p class="font-body-lg text-body-lg leading-relaxed text-on-surface-variant">
+        Seventh-day Adventists accept the Bible as their only creed and hold 28 fundamental beliefs to be the teaching of the Holy Scriptures. These beliefs are organized into six categories exploring the doctrines of God, man, salvation, the church, Christian life, and last-day events.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════ CATEGORY NAVIGATION ══════════════ -->
+  <section class="px-margin-mobile md:px-margin-desktop pb-16">
+    <div class="max-w-[1280px] mx-auto flex flex-wrap justify-center gap-4">
+      <a class="belief-cat-pill active" href="#god">Doctrines of God</a>
+      <a class="belief-cat-pill" href="#man">Doctrines of Man</a>
+      <a class="belief-cat-pill" href="#salvation">Doctrines of Salvation</a>
+      <a class="belief-cat-pill" href="#church">Doctrines of the Church</a>
+      <a class="belief-cat-pill" href="#life">Doctrines of Christian Life</a>
+      <a class="belief-cat-pill" href="#last-things">Doctrines of Last Things</a>
+    </div>
+  </section>
+
+  <!-- ══════════════ BELIEF CARDS — DOCTRINES OF GOD (Beliefs 1–4 shown; 5–6 to follow) ══════════════ -->
+  <section class="px-margin-mobile md:px-margin-desktop pb-section-gap" id="god">
+    <div class="max-w-[1280px] mx-auto">
+      <div class="flex flex-col items-center mb-12">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Doctrines of God</h2>
+        <div class="gold-divider"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+
+        <!-- Belief 1 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="images/beliefs-scripture.jpg" alt="Open Bible"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>menu_book</span><span class=\'ph-label\'>Add images/beliefs-scripture.jpg</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 1</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">Holy Scriptures</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              The Holy Scriptures, Old and New Testaments, are the written Word of God, given by divine inspiration.
+            </p>
+            <a class="font-label-md text-label-md text-secondary flex items-center gap-2 hover:gap-4 transition-all" href="#">
+              Read more <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Belief 2 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="images/beliefs-trinity.jpg" alt="Trinity symbolism"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>diversity_3</span><span class=\'ph-label\'>Add images/beliefs-trinity.jpg</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 2</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Trinity</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              There is one God: Father, Son, and Holy Spirit, a unity of three coeternal Persons.
+            </p>
+            <a class="font-label-md text-label-md text-secondary flex items-center gap-2 hover:gap-4 transition-all" href="#">
+              Read more <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Belief 3 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="images/beliefs-father.jpg" alt="Sunrise over creation"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>wb_sunny</span><span class=\'ph-label\'>Add images/beliefs-father.jpg</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 3</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">God the Father</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              God the eternal Father is the Creator, Source, Sustainer, and Sovereign of all creation.
+            </p>
+            <a class="font-label-md text-label-md text-secondary flex items-center gap-2 hover:gap-4 transition-all" href="#">
+              Read more <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Belief 4 (placeholder / fallback style, retained from Stitch's design intent) -->
+        <div class="border-2 border-dashed border-outline-variant rounded-xl p-8 flex flex-col justify-center items-center text-center hover:bg-surface-container-low transition-colors">
+          <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-secondary text-3xl">church</span>
+          </div>
+          <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 4</span>
+          <h3 class="font-title-lg text-title-lg text-primary mb-4">God the Son</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+            God the eternal Son became incarnate in Jesus Christ. Through Him all things were created.
+          </p>
+          <a class="font-label-md text-label-md text-secondary flex items-center gap-2" href="#">
+            Read more <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FEATURED SCRIPTURE BANNER ══════════════ -->
+  <section class="w-full bg-primary py-24 relative overflow-hidden">
+    <div class="absolute -left-20 -top-20 w-64 h-64 border-2 border-secondary/20 rounded-full"></div>
+    <div class="absolute -right-10 bottom-0 w-48 h-48 border-2 border-secondary/20 rounded-full"></div>
+    <div class="max-w-4xl mx-auto text-center px-margin-mobile md:px-margin-desktop relative z-10">
+      <blockquote class="font-headline-lg text-headline-lg italic text-white mb-6 leading-tight">
+        "Thy word is a lamp unto my feet, and a light unto my path."
+      </blockquote>
+      <p class="font-label-md text-label-md text-secondary-fixed tracking-widest uppercase">Psalm 119:105</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ CLOSING CTA ══════════════ -->
+  <section class="py-section-gap px-margin-mobile md:px-margin-desktop">
+    <div class="max-w-[1280px] mx-auto bg-primary rounded-[2rem] p-12 md:p-20 text-center relative overflow-hidden sacred-shadow">
+      <div class="absolute top-0 right-0 w-64 h-64 bg-secondary/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+      <div class="absolute bottom-0 left-0 w-32 h-32 bg-secondary/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+      <div class="relative z-10">
+        <h2 class="font-headline-lg text-headline-lg text-on-primary mb-6">Explore Further</h2>
+        <p class="font-body-lg text-body-lg text-on-primary/80 max-w-2xl mx-auto mb-10">
+          Join us for Sabbath School or request a Bible study to dive deeper into these truths and experience the transformative power of God's Word.
+        </p>
+        <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+          <button class="bg-secondary text-white px-10 py-4 rounded-xl font-title-lg text-title-lg hover:bg-secondary/90 transition-all active:scale-95">
+            Join a Study
+          </button>
+          <a href="index.html#find-us" class="border-2 border-on-primary/20 text-on-primary px-10 py-4 rounded-xl font-title-lg text-title-lg hover:bg-on-primary/10 transition-all">
+            Find a Church
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="bg-primary text-on-primary w-full py-12 border-t-4 border-secondary">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+    <div class="md:col-span-1">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="logo-badge logo-badge-sm" style="background-color:#0a1a3a; border-color:#e6c364;">
+          <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        </div>
+        <span class="font-headline-md text-headline-md text-on-primary">Makeni Central</span>
+      </div>
+      <p class="font-body-md text-body-md text-on-primary/80">Proclaiming the everlasting gospel to every nation, kindred, tongue, and people.</p>
+    </div>
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
+      <ul class="space-y-3" role="list">
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="index.html">Home</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="leaders.html">Leaders</a></li>
+        <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="beliefs.html" aria-current="page">Our Beliefs</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="news.html">News</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="building.html">New Building</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Resources</h4>
+      <ul class="space-y-3">
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Sermon Archive</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Study Guides</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Privacy Policy</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-title-lg text-title-lg mb-6">Contact</h4>
+      <p class="font-body-md text-body-md text-on-primary/80 mb-4">123 Makeni Road<br/>Lusaka, Zambia</p>
+      <div class="flex gap-4">
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
+          <span class="material-symbols-outlined">public</span>
+        </a>
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
+          <span class="material-symbols-outlined">mail</span>
+        </a>
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
+          <span class="material-symbols-outlined">call</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 text-center">
+    <p class="font-body-md text-body-md text-on-primary/60">© 2026 Makeni Central SDA Church. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="sda.js" defer></script>
+<script src="func.js" defer></script>
+<script>
+  // ── Category pill active-state — page-specific scroll-spy only.
+  // Smooth scroll to sections, and updates which pill looks "active"
+  // as the corresponding category comes into view.
+  (function () {
+    document.addEventListener('DOMContentLoaded', function () {
+      var pills = document.querySelectorAll('.belief-cat-pill');
+      var sections = [...pills].map(function (p) {
+        return document.querySelector(p.getAttribute('href'));
+      }).filter(Boolean);
+
+      if (!sections.length) return;
+
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var id = '#' + entry.target.id;
+          pills.forEach(function (p) {
+            p.classList.toggle('active', p.getAttribute('href') === id);
+          });
+        });
+      }, { threshold: 0.3, rootMargin: '-100px 0px -60% 0px' });
+
+      sections.forEach(function (s) { obs.observe(s); });
+    });
+  })();
+</script>
+
+</body>
+</html>

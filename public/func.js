@@ -1,7 +1,8 @@
 /**
- * func.js — Makeni Central SDA Church  v4
+ * func.js — Makeni Central SDA Church  v4.2
  * API-driven features: fund tracker, stories, youth board,
- * discussion modal, toast system, and shared API utilities.
+ * discussion modal, leaders grid, toast system, and shared
+ * API utilities.
  *
  * Division of responsibility (func.js owns):
  *  • SDAToast          — richer toast (installed before DOMContentLoaded;
@@ -9,23 +10,26 @@
  *  • apiPost           — shared fetch helper (used by sda.js Give modal)
  *  • Fund tracker      — [data-func="fund-*"] live data
  *  • Kids stories      — [data-func="stories"] carousel / grid
+ *  • Leaders grid      — [data-func="leaders"] on leaders.html:
+ *                        fetches /api/leaders, renders cards, owns the
+ *                        department filter pills
  *  • Youth board       — §16: filters, likes, read-more toggle,
  *                        "Start a Discussion" modal (open/close/submit/inject),
  *                        char counters, FAB wiring, dynamic footer year
  *
  * sda.js owns everything else (UI motion, navbar, hero, counters,
- * Give modal, scroll-reveal, back-to-top, image shimmer, active nav).
+ * Give modal, scroll-reveal, back-to-top, image shimmer, active nav,
+ * dropdown nav, mobile accordion).
  *
- * CHANGES vs v3 (sda.js side — for reference):
- *  § Responsive fluid typography + mobile spacing now injected by sda.js §17.
- *  § @media (prefers-reduced-motion) respected throughout sda.js.
- *  § Hamburger / drawer wiring moved from inline page scripts into sda.js §1.
- *  § initYouthBoard moved here from sda.js (this file is the authoritative owner).
- *
- * CHANGES v4 → v4.1:
- *  § loadDiscussions() — fetches real discussions from /api/discussions on page load,
- *    replaces static placeholder cards with live MongoDB data.
- *  § wireLikeBtn — now persists likes to /api/discussions/:id/like (one like per session).
+ * CHANGES v4.1 → v4.2:
+ *  § initLeadersGrid — NEW §17. Fetches /api/leaders on leaders.html,
+ *    renders leader cards (photo w/ placeholder fallback, name,
+ *    department, short description, phone, department link), and wires
+ *    the .dept-filter pills. Falls back gracefully to the static HTML
+ *    cards already in the page if the fetch fails or the endpoint isn't
+ *    built yet. Supersedes the inline filter script that used to live
+ *    at the bottom of leaders.html — remove that inline block now that
+ *    this owns it (see notes after the file).
  */
 
 'use strict';
@@ -64,7 +68,6 @@
     .sda-toast.t-error   { border-color:#ba1a1a; background:#2d0a0a; }
   `;
 
-  // Append once DOM exists
   function mount() {
     if (!document.getElementById('sda-toast-wrap')) {
       document.head.appendChild(s);
@@ -75,7 +78,6 @@
   else { document.addEventListener('DOMContentLoaded', mount, { once: true }); }
 
   window.SDAToast = function(message, type = 'info', duration = 3000) {
-    // Ensure mounted even if called very early
     if (!wrap.parentNode) mount();
     const t = document.createElement('div');
     t.className = `sda-toast t-${type}`;
@@ -92,8 +94,6 @@
 
 /* ═══════════════════════════════════════════════
    SHARED API HELPER
-   Used by sda.js Give modal and any func.js feature
-   that needs to POST JSON to the server.
 ═══════════════════════════════════════════════ */
 async function apiPost(endpoint, payload) {
   try {
@@ -110,6 +110,23 @@ async function apiPost(endpoint, payload) {
   }
 }
 
+/* Shared HTML-escape helper — used by leaders grid + youth board */
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/* Shared slugify helper — used by leaders grid to derive data-dept
+   from a department name if the API doesn't supply a slug directly. */
+function slugify(str) {
+  return String(str)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 
 /* ═══════════════════════════════════════════════
    DOM-READY INIT
@@ -120,10 +137,11 @@ function funcInit() {
   initHeroSlideshow(); // index.html
   initFundTracker();   // building.html
   initStories();       // kids.html
+  initLeadersGrid();   // leaders.html
   initYouthBoard();    // §16 — youth.html only
 
   console.log(
-    '%c✦ Makeni Central SDA — func.js v4.1 loaded',
+    '%c✦ Makeni Central SDA — func.js v4.2 loaded',
     'color:#e6c364;background:#041534;padding:6px 14px;border-radius:4px;font-weight:600;'
   );
 }
@@ -131,9 +149,6 @@ function funcInit() {
 
 /* ═══════════════════════════════════════════════
    HERO SLIDESHOW — index.html
-   Crossfades between hero-slide divs with Ken Burns
-   per slide. Dots below allow manual navigation.
-   Pauses on user interaction, resumes after 8 s.
 ═══════════════════════════════════════════════ */
 function initHeroSlideshow() {
   const slides = document.querySelectorAll('.hero-slide');
@@ -141,8 +156,8 @@ function initHeroSlideshow() {
 
   if (!slides.length) return;
 
-  const INTERVAL     = 6000;  // ms between auto-advances
-  const RESUME_DELAY = 8000;  // ms before resuming after manual nav
+  const INTERVAL     = 6000;
+  const RESUME_DELAY = 8000;
 
   let current     = 0;
   let timer       = null;
@@ -162,7 +177,7 @@ function initHeroSlideshow() {
     current = (index + slides.length) % slides.length;
     const incoming = slides[current];
     incoming.style.animation = 'none';
-    incoming.offsetHeight; // reflow to restart animation
+    incoming.offsetHeight;
     incoming.style.animation = '';
     incoming.classList.add('active');
 
@@ -206,8 +221,6 @@ function initHeroSlideshow() {
 
 /* ═══════════════════════════════════════════════
    FUND TRACKER — building.html
-   Reads [data-func="fund-*"] elements and animates
-   them to match the latest server data.
 ═══════════════════════════════════════════════ */
 function initFundTracker() {
   const raised  = document.querySelector('[data-func="fund-raised"]');
@@ -303,28 +316,142 @@ function initStories() {
 
 
 /* ═══════════════════════════════════════════════
+   §17. LEADERS GRID — leaders.html
+   Fetches /api/leaders and renders cards into
+   [data-func="leaders"]. Owns the .dept-filter pills
+   so filtering works whether cards are the static
+   fallback markup or freshly injected from the API.
+═══════════════════════════════════════════════ */
+function initLeadersGrid() {
+  const grid = document.querySelector('[data-func="leaders"]');
+  if (!grid) return;
+
+  const filters = document.querySelectorAll('.dept-filter');
+
+  /* ── Filter wiring — re-queries cards each click so it works
+     against whichever set (static or API-rendered) is currently
+     in the DOM. ── */
+  function wireFilters() {
+    filters.forEach(btn => {
+      if (btn.dataset.filterWired) return;
+      btn.dataset.filterWired = '1';
+      btn.addEventListener('click', () => {
+        filters.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const dept  = btn.dataset.dept;
+        const cards = grid.querySelectorAll('.leader-card');
+        cards.forEach(card => {
+          const show = dept === 'all' || card.dataset.dept === dept;
+          card.style.display = show ? '' : 'none';
+        });
+      });
+    });
+  }
+  wireFilters();
+
+  /* ── Card builder — matches the markup/classes already used by
+     the static fallback cards in leaders.html, so styling and
+     scroll-reveal (sda.js picks up .sacred-shadow automatically)
+     both work identically for API-rendered cards. ── */
+  function buildCard(leader) {
+    const name       = leader.name || 'Unnamed Leader';
+    const photo      = leader.photo || '';
+    const phone      = leader.phone || '';
+    const department = leader.department || 'Department';
+    const deptSlug   = leader.departmentSlug || slugify(department);
+    const deptDesc   = leader.departmentDescription || '';
+    const deptUrl    = leader.departmentUrl || '#';
+
+    const card = document.createElement('article');
+    card.className = 'leader-card flex flex-col h-full';
+    card.dataset.dept = deptSlug;
+
+    const photoBlock = photo
+      ? `<div class="img-wrap rounded-xl sacred-shadow border border-outline-variant/30">
+           <img src="${escHtml(photo)}" alt="${escHtml(name)}" loading="lazy"/>
+         </div>`
+      : `<div class="img-placeholder rounded-xl sacred-shadow border border-outline-variant/30">
+           <span class="material-symbols-outlined ph-icon">account_circle</span>
+           <span class="ph-label">Photo coming soon</span>
+         </div>`;
+
+    const phoneBlock = phone
+      ? `<a class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors" href="tel:${escHtml(phone)}">
+           <span class="material-symbols-outlined text-[18px]">phone</span>
+           <span>Contact ${escHtml(name.split(' ')[0] || name)}</span>
+         </a>`
+      : `<div class="flex items-center gap-2 text-outline font-label-md text-label-md">
+           <span class="material-symbols-outlined text-[18px]">phone</span>
+           <span>Available Soon</span>
+         </div>`;
+
+    card.innerHTML = `
+      <div class="relative aspect-[3/4] mb-[-40px] z-10 px-4">${photoBlock}</div>
+      <div class="leader-card-body bg-surface-container-lowest p-8 pt-16 rounded-xl sacred-shadow flex flex-col h-full">
+        <span class="font-label-md text-label-md text-secondary uppercase tracking-[0.08em] block mb-2">${escHtml(department)}</span>
+        <h3 class="font-title-lg text-title-lg text-primary mb-3">${escHtml(name)}</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">${escHtml(deptDesc)}</p>
+        <div class="mt-auto space-y-4">
+          ${phoneBlock}
+          <a class="inline-flex items-center gap-1 text-secondary font-bold font-label-md text-label-md hover:underline" href="${escHtml(deptUrl)}">
+            View ${escHtml(department)} <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>`;
+
+    // Placeholder fallback if the photo URL 404s/fails to load
+    const img = card.querySelector('img');
+    if (img) {
+      img.addEventListener('error', () => {
+        const wrap = img.closest('.img-wrap');
+        if (!wrap) return;
+        wrap.outerHTML = `
+          <div class="img-placeholder rounded-xl sacred-shadow border border-outline-variant/30">
+            <span class="material-symbols-outlined ph-icon">account_circle</span>
+            <span class="ph-label">Photo coming soon</span>
+          </div>`;
+      }, { once: true });
+    }
+
+    return card;
+  }
+
+  fetch('/api/leaders')
+    .then(r => r.ok ? r.json() : null)
+    .catch(() => null)
+    .then(data => {
+      if (!Array.isArray(data) || !data.length) return; // keep static fallback cards
+
+      grid.querySelectorAll('.leader-card').forEach(c => c.remove());
+
+      data.forEach(leader => grid.appendChild(buildCard(leader)));
+
+      // Re-apply whatever filter is currently active (defaults to "All")
+      const activeBtn = document.querySelector('.dept-filter.active') || filters[0];
+      if (activeBtn) activeBtn.click();
+    })
+    .catch(err => {
+      console.warn('[func.js] initLeadersGrid fetch failed, keeping static cards:', err);
+    });
+}
+
+
+/* ═══════════════════════════════════════════════
    §16. YOUTH BOARD — youth.html only
-   Owns: API load, filters, likes, read-more toggle,
-   "Start a Discussion" modal (open/close/submit/inject),
-   char counters, FAB wiring, dynamic footer year.
 ═══════════════════════════════════════════════ */
 function initYouthBoard() {
   if (document.body.dataset.page !== 'youth') return;
 
-  /* ── Dynamic footer year ── */
   const yearEl = document.getElementById('footer-year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  /* ── Like buttons ──
-     Wire existing static cards + expose helper for injected cards.
-     Persists one like per card per session to the API.
-  ── */
   function wireLikeBtn(btn) {
     if (btn.dataset.likeWired) return;
     btn.dataset.likeWired = '1';
     let liked = false;
     btn.addEventListener('click', async () => {
-      if (liked) return; // one like per session
+      if (liked) return;
       liked = true;
 
       let count = parseInt(btn.dataset.count) || 0;
@@ -338,7 +465,6 @@ function initYouthBoard() {
       if (icon) icon.style.fontVariationSettings = "'FILL' 1";
       btn.style.color = '#ba1a1a';
 
-      // Persist to server
       const id = btn.dataset.id;
       if (id) {
         try {
@@ -349,30 +475,18 @@ function initYouthBoard() {
   }
   document.querySelectorAll('.like-btn').forEach(wireLikeBtn);
 
-  /* ── Load discussions from API ──
-     Fetches /api/discussions, clears static placeholder cards,
-     and renders live cards from MongoDB. Falls back to static
-     HTML gracefully if the fetch fails.
-  ── */
   async function loadDiscussions() {
     const list = document.getElementById('discussions-list');
     if (!list) return;
 
     try {
       const res = await fetch('/api/discussions');
-      if (!res.ok) return; // keep static HTML on error
+      if (!res.ok) return;
 
       const data = await res.json();
       if (!Array.isArray(data) || !data.length) return;
 
-      // Remove static placeholder articles, keep empty-state div
       list.querySelectorAll('article').forEach(a => a.remove());
-
-      function esc(str) {
-        return String(str)
-          .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-      }
 
       function timeAgo(dateStr) {
         const diff = Date.now() - new Date(dateStr).getTime();
@@ -392,12 +506,12 @@ function initYouthBoard() {
         const p = btn.previousElementSibling;
         if (!p) return;
         btn.addEventListener('click', () => {
-          const expanded = p.classList.toggle('line-clamp-2');
-          btn.textContent = expanded ? 'Read more' : 'Show less';
+          const expanded = p.classList.toggle('expanded');
+          p.classList.toggle('line-clamp-2', !expanded);
+          btn.textContent = expanded ? 'Show less' : 'Read more';
         });
       }
 
-      // Render newest-first (API already sorts by createdAt: -1)
       data.forEach(d => {
         const initials = d.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
@@ -409,15 +523,15 @@ function initYouthBoard() {
         card.innerHTML = `
           <div class="flex items-center gap-3 mb-4">
             <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center font-bold text-on-secondary-container flex-shrink-0"
-                 aria-label="${esc(d.name)}">${esc(initials)}</div>
+                 aria-label="${escHtml(d.name)}">${escHtml(initials)}</div>
             <div>
-              <h4 class="font-label-md text-label-md text-primary">${esc(d.name)}</h4>
-              <p class="text-[12px] text-on-surface-variant uppercase tracking-tighter">${timeAgo(d.createdAt)} in ${esc(d.category)}</p>
+              <h4 class="font-label-md text-label-md text-primary">${escHtml(d.name)}</h4>
+              <p class="text-[12px] text-on-surface-variant uppercase tracking-tighter">${timeAgo(d.createdAt)} in ${escHtml(d.category)}</p>
             </div>
           </div>
-          <span class="card-category">${esc(d.category)}</span>
-          <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${esc(d.title)}</h3>
-          <p class="card-body font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-2">${esc(d.body)}</p>
+          <span class="card-category">${escHtml(d.category)}</span>
+          <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${escHtml(d.title)}</h3>
+          <p class="card-body font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-2">${escHtml(d.body)}</p>
           <button class="read-more-btn">Read more</button>
           <div class="flex items-center gap-6 mt-4">
             <div class="flex items-center gap-2 text-on-surface-variant">
@@ -425,13 +539,12 @@ function initYouthBoard() {
               <span class="font-label-md">${d.comments || 0} Comments</span>
             </div>
             <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors"
-                    aria-label="Like this post" data-count="${d.likes || 0}" data-id="${esc(d._id)}">
+                    aria-label="Like this post" data-count="${d.likes || 0}" data-id="${escHtml(d._id)}">
               <span class="material-symbols-outlined text-[20px]">favorite</span>
               <span class="font-label-md like-count">${d.likes || 0} Likes</span>
             </button>
           </div>`;
 
-        // Append in order (API is already sorted newest-first)
         const emptyState = document.getElementById('empty-state');
         if (emptyState) {
           list.insertBefore(card, emptyState);
@@ -443,33 +556,30 @@ function initYouthBoard() {
         wireReadMore(card.querySelector('.read-more-btn'));
       });
 
-      // Hide empty state since we have real cards
       const emptyState = document.getElementById('empty-state');
       if (emptyState) emptyState.classList.add('hidden');
 
     } catch (err) {
       console.warn('[func.js] loadDiscussions failed:', err);
-      // Static HTML placeholder cards remain visible
     }
   }
 
   loadDiscussions();
-  
+
   function wireReadMore(btn) {
-  if (btn.dataset.wired) return;
-  btn.dataset.wired = '1';
-  const p = btn.previousElementSibling;
-  if (!p) return;
+    if (btn.dataset.wired) return;
+    btn.dataset.wired = '1';
+    const p = btn.previousElementSibling;
+    if (!p) return;
 
-  btn.addEventListener('click', () => {
-    const expanded = p.classList.toggle('expanded');
-    p.classList.toggle('line-clamp-2', !expanded);
-    btn.textContent = expanded ? 'Show less' : 'Read more';
-  });
-}
-document.querySelectorAll('.read-more-btn').forEach(wireReadMore);
+    btn.addEventListener('click', () => {
+      const expanded = p.classList.toggle('expanded');
+      p.classList.toggle('line-clamp-2', !expanded);
+      btn.textContent = expanded ? 'Show less' : 'Read more';
+    });
+  }
+  document.querySelectorAll('.read-more-btn').forEach(wireReadMore);
 
-  /* ── Filter buttons ── */
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const filter = btn.dataset.filter;
@@ -490,7 +600,6 @@ document.querySelectorAll('.read-more-btn').forEach(wireReadMore);
     });
   });
 
-  /* ── Read-more toggle (exposed on window for onclick="" in HTML) ── */
   window.toggleExpand = function(id, btn) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -506,7 +615,6 @@ document.querySelectorAll('.read-more-btn').forEach(wireReadMore);
     }
   };
 
-  /* ── Discussion modal ── */
   const discModal = document.getElementById('discussion-modal');
   if (!discModal) return;
 
@@ -538,14 +646,12 @@ document.querySelectorAll('.read-more-btn').forEach(wireReadMore);
     }, 300);
   };
 
-  // Escape key + backdrop
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && discModal.classList.contains('open')) window.closeModal();
   });
   const backdrop = discModal.querySelector('.modal-backdrop');
   if (backdrop) backdrop.addEventListener('click', window.closeModal);
 
-  // Char counters
   const titleField = document.getElementById('disc-title');
   const bodyField  = document.getElementById('disc-body');
   if (titleField) {
@@ -567,7 +673,6 @@ document.querySelectorAll('.read-more-btn').forEach(wireReadMore);
     });
   }
 
-  // Submit — posts to API then injects card into DOM immediately
   window.submitDiscussion = async function() {
     const name     = (document.getElementById('disc-name')?.value     || '').trim();
     const category = (document.getElementById('disc-category')?.value || '').trim();
@@ -597,12 +702,7 @@ document.querySelectorAll('.read-more-btn').forEach(wireReadMore);
     });
     if (!valid) return;
 
-    // POST to server — get back the new _id so the like button can use it
     const result = await apiPost('/api/discussions', { name, category, title, body });
-
-    function esc(str) {
-      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
 
     const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
     const newCard  = document.createElement('article');
@@ -614,15 +714,15 @@ document.querySelectorAll('.read-more-btn').forEach(wireReadMore);
     newCard.innerHTML = `
       <div class="flex items-center gap-3 mb-4">
         <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center font-bold text-on-secondary-container flex-shrink-0"
-             aria-label="${esc(name)}">${esc(initials)}</div>
+             aria-label="${escHtml(name)}">${escHtml(initials)}</div>
         <div>
-          <h4 class="font-label-md text-label-md text-primary">${esc(name)}</h4>
+          <h4 class="font-label-md text-label-md text-primary">${escHtml(name)}</h4>
           <p class="text-[12px] text-on-surface-variant uppercase tracking-tighter">Just now</p>
         </div>
       </div>
-      <span class="card-category">${esc(category)}</span>
-      <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${esc(title)}</h3>
-      <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-6">${esc(body)}</p>
+      <span class="card-category">${escHtml(category)}</span>
+      <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${escHtml(title)}</h3>
+      <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-6">${escHtml(body)}</p>
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2 text-on-surface-variant">
           <span class="material-symbols-outlined text-[20px]">forum</span>
@@ -649,7 +749,6 @@ document.querySelectorAll('.read-more-btn').forEach(wireReadMore);
     document.getElementById('modal-success-view').classList.add('show');
   };
 
-  /* ── FAB wiring (in case onclick attr not present) ── */
   const fab = document.getElementById('fab-new-discussion');
   if (fab && !fab.dataset.youthWired) {
     fab.dataset.youthWired = '1';

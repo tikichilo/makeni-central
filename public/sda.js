@@ -1,37 +1,30 @@
 /**
- * sda.js — Makeni Central SDA Church  v4
+ * sda.js — Makeni Central SDA Church  v5
  * UI motion, interactions & enhancements
  *
- * CHANGES vs v3:
- *  § Responsive fluid typography injected via JS (clamp) so every page
- *    benefits without a separate CSS file dependency.
- *  § @media (prefers-reduced-motion) respected — all animations skip
- *    or use instant transitions when the user prefers reduced motion.
- *  § initNavbar — hide-on-scroll now accounts for the mobile drawer being
- *    open (already existed) AND uses a smaller threshold on mobile.
- *    Hamburger / drawer wiring moved here from inline page scripts.
- *  § initScrollReveal — will-change added; REDUCED_MOTION skips animation;
- *    stagger capped at 300 ms.
- *  § initHero — Ken Burns bg animation added; REDUCED_MOTION guard added;
- *    parallax factor corrected to 0.18; desktop-only parallax.
- *  § initCounters — REDUCED_MOTION collapses duration to 0.
- *  § initGiveButton — ripple gated behind REDUCED_MOTION; mobile padding
- *    rule added; modal box uses width:100% with padding for safe overflow.
- *  § initPageTransitions — REDUCED_MOTION guard (skips entire setup).
- *  § initGoldDividers — REDUCED_MOTION guard (instant width).
- *  § initImageShimmer — now covers ALL <img>, not just lazy ones;
- *    REDUCED_MOTION guard (skips purely decorative animation).
- *  § initActiveNav — also targets .mobile-drawer nav a; uses array map
- *    so both 'index.html' and '/' match the home page.
- *  § initToast — max-width:88vw added so long messages don't overflow.
- *  § initBackToTop — REDUCED_MOTION guard on scroll behavior and hover.
- *  § initYouthBoard — REMOVED. func.js owns the full API-driven youth
- *    board (discussions, filters, FAB, modal). sda.js no longer touches
- *    youth board data or DOM beyond scroll-reveal + hero.
- *    The Give-modal openModal / closeModal / submitDiscussion window
- *    globals are also removed from here (func.js owns discussion modal).
- *  § initResponsive — NEW §17: injects fluid typography + mobile spacing
- *    CSS into <head> once, replacing the need for sda-shared.css.
+ * CHANGES vs v4:
+ *  § initDropdownNav — NEW §1b. Desktop dropdown nav (About/Youth/
+ *    Ministries/Quick Links) moved here from copy-pasted inline scripts
+ *    on index.html and pathfinders.html. Click/tap driven so touch
+ *    devices work correctly; closes on outside click / Escape.
+ *  § initMobileAccordion — NEW §1c. Mobile drawer accordion submenus,
+ *    same de-duplication as above.
+ *  § initNavbar — scroll handler now also toggles the `scrolled` class
+ *    on <header> (drives the .nav-inner 80px→64px shrink defined in
+ *    CSS), which previously only worked on pages that happened to carry
+ *    their own inline scroll listener.
+ *  § initHeroSlideshows — NEW §16b. Named hero slideshows (Pathfinders/
+ *    AY/Adventurers) — auto-rotating bg slides with dot nav. Guarded,
+ *    so safe to run globally; no-ops on pages without the markup.
+ *  § initGenericSlideshows — NEW §16c. [data-slideshow] crossfade
+ *    carousels used inside content sections (e.g. Honors on
+ *    pathfinders.html).
+ *
+ *  IMPORTANT: this version supersedes the inline dropdown/accordion
+ *  script that used to live inside index.html and the separate
+ *  navigation script that used to live inside pathfinders.html.
+ *  Both of those must be REMOVED from their pages now that sda.js
+ *  owns this logic — see notes below the file.
  */
 
 'use strict';
@@ -50,7 +43,9 @@ document.addEventListener('DOMContentLoaded', init);
 
 function init() {
   initResponsive();      // §17 — fluid type + mobile spacing
-  initNavbar();          // §1
+  initNavbar();          // §1  — hamburger/drawer + scroll shrink
+  initDropdownNav();     // §1b — desktop dropdown nav
+  initMobileAccordion(); // §1c — mobile drawer accordion
   initScrollReveal();    // §2
   initHero();            // §3
   initCounters();        // §4
@@ -62,10 +57,11 @@ function init() {
   initBackToTop();       // §13
   initImageShimmer();    // §14
   initActiveNav();       // §15
-  // §16 removed — func.js owns all youth-board logic
+  initHeroSlideshows();    // §16b — named page hero slideshows
+  initGenericSlideshows(); // §16c — [data-slideshow] content carousels
 
   console.log(
-    '%c✦ Makeni Central SDA — sda.js v4 loaded',
+    '%c✦ Makeni Central SDA — sda.js v5 loaded',
     'color:#e6c364;background:#041534;padding:6px 14px;border-radius:4px;font-weight:600;'
   );
 }
@@ -82,17 +78,14 @@ function initResponsive() {
   s.id = 'sda-responsive-style';
   s.textContent = `
     /* ── Fluid typography ─────────────────────────── */
-    /* display-lg  56 px → 32 px */
     .font-display-lg, .text-display-lg {
       font-size: clamp(2rem, 4vw + 0.75rem, 3.5rem) !important;
       line-height: 1.1 !important;
     }
-    /* headline-lg  40 px → 26 px */
     .font-headline-lg, .text-headline-lg {
       font-size: clamp(1.625rem, 3vw + 0.5rem, 2.5rem) !important;
       line-height: 1.2 !important;
     }
-    /* headline-md  32 px → 22 px */
     .font-headline-md, .text-headline-md {
       font-size: clamp(1.375rem, 2.5vw + 0.25rem, 2rem) !important;
       line-height: 1.3 !important;
@@ -109,7 +102,6 @@ function initResponsive() {
 
     /* ── Building page ────────────────────────────── */
     @media (max-width: 767px) {
-      /* Bento gallery: fixed 600 px height breaks on mobile */
       .grid.grid-rows-2.h-\\[600px\\] {
         height: auto !important;
       }
@@ -118,7 +110,6 @@ function initResponsive() {
         grid-column: auto !important;
         grid-row: auto !important;
       }
-      /* Fund stat numbers */
       [data-func="fund-raised"],
       [data-func="fund-goal"],
       [data-func="fund-percent"],
@@ -130,7 +121,6 @@ function initResponsive() {
 
     /* ── Kids page ────────────────────────────────── */
     @media (max-width: 767px) {
-      /* Large bento story card: force vertical stack */
       [data-func="stories"] .md\\:col-span-8 {
         flex-direction: column !important;
       }
@@ -142,7 +132,6 @@ function initResponsive() {
 
     /* ── Youth page ───────────────────────────────── */
     @media (max-width: 767px) {
-      /* FAB → round icon-only button */
       #fab-new-discussion {
         width: 56px !important;
         height: 56px !important;
@@ -152,12 +141,10 @@ function initResponsive() {
       }
       #fab-new-discussion .fab-label { display: none !important; }
 
-      /* Filter pills */
       [data-filter] {
         font-size: 12px !important;
         padding: 6px 14px !important;
       }
-      /* Discussion cards */
       .discussion-card { padding: 20px !important; }
     }
 
@@ -213,7 +200,6 @@ function initResponsive() {
   `;
   document.head.appendChild(s);
 
-  /* Mark FAB label for mobile hide */
   const fabLabel = document.querySelector('#fab-new-discussion span:last-child');
   if (fabLabel && !fabLabel.classList.contains('material-symbols-outlined')) {
     fabLabel.classList.add('fab-label');
@@ -236,7 +222,6 @@ function initNavbar() {
 
   const drawer = document.getElementById('mobile-drawer');
 
-  /* Mobile nav toggle — replaces copy-pasted inline scripts on each page */
   const hamburger = document.getElementById('hamburger-btn');
   if (hamburger && drawer) {
     function setDrawerOpen(state) {
@@ -259,17 +244,14 @@ function initNavbar() {
     });
     window.addEventListener('resize', () => {
       if (window.innerWidth >= 768 && drawerOpen) setDrawerOpen(false);
-      // Preserve overflow:hidden if any modal is open
       if (document.body.dataset.visitModalOpen || document.body.dataset.giveModalOpen) {
         document.body.style.overflow = 'hidden';
       }
     }, { passive: true });
 
-    // Watch class so scroll handler knows drawer state
     new MutationObserver(() => { drawerOpen = drawer.classList.contains('open'); })
       .observe(drawer, { attributes: true, attributeFilter: ['class'] });
   } else if (drawer) {
-    // No hamburger button — still track drawer state for scroll handler
     new MutationObserver(() => { drawerOpen = drawer.classList.contains('open'); })
       .observe(drawer, { attributes: true, attributeFilter: ['class'] });
   }
@@ -280,6 +262,9 @@ function initNavbar() {
   window.addEventListener('scroll', () => {
     if (drawerOpen) return;
     const y = window.scrollY;
+
+    // Drives .nav-inner 80px → 64px shrink (CSS: header.scrolled .nav-inner)
+    header.classList.toggle('scrolled', y > 40);
 
     header.style.boxShadow         = y > 60 ? '0 4px 24px rgba(4,21,52,0.12)' : '';
     header.style.borderBottomColor = y > 60 ? '#e6c364' : '';
@@ -294,6 +279,86 @@ function initNavbar() {
 
     lastScroll = y;
   }, { passive: true });
+}
+
+
+/* ═══════════════════════════════════════════════
+   §1b. DESKTOP DROPDOWN NAV — About / Youth / Ministries / Quick Links
+   Click/tap driven (not just CSS :hover) so touch devices work
+   correctly. Consolidated here from the duplicated inline copies
+   that used to live in index.html and pathfinders.html.
+═══════════════════════════════════════════════ */
+function initDropdownNav() {
+  const navItems = document.querySelectorAll('.nav-item');
+  if (!navItems.length) return;
+
+  navItems.forEach(item => {
+    const trigger = item.querySelector('.nav-trigger');
+    if (!trigger) return; // plain links (Home, News) have no dropdown
+
+    trigger.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const willOpen = !item.classList.contains('nav-open');
+      navItems.forEach(other => {
+        other.classList.remove('nav-open');
+        const t = other.querySelector('.nav-trigger');
+        if (t) t.setAttribute('aria-expanded', 'false');
+      });
+      if (willOpen) {
+        item.classList.add('nav-open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    item.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        item.classList.remove('nav-open');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.focus();
+      }
+    });
+  });
+
+  document.addEventListener('click', e => {
+    navItems.forEach(item => {
+      if (!item.contains(e.target)) {
+        item.classList.remove('nav-open');
+        const t = item.querySelector('.nav-trigger');
+        if (t) t.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+}
+
+
+/* ═══════════════════════════════════════════════
+   §1c. MOBILE ACCORDION SUBMENUS — inside the drawer
+   (About / Youth / Ministries / Quick Links). Consolidated
+   here for the same reason as §1b.
+═══════════════════════════════════════════════ */
+function initMobileAccordion() {
+  const triggers = document.querySelectorAll('.mobile-drawer .accordion-trigger');
+  if (!triggers.length) return;
+
+  triggers.forEach(trigger => {
+    const panel = trigger.nextElementSibling;
+    trigger.addEventListener('click', () => {
+      const isOpen = trigger.classList.contains('open');
+
+      triggers.forEach(t => {
+        t.classList.remove('open');
+        t.setAttribute('aria-expanded', 'false');
+        if (t.nextElementSibling) t.nextElementSibling.style.maxHeight = null;
+      });
+
+      if (!isOpen) {
+        trigger.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+        if (panel) panel.style.maxHeight = panel.scrollHeight + 'px';
+      }
+    });
+  });
 }
 
 
@@ -316,7 +381,6 @@ function initScrollReveal() {
   `;
   document.head.appendChild(s);
 
-  // If reduced motion, skip all animation — just show everything
   if (REDUCED_MOTION) {
     document.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('revealed'));
     return;
@@ -400,13 +464,11 @@ function initHero() {
       el.style.animationDelay = `${0.2 + i * 0.15}s`;
     });
 
-    // Ken Burns on background image div (index) or img (building)
     const bgDiv = hero.querySelector('[style*="background-image"]');
     const bgImg = hero.querySelector('img');
     if (bgDiv) bgDiv.classList.add('hero-bg-animate');
     else if (bgImg) bgImg.classList.add('hero-bg-animate');
 
-    // Parallax — only on desktop (too jumpy on mobile)
     const parallaxTarget = bgDiv || bgImg;
     if (parallaxTarget && window.innerWidth >= 768) {
       window.addEventListener('scroll', () => {
@@ -533,7 +595,6 @@ function initGiveButton() {
   `;
   document.head.appendChild(rippleStyle);
 
-  // Ripple on all primary buttons — only when motion is allowed
   if (!REDUCED_MOTION) {
     document.querySelectorAll('button, a[class*="bg-primary"], a[class*="bg-secondary"]').forEach(btn => {
       if (btn.dataset.rippleWired) return;
@@ -639,13 +700,11 @@ function initGiveButton() {
     if (e.key === 'Escape' && modal.classList.contains('active')) closeGiveModal();
   });
 
-  // Expose globally so onclick="openGiveModal()" in HTML works too
   window.openGiveModal  = openGiveModal;
   window.closeGiveModal = closeGiveModal;
 
-  // Wire all Give buttons — fixed: use innerText trimmed + lowercase, check all class variants
   function isGiveButton(btn) {
-    if (btn.closest('#give-modal')) return false; // never wire modal's own buttons
+    if (btn.closest('#give-modal')) return false;
     if (btn.classList.contains('desktop-give'))    return true;
     if (btn.classList.contains('mobile-give'))     return true;
     if (btn.classList.contains('mobile-give-btn')) return true;
@@ -725,8 +784,6 @@ function initGoldDividers() {
    §10. TOAST — yields to func.js's richer version
 ═══════════════════════════════════════════════ */
 function initToast() {
-  // func.js runs its own IIFE toast setup before DOMContentLoaded;
-  // only install the fallback if func.js isn't loaded.
   if (typeof window.SDAToast === 'function') return;
 
   const wrap = document.createElement('div');
@@ -828,7 +885,7 @@ function initBackToTop() {
    §14. IMAGE SHIMMER — loading placeholder
 ═══════════════════════════════════════════════ */
 function initImageShimmer() {
-  if (REDUCED_MOTION) return; // skip purely decorative loading animation
+  if (REDUCED_MOTION) return;
 
   const s = document.createElement('style');
   s.textContent = `
@@ -845,7 +902,6 @@ function initImageShimmer() {
   `;
   document.head.appendChild(s);
 
-  // All <img> — not just lazy ones
   document.querySelectorAll('img').forEach(img => {
     img.classList.add('img-loading');
     if (img.complete) {
@@ -860,9 +916,6 @@ function initImageShimmer() {
 
 /* ═══════════════════════════════════════════════
    §15. ACTIVE NAV LINK HIGHLIGHTER
-   Matches against the full pathname so sub-pages
-   don't incorrectly light up "Home".
-   Also targets .mobile-drawer nav a.
 ═══════════════════════════════════════════════ */
 function initActiveNav() {
   const page    = document.body.dataset.page || '';
@@ -883,5 +936,94 @@ function initActiveNav() {
     } else {
       a.classList.remove('text-primary', 'border-b-2', 'border-secondary', 'pb-1');
     }
+  });
+}
+
+
+/* ═══════════════════════════════════════════════
+   §16b. NAMED HERO SLIDESHOWS — Pathfinders/AY/Adventurers
+   Auto-rotating bg slides with dot navigation. Guarded, so
+   safe to run globally: no-ops on pages without the matching
+   markup. Add one initNamedHeroSlideshow() call per page below.
+═══════════════════════════════════════════════ */
+function initNamedHeroSlideshow(rootId, dotsId) {
+  const root = document.getElementById(rootId);
+  if (!root) return;
+  const slides = root.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll(`#${dotsId} .hero-dot`);
+  if (slides.length < 2) return;
+
+  let current = 0;
+  const intervalMs = 6000;
+  let timer = null;
+
+  function goTo(index) {
+    slides[current].classList.remove('active');
+    if (dots[current]) dots[current].classList.remove('active');
+    current = index;
+    slides[current].classList.add('active');
+    if (dots[current]) dots[current].classList.add('active');
+  }
+  function next() { goTo((current + 1) % slides.length); }
+  function start() { stop(); if (!REDUCED_MOTION) timer = setInterval(next, intervalMs); }
+  function stop() { if (timer) clearInterval(timer); }
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const idx = parseInt(dot.getAttribute('data-index'), 10);
+      if (!isNaN(idx) && idx !== current) { goTo(idx); start(); }
+    });
+  });
+
+  goTo(0);
+  start();
+}
+
+function initHeroSlideshows() {
+  initNamedHeroSlideshow('pathfinders-hero-slideshow', 'pathfinders-hero-dots');
+  // Add matching lines here as AY / Adventurers get their own hero slideshows:
+  // initNamedHeroSlideshow('ay-hero-slideshow', 'ay-hero-dots');
+  // initNamedHeroSlideshow('adventurers-hero-slideshow', 'adventurers-hero-dots');
+}
+
+
+/* ═══════════════════════════════════════════════
+   §16c. GENERIC IN-PAGE SLIDESHOWS — [data-slideshow]
+   Crossfade image carousels inside content sections
+   (e.g. the Honors section on pathfinders.html).
+═══════════════════════════════════════════════ */
+function initGenericSlideshows() {
+  document.querySelectorAll('[data-slideshow]').forEach(wrap => {
+    if (wrap.dataset.slideshowWired) return;
+    wrap.dataset.slideshowWired = '1';
+
+    const slides = wrap.querySelectorAll('.slide');
+    const dots = wrap.querySelectorAll('.slide-dot');
+    if (slides.length < 2) return;
+
+    let current = 0;
+    const INTERVAL = 4500;
+    let timer;
+
+    function goTo(index) {
+      slides[current].classList.remove('opacity-100');
+      slides[current].classList.add('opacity-0');
+      if (dots[current]) { dots[current].classList.remove('bg-white', 'w-5'); dots[current].classList.add('bg-white/50', 'w-2'); }
+
+      current = index;
+
+      slides[current].classList.remove('opacity-0');
+      slides[current].classList.add('opacity-100');
+      if (dots[current]) { dots[current].classList.remove('bg-white/50', 'w-2'); dots[current].classList.add('bg-white', 'w-5'); }
+    }
+    function next() { goTo((current + 1) % slides.length); }
+    function restart() { clearInterval(timer); if (!REDUCED_MOTION) timer = setInterval(next, INTERVAL); }
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => { goTo(i); restart(); });
+    });
+
+    goTo(0);
+    restart();
   });
 }
