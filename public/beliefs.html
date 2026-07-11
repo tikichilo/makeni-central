@@ -263,6 +263,14 @@
 
   /* ── Navy gradient for hero overlay ── */
   .navy-gradient { background: linear-gradient(to bottom, transparent 0%, rgba(4, 21, 52, 0.85) 100%); }
+
+  /* ── Category section number badge ── */
+  .cat-num-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #041534; color: #fff; font-family: Inter, sans-serif;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  }
 </style>
 </head>
 
@@ -427,7 +435,7 @@
   <section class="relative h-[70vh] w-full flex items-end overflow-hidden">
     <div class="absolute inset-0 z-0">
       <div class="img-wrap">
-        <img alt="Open Bible on a wooden pulpit" src="images/beliefs-hero.jpg"
+        <img alt="Sunrise breaking over mountain peaks" src="https://images.unsplash.com/photo-1756758005190-92941d91b8b2?auto=format&fit=crop&w=1600&q=80"
           onerror="this.parentElement.parentElement.style.background='#041534'; this.remove();"/>
       </div>
       <div class="absolute inset-0 navy-gradient"></div>
@@ -462,10 +470,11 @@
     </div>
   </section>
 
-  <!-- ══════════════ BELIEF CARDS — DOCTRINES OF GOD (Beliefs 1–4 shown; 5–6 to follow) ══════════════ -->
+  <!-- ══════════════ I. DOCTRINES OF GOD (Beliefs 1–6) ══════════════ -->
   <section class="px-margin-mobile md:px-margin-desktop pb-section-gap" id="god">
     <div class="max-w-[1280px] mx-auto">
       <div class="flex flex-col items-center mb-12">
+        <span class="cat-num-badge mb-4">I</span>
         <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Doctrines of God</h2>
         <div class="gold-divider"></div>
       </div>
@@ -475,19 +484,16 @@
         <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
-              <img src="images/beliefs-scripture.jpg" alt="Open Bible"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>menu_book</span><span class=\'ph-label\'>Add images/beliefs-scripture.jpg</span></div>'"/>
+              <img src="https://images.unsplash.com/photo-1747738609473-9e92707075eb?auto=format&fit=crop&w=800&q=80" alt="Open Bible resting in warm sunlight"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>menu_book</span><span class=\'ph-label\'>Holy Scriptures</span></div>'"/>
             </div>
           </div>
           <div class="p-8">
             <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 1</span>
             <h3 class="font-title-lg text-title-lg text-primary mb-4">Holy Scriptures</h3>
             <p class="font-body-md text-body-md text-on-surface-variant mb-6">
-              The Holy Scriptures, Old and New Testaments, are the written Word of God, given by divine inspiration.
+              The Holy Scriptures, Old and New Testaments, are the written Word of God, given by divine inspiration and the infallible standard for faith and practice.
             </p>
-            <a class="font-label-md text-label-md text-secondary flex items-center gap-2 hover:gap-4 transition-all" href="#">
-              Read more <span class="material-symbols-outlined text-sm">arrow_forward</span>
-            </a>
           </div>
         </div>
 
@@ -495,19 +501,16 @@
         <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
-              <img src="images/beliefs-trinity.jpg" alt="Trinity symbolism"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>diversity_3</span><span class=\'ph-label\'>Add images/beliefs-trinity.jpg</span></div>'"/>
+              <img src="https://images.unsplash.com/photo-1757495363009-e435d0570b71?auto=format&fit=crop&w=800&q=80" alt="Starry night sky and the Milky Way"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>diversity_3</span><span class=\'ph-label\'>The Trinity</span></div>'"/>
             </div>
           </div>
           <div class="p-8">
             <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 2</span>
             <h3 class="font-title-lg text-title-lg text-primary mb-4">The Trinity</h3>
             <p class="font-body-md text-body-md text-on-surface-variant mb-6">
-              There is one God: Father, Son, and Holy Spirit, a unity of three coeternal Persons.
+              There is one God: Father, Son, and Holy Spirit, a unity of three coeternal Persons, infinite and beyond full human understanding, yet near to every heart.
             </p>
-            <a class="font-label-md text-label-md text-secondary flex items-center gap-2 hover:gap-4 transition-all" href="#">
-              Read more <span class="material-symbols-outlined text-sm">arrow_forward</span>
-            </a>
           </div>
         </div>
 
@@ -515,35 +518,181 @@
         <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
-              <img src="images/beliefs-father.jpg" alt="Sunrise over creation"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>wb_sunny</span><span class=\'ph-label\'>Add images/beliefs-father.jpg</span></div>'"/>
+              <img src="https://images.unsplash.com/photo-1756758005190-92941d91b8b2?auto=format&fit=crop&w=800&q=80" alt="Golden sunrise over mountain peaks"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>wb_sunny</span><span class=\'ph-label\'>God the Father</span></div>'"/>
             </div>
           </div>
           <div class="p-8">
             <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 3</span>
             <h3 class="font-title-lg text-title-lg text-primary mb-4">God the Father</h3>
             <p class="font-body-md text-body-md text-on-surface-variant mb-6">
-              God the eternal Father is the Creator, Source, Sustainer, and Sovereign of all creation.
+              God the eternal Father is the Creator, Source, Sustainer, and Sovereign of all creation, just and holy, merciful and slow to anger.
             </p>
-            <a class="font-label-md text-label-md text-secondary flex items-center gap-2 hover:gap-4 transition-all" href="#">
-              Read more <span class="material-symbols-outlined text-sm">arrow_forward</span>
-            </a>
           </div>
         </div>
 
-        <!-- Belief 4 (placeholder / fallback style, retained from Stitch's design intent) -->
-        <div class="border-2 border-dashed border-outline-variant rounded-xl p-8 flex flex-col justify-center items-center text-center hover:bg-surface-container-low transition-colors">
-          <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-6">
-            <span class="material-symbols-outlined text-secondary text-3xl">church</span>
+        <!-- Belief 4 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1612821394773-23f0a7d33ede?auto=format&fit=crop&w=800&q=80" alt="Sunlight streaming through forest trees"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>church</span><span class=\'ph-label\'>God the Son</span></div>'"/>
+            </div>
           </div>
-          <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 4</span>
-          <h3 class="font-title-lg text-title-lg text-primary mb-4">God the Son</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant mb-6">
-            God the eternal Son became incarnate in Jesus Christ. Through Him all things were created.
-          </p>
-          <a class="font-label-md text-label-md text-secondary flex items-center gap-2" href="#">
-            Read more <span class="material-symbols-outlined text-sm">arrow_forward</span>
-          </a>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 4</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">God the Son</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              God the eternal Son became incarnate in Jesus Christ. Through Him all things were created; He lived a sinless life, died for our sins, and rose again.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 5 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1507126882445-434b04530d1a?auto=format&fit=crop&w=800&q=80" alt="Two white doves flying"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>air</span><span class=\'ph-label\'>The Holy Spirit</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 5</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Holy Spirit</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              The Holy Spirit is the ever-present power of God, active in creation and Scripture, convicting hearts, and equipping believers with gifts for service.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 6 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1759585201008-b113bb7c196d?auto=format&fit=crop&w=800&q=80" alt="Waterfall in a lush green forest"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>park</span><span class=\'ph-label\'>Creation</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 6</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">Creation</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              God created the heavens, the earth, and all living things in six literal days, and rested on the seventh, establishing the Sabbath as a memorial of creation.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ II. DOCTRINES OF MAN (Beliefs 7–8) ══════════════ -->
+  <section class="px-margin-mobile md:px-margin-desktop pb-section-gap" id="man">
+    <div class="max-w-[1280px] mx-auto">
+      <div class="flex flex-col items-center mb-12">
+        <span class="cat-num-badge mb-4">II</span>
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Doctrines of Man</h2>
+        <div class="gold-divider"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+
+        <!-- Belief 7 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1555231955-348aa2312e19?auto=format&fit=crop&w=800&q=80" alt="Delicate pink blossoms in bloom"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>diversity_1</span><span class=\'ph-label\'>Nature of Humanity</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 7</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Nature of Humanity</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Man and woman were made in the image of God, with dignity and freedom of choice. Through sin, that image was marred, leaving humanity in need of redemption.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 8 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1780047053902-9bcf0f8af9fb?auto=format&fit=crop&w=800&q=80" alt="Sunlight breaking through dark storm clouds"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>bolt</span><span class=\'ph-label\'>The Great Controversy</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 8</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Great Controversy</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Behind human history lies a cosmic conflict between Christ and Satan over God's character and law, a struggle in which every heart takes part.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ III. DOCTRINES OF SALVATION (Beliefs 9–11) ══════════════ -->
+  <section class="px-margin-mobile md:px-margin-desktop pb-section-gap" id="salvation">
+    <div class="max-w-[1280px] mx-auto">
+      <div class="flex flex-col items-center mb-12">
+        <span class="cat-num-badge mb-4">III</span>
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Doctrines of Salvation</h2>
+        <div class="gold-divider"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+
+        <!-- Belief 9 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1673886138237-ea511ad75104?auto=format&fit=crop&w=800&q=80" alt="Rainbow arcing over a green field"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>brightness_5</span><span class=\'ph-label\'>Life, Death & Resurrection of Christ</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 9</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">Life, Death, and Resurrection of Christ</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Through His sinless life, sacrificial death, and bodily resurrection, Christ secured forgiveness and eternal life for all who put their trust in Him.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 10 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1619233651146-7364c945c3ee?auto=format&fit=crop&w=800&q=80" alt="Ocean waves washing onto the shore"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>favorite</span><span class=\'ph-label\'>Experience of Salvation</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 10</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Experience of Salvation</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Salvation is God's gift, received by grace through faith in Christ alone, bringing forgiveness, new birth, and a growing relationship with Him.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 11 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1759585201008-b113bb7c196d?auto=format&fit=crop&w=800&q=80" alt="Stream of water flowing through a forest"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>eco</span><span class=\'ph-label\'>Growing in Christ</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 11</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">Growing in Christ</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Through the Spirit, prayer, Scripture, and worship, believers grow daily into Christlike maturity and stand firm against the forces of evil.
+            </p>
+          </div>
         </div>
 
       </div>
@@ -559,6 +708,337 @@
         "Thy word is a lamp unto my feet, and a light unto my path."
       </blockquote>
       <p class="font-label-md text-label-md text-secondary-fixed tracking-widest uppercase">Psalm 119:105</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ IV. DOCTRINES OF THE CHURCH (Beliefs 12–18) ══════════════ -->
+  <section class="px-margin-mobile md:px-margin-desktop py-section-gap" id="church">
+    <div class="max-w-[1280px] mx-auto">
+      <div class="flex flex-col items-center mb-12">
+        <span class="cat-num-badge mb-4">IV</span>
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Doctrines of the Church</h2>
+        <div class="gold-divider"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+
+        <!-- Belief 12 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1756758005190-92941d91b8b2?auto=format&fit=crop&w=800&q=80" alt="Sunrise light over the mountains"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>groups</span><span class=\'ph-label\'>The Church</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 12</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Church</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              The church is the community of believers who confess Jesus Christ as Lord, called out from the world for worship, fellowship, and mission together.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 13 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1757495363009-e435d0570b71?auto=format&fit=crop&w=800&q=80" alt="Night sky filled with stars"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>campaign</span><span class=\'ph-label\'>The Remnant and Its Mission</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 13</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Remnant and Its Mission</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              In the last days, a faithful remnant keeps God's commandments and the faith of Jesus, proclaiming the everlasting gospel to every nation.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 14 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1753081490091-37ce36d8bbd8?auto=format&fit=crop&w=800&q=80" alt="Golden wheat field ready for harvest"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>handshake</span><span class=\'ph-label\'>Unity in the Body of Christ</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 14</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">Unity in the Body of Christ</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              All believers, whatever their background, are one in Christ, joined by the Spirit into a single body of fellowship, service, and shared mission.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 15 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1619233651146-7364c945c3ee?auto=format&fit=crop&w=800&q=80" alt="Clear ocean water washing over the shore"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>water_drop</span><span class=\'ph-label\'>Baptism</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 15</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">Baptism</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Baptism by immersion symbolizes union with Christ's death and resurrection, following repentance and faith, and marks entrance into the church family.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 16 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1727647279740-bb8a586193fa?auto=format&fit=crop&w=800&q=80" alt="Cluster of grapes on the vine"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>local_dining</span><span class=\'ph-label\'>The Lord's Supper</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 16</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Lord's Supper</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Communion in the bread and cup proclaims Christ's sacrifice until He returns, preceded by foot-washing as a symbol of humble service.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 17 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1507126882445-434b04530d1a?auto=format&fit=crop&w=800&q=80" alt="Doves in flight against the sky"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>volunteer_activism</span><span class=\'ph-label\'>Spiritual Gifts and Ministries</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 17</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">Spiritual Gifts and Ministries</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              The Holy Spirit gives every believer gifts to build up the church and carry out its mission, each member contributing to the body of Christ.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 18 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1747738609473-9e92707075eb?auto=format&fit=crop&w=800&q=80" alt="Bible open in soft light"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>visibility</span><span class=\'ph-label\'>The Gift of Prophecy</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 18</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Gift of Prophecy</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Scripture identifies the gift of prophecy as a mark of the remnant church, a gift Adventists recognize in the ministry of Ellen G. White.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ V. DOCTRINES OF CHRISTIAN LIFE (Beliefs 19–23) ══════════════ -->
+  <section class="px-margin-mobile md:px-margin-desktop py-section-gap bg-surface-container-low" id="life">
+    <div class="max-w-[1280px] mx-auto">
+      <div class="flex flex-col items-center mb-12">
+        <span class="cat-num-badge mb-4">V</span>
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Doctrines of Christian Life</h2>
+        <div class="gold-divider"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+
+        <!-- Belief 19 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1756758005190-92941d91b8b2?auto=format&fit=crop&w=800&q=80" alt="Mountain peak at sunrise"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>gavel</span><span class=\'ph-label\'>The Law of God</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 19</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Law of God</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              The Ten Commandments express God's unchanging character and remain the standard for righteous living, revealing sin and pointing us to grace.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 20 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1759585201008-b113bb7c196d?auto=format&fit=crop&w=800&q=80" alt="Peaceful waterfall in a green forest"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>self_improvement</span><span class=\'ph-label\'>The Sabbath</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 20</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Sabbath</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              The seventh-day Sabbath, from Friday sunset to Saturday sunset, is God's gift of weekly rest and worship, a memorial of creation and a foretaste of eternity.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 21 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1753081490091-37ce36d8bbd8?auto=format&fit=crop&w=800&q=80" alt="Golden wheat field ready for harvest"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>volunteer_activism</span><span class=\'ph-label\'>Stewardship</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 21</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">Stewardship</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Believers are entrusted by God to faithfully manage their time, talents, finances, and the earth's resources, returning tithe and offerings in gratitude.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 22 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1555231955-348aa2312e19?auto=format&fit=crop&w=800&q=80" alt="Blossoms flowering in springtime"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>spa</span><span class=\'ph-label\'>Christian Behavior</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 22</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">Christian Behavior</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Believers are called to wholesome living that reflects biblical principles of health, modesty, and integrity in every area of daily life.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 23 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1673886138237-ea511ad75104?auto=format&fit=crop&w=800&q=80" alt="Rainbow over a field of trees"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>family_restroom</span><span class=\'ph-label\'>Marriage and the Family</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 23</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">Marriage and the Family</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Marriage is a lifelong covenant between one man and one woman, and the family is meant to reflect love, respect, and God's grace to one another.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ VI. DOCTRINES OF LAST THINGS (Beliefs 24–28) ══════════════ -->
+  <section class="px-margin-mobile md:px-margin-desktop py-section-gap" id="last-things">
+    <div class="max-w-[1280px] mx-auto">
+      <div class="flex flex-col items-center mb-12">
+        <span class="cat-num-badge mb-4">VI</span>
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Doctrines of Last Things</h2>
+        <div class="gold-divider"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+
+        <!-- Belief 24 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1780047053902-9bcf0f8af9fb?auto=format&fit=crop&w=800&q=80" alt="Sunlight breaking through dramatic clouds"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>temple_buddhist</span><span class=\'ph-label\'>Christ's Ministry in the Heavenly Sanctuary</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 24</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">Christ's Ministry in the Heavenly Sanctuary</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Since 1844, Christ has carried out the final phase of His atoning ministry in heaven, a work of judgment that prepares the way for His return.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 25 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1757495363009-e435d0570b71?auto=format&fit=crop&w=800&q=80" alt="Vast starry night sky"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>auto_awesome</span><span class=\'ph-label\'>The Second Coming of Christ</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 25</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Second Coming of Christ</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Christ's return will be literal, visible, and glorious, the blessed hope of the church, bringing resurrection and reunion with the righteous.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 26 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1612821394773-23f0a7d33ede?auto=format&fit=crop&w=800&q=80" alt="Light breaking through a quiet forest"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>nightlight</span><span class=\'ph-label\'>Death and Resurrection</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 26</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">Death and Resurrection</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              Death is a state of rest, like sleep, until the resurrection, when the righteous will rise to eternal life at Christ's coming.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 27 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1756758005190-92941d91b8b2?auto=format&fit=crop&w=800&q=80" alt="Dawn light breaking over the mountains"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>hourglass_bottom</span><span class=\'ph-label\'>The Millennium and the End of Sin</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 27</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The Millennium and the End of Sin</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              After the Second Coming, the redeemed reign with Christ in heaven for a thousand years, after which sin and evil are finally and permanently ended.
+            </p>
+          </div>
+        </div>
+
+        <!-- Belief 28 -->
+        <div class="belief-card bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden border border-outline-variant/30">
+          <div class="h-48 overflow-hidden relative">
+            <div class="img-wrap">
+              <img src="https://images.unsplash.com/photo-1555231955-348aa2312e19?auto=format&fit=crop&w=800&q=80" alt="Flowers blooming in a peaceful garden"
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>public</span><span class=\'ph-label\'>The New Earth</span></div>'"/>
+            </div>
+          </div>
+          <div class="p-8">
+            <span class="font-label-md text-label-md text-secondary mb-2 block">Belief 28</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-4">The New Earth</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mb-6">
+              God will recreate the earth as an eternal home for the redeemed, free from sin, suffering, and death, where He dwells with His people forever.
+            </p>
+          </div>
+        </div>
+
+      </div>
     </div>
   </section>
 
