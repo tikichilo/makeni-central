@@ -1740,7 +1740,7 @@
       <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
       <ul class="space-y-3" role="list">
         <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#" aria-current="page">Home</a></li>
-        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="adventures.html">Adventures</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="adventurers.html">Adventures</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="news.html">News</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="youth.html">Youth Board</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="building.html">New Building</a></li>
@@ -1864,13 +1864,20 @@
           <div class="service-option-check"></div>
         </button>
 
+        <button class="service-option" data-service="Friday Vespers" data-time="17:40 PM" data-start="17:40" data-end="19:00" aria-pressed="false">
+          <div class="service-option-icon">
+            <span class="material-symbols-outlined">wb_twilight</span>
+          </div>
+          <div>
+            <div class="service-option-label">Friday Vespers</div>
+            <div class="service-option-time">17:40 PM · Evening worship</div>
+          </div>
+          <div class="service-option-check"></div>
+        </button>
+
         <button class="service-option" data-service="Divine Service" data-time="11:00 AM" data-start="11:00" data-end="13:00" aria-pressed="false">
           <div class="service-option-icon">
             <span class="material-symbols-outlined">church</span>
-          </div>
-          <div>
-            <div class="service-option-label">Friday</div>
-            <div class="service-option-time">17:40 PM · Vespers</div>
           </div>
           <div>
             <div class="service-option-label">Divine Service</div>
@@ -2036,91 +2043,20 @@
    INDEX PAGE — inline init
    Runs immediately (no defer); safe because we only
    attach to DOM after DOMContentLoaded.
+
+   NOTE: Desktop dropdown nav, mobile accordion submenus,
+   and header scroll-shrink are ALL owned by sda.js
+   (initDropdownNav / initMobileAccordion / initNavbar).
+   Do NOT re-wire any of that here — sda.js is loaded with
+   `defer`, so it always runs after this inline script; two
+   click handlers on the same .nav-item / .accordion-trigger
+   toggle the open state twice per click, which cancels itself
+   out and makes the dropdowns/accordions appear broken
+   (open then instantly close). This file only owns things
+   sda.js does NOT already handle: the API data loaders,
+   footer year, and the visit planner modal.
 ══════════════════════════════════════════════════════ */
 (function () {
-
-  /* Mobile hamburger/drawer (#hamburger-btn / #mobile-drawer) is wired by
-     sda.js → initNavbar(). Do NOT re-wire it here — two handlers on the
-     same button/state cause the drawer to flicker or fail to close. */
-
-  /* ── Desktop dropdown nav (hover + keyboard + touch fallback) ── */
-  (function () {
-    var navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(function (item) {
-      var trigger = item.querySelector('.nav-trigger');
-      if (!trigger) return; // plain links (Home, News) have no dropdown
-
-      // Click toggles (covers touch devices where :hover doesn't apply)
-      trigger.addEventListener('click', function (e) {
-        e.preventDefault();
-        var willOpen = !item.classList.contains('nav-open');
-        navItems.forEach(function (other) {
-          other.classList.remove('nav-open');
-          var t = other.querySelector('.nav-trigger');
-          if (t) t.setAttribute('aria-expanded', 'false');
-        });
-        if (willOpen) {
-          item.classList.add('nav-open');
-          trigger.setAttribute('aria-expanded', 'true');
-        }
-      });
-
-      // Keyboard: Escape closes
-      item.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-          item.classList.remove('nav-open');
-          trigger.setAttribute('aria-expanded', 'false');
-          trigger.focus();
-        }
-      });
-    });
-
-    // Click outside closes any open dropdown
-    document.addEventListener('click', function (e) {
-      navItems.forEach(function (item) {
-        if (!item.contains(e.target)) {
-          item.classList.remove('nav-open');
-          var t = item.querySelector('.nav-trigger');
-          if (t) t.setAttribute('aria-expanded', 'false');
-        }
-      });
-    });
-  })();
-
-  /* ── Mobile accordion submenus ── */
-  (function () {
-    var triggers = document.querySelectorAll('.mobile-drawer .accordion-trigger');
-    triggers.forEach(function (trigger) {
-      var panel = trigger.nextElementSibling;
-      trigger.addEventListener('click', function () {
-        var isOpen = trigger.classList.contains('open');
-        // Close all other panels (accordion behaviour)
-        triggers.forEach(function (t) {
-          t.classList.remove('open');
-          t.setAttribute('aria-expanded', 'false');
-          if (t.nextElementSibling) t.nextElementSibling.style.maxHeight = null;
-        });
-        if (!isOpen) {
-          trigger.classList.add('open');
-          trigger.setAttribute('aria-expanded', 'true');
-          panel.style.maxHeight = panel.scrollHeight + 'px';
-        }
-      });
-    });
-  })();
-
-  /* ── Header scroll-shrink (nav-inner height only; box-shadow/hide-on-scroll
-     is handled by sda.js → initNavbar()) ── */
-  var header = document.getElementById('main-header');
-  if (header) {
-    window.addEventListener('scroll', function () {
-      header.classList.toggle('scrolled', window.scrollY > 40);
-    }, { passive: true });
-  }
-
-  /* Value-tile fade-in is handled automatically by sda.js → initScrollReveal(),
-     which picks up any .sacred-shadow element — the tiles below already carry
-     that class, so no separate observer is wired here. */
 
   /* ── Footer year ── */
   var fy = document.getElementById('footer-year');
