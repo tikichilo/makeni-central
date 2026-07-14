@@ -545,55 +545,127 @@
     cursor: pointer;
   }
 
-  /* ── Announcements ticker ── */
-  .ticker-wrap {
-    overflow: hidden;
-    white-space: nowrap;
-    position: relative;
-  }
-  .ticker-wrap::before,
-  .ticker-wrap::after {
-    content: '';
-    position: absolute;
-    top: 0; bottom: 0;
-    width: 60px;
-    z-index: 2;
-    pointer-events: none;
-  }
-  .ticker-wrap::before { left: 0;  background: linear-gradient(to right,  #fed977, transparent); }
-  .ticker-wrap::after  { right: 0; background: linear-gradient(to left,   #fed977, transparent); }
+  /* ═══════════════════════════════════════════
+   ANNOUNCEMENTS — CARD CAROUSEL
+═══════════════════════════════════════════ */
+.announce-wrap {
+  background: #fed977;
+  border-bottom: 1px solid rgba(117,91,0,0.25);
+  padding: 20px 0;
+}
 
-  @keyframes ticker {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  .ticker-track {
-    display: inline-flex;
-    gap: 0;
-    animation: ticker 28s linear infinite;
-  }
-  .ticker-track:hover { animation-play-state: paused; }
-  .ticker-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 40px;
-  }
-  .ticker-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: #755b00;
-    flex-shrink: 0;
-  }
+.announce-shell {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
 
-  /* ── Pulsing map pin dot ── */
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
-    50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
-  }
-  #pin-dot { animation: pulse 1.8s ease-in-out infinite; }
+.announce-viewport {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+}
 
+.announce-track {
+  position: relative;
+  width: 100%;
+  min-height: 88px;
+}
+
+.announce-card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.announce-card.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.announce-icon {
+  color: #755b00;
+  font-size: 30px;
+  flex-shrink: 0;
+}
+
+.announce-text {
+  font-family: Inter, sans-serif;
+  font-size: 19px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: #241a00;
+  max-width: 640px;
+}
+.announce-text strong {
+  color: #041534;
+}
+
+/* Nav arrows */
+.announce-nav {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(117,91,0,0.3);
+  background: rgba(255,255,255,0.5);
+  color: #755b00;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+.announce-nav:hover { background: #fff; border-color: #755b00; }
+.announce-nav:active { transform: scale(0.94); }
+
+/* Dot indicators */
+.announce-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.announce-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(117,91,0,0.35);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+.announce-dot.active {
+  background: #755b00;
+  transform: scale(1.3);
+}
+
+/* Mobile sizing */
+@media (max-width: 640px) {
+  .announce-text { font-size: 16.5px; max-width: 260px; }
+  .announce-icon { font-size: 24px; }
+  .announce-nav  { width: 34px; height: 34px; }
+  .announce-viewport { min-height: 96px; }
+  .announce-track { min-height: 96px; }
+}
+
+/* Respect users who've asked for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .announce-card { transition: opacity 0.2s ease; transform: none !important; }
+}
+ 
   /* ── Lesson card button ── */
   .lesson-btn {
     position: relative;
@@ -1233,44 +1305,95 @@
   }
 
   /* ── Contact Us card (Find Us section) — click-to-call ── */
-  .contact-call-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
-  .contact-call-btn {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    border-radius: 12px;
-    border: 1px solid #e2e2e2;
-    background: #fff;
-    text-decoration: none;
-    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
-  }
-  .contact-call-btn:hover { border-color: #755b00; background: #fffbee; }
-  .contact-call-btn:active { transform: scale(0.98); }
-  .contact-call-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: #041534;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .contact-call-icon .material-symbols-outlined { color: #e6c364; font-size: 18px; }
-  .contact-call-name {
-    font-family: Inter, sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: #041534;
-    line-height: 1.3;
-  }
-  .contact-call-number {
-    font-family: Inter, sans-serif;
-    font-size: 13px;
-    color: #75777f;
-    line-height: 1.3;
-  }
+.contact-call-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  margin-top: 0;
+  transition: max-height 0.35s ease, opacity 0.3s ease, margin-top 0.3s ease;
+}
+.contact-call-list.open {
+  max-height: 220px;
+  opacity: 1;
+  margin-top: 10px;
+}
+.contact-call-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e2e2;
+  background: #fff;
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+.contact-call-btn:hover { border-color: #755b00; background: #fffbee; }
+.contact-call-btn:active { transform: scale(0.98); }
+.contact-call-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #041534;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.contact-call-icon .material-symbols-outlined { color: #e6c364; font-size: 18px; }
+.contact-call-name {
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #041534;
+  line-height: 1.3;
+}
+.contact-call-number {
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  color: #75777f;
+  line-height: 1.3;
+}
+
+/* ── Contact Us toggle button ── */
+.contact-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.contact-toggle-caret {
+  transition: transform 0.3s ease;
+}
+.contact-toggle-btn.open .contact-toggle-caret {
+  transform: rotate(180deg);
+  color: #755b00;
+}
+
+  /* ── Watch Live status dot ── */
+.live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #75777f;
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+.live-dot.is-live {
+  background: #ef4444;
+  animation: liveBlink 1.4s ease-in-out infinite;
+}
+@keyframes liveBlink {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
+  50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+}
 </style>
 </head>
 
@@ -1491,20 +1614,100 @@
     </a>
   </section>
 
-  <!-- ══════════════ ANNOUNCEMENTS TICKER ══════════════ -->
-  <div id="announcements" class="bg-secondary-container border-b border-secondary/30 py-3 ticker-wrap" role="region" aria-label="Church announcements">
-    <div data-func="announcements" id="ticker-track" class="ticker-track font-label-md text-label-md text-on-secondary-container">
-      <!-- Populated by initIndexPage(); fallback shown while loading -->
-      <span class="ticker-item">
-        <span class="ticker-dot" aria-hidden="true"></span>
-        Welcome to Makeni Central SDA — Sabbath School 09:00 AM &nbsp;·&nbsp; Divine Service 11:00 AM
-      </span>
-      <span class="ticker-item">
-        <span class="ticker-dot" aria-hidden="true"></span>
-        Welcome to Makeni Central SDA — Sabbath School 09:00 AM &nbsp;·&nbsp; Divine Service 11:00 AM
-      </span>
+<!-- ══════════════ ANNOUNCEMENTS (CARD CAROUSEL) ══════════════ -->
+<div id="announcements" class="announce-wrap" role="region" aria-label="Church announcements" aria-roledescription="carousel">
+  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="announce-shell">
+
+      <button class="announce-nav announce-nav-prev" id="announce-prev" aria-label="Previous announcement">
+        <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+      </button>
+
+      <div class="announce-viewport">
+        <div data-func="announcements" id="announce-track" class="announce-track">
+          <!-- Fallback cards shown while /api/announcements loads -->
+          <div class="announce-card active" role="group" aria-roledescription="slide" aria-label="1 of 2">
+            <span class="material-symbols-outlined announce-icon" aria-hidden="true">campaign</span>
+            <p class="announce-text">Welcome to Makeni Central SDA — Sabbath School <strong>09:00 AM</strong></p>
+          </div>
+          <div class="announce-card" role="group" aria-roledescription="slide" aria-label="2 of 2">
+            <span class="material-symbols-outlined announce-icon" aria-hidden="true">church</span>
+            <p class="announce-text">Divine Service begins <strong>11:00 AM</strong> — join us!</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="announce-nav announce-nav-next" id="announce-next" aria-label="Next announcement">
+        <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+      </button>
+
+    </div>
+
+    <div class="announce-dots" id="announce-dots" role="tablist" aria-label="Announcement navigation"></div>
+  </div>
+</div>
+
+  <!-- ══════════════ WATCH LIVE ══════════════ -->
+<section id="watch-live" class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pt-section-gap" aria-labelledby="watch-live-heading">
+  <div class="bg-primary rounded-xl sacred-shadow overflow-hidden relative">
+    <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 20% 80%, #fff 1px, transparent 1px); background-size: 24px 24px;" aria-hidden="true"></div>
+
+    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center p-10 lg:p-12">
+
+      <!-- Left: text + CTA -->
+      <div class="lg:col-span-7">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="live-dot" id="live-dot" aria-hidden="true"></span>
+          <span class="font-label-md text-label-md text-secondary-fixed uppercase tracking-widest" id="live-status-text">Streams Every Saturday</span>
+        </div>
+
+        <h2 id="watch-live-heading" class="font-headline-md text-headline-md text-on-primary mb-4">Watch the Sermon Live</h2>
+        <p class="font-body-md text-body-md text-on-primary/70 mb-6 leading-relaxed">
+          Can't make it in person? Join us online — we stream every Sabbath straight from the sanctuary.
+        </p>
+
+        <div class="flex flex-wrap gap-x-8 gap-y-3 mb-8">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">music_note</span>
+            <span class="font-body-md text-body-md text-on-primary/80">Song Service <strong class="text-on-primary">10:30 AM</strong></span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">campaign</span>
+            <span class="font-body-md text-body-md text-on-primary/80">Sermon <strong class="text-on-primary">11:30 AM</strong></span>
+          </div>
+        </div>
+
+        id="watch-live-btn"
+          href="https://www.facebook.com/YOUR_FACEBOOK_PAGE"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container px-7 py-3.5 rounded-xl font-label-md text-label-md hover:bg-secondary-fixed transition-all active:scale-95">
+         <span class="material-symbols-outlined" style="font-size:20px;" aria-hidden="true">play_circle</span>
+          <span id="watch-live-btn-text">Watch on Facebook</span>
+        </a>
+      </div>
+
+      <!-- Right: Facebook video embed -->
+      <div class="lg:col-span-5">
+        <div class="rounded-xl overflow-hidden bg-black/20" style="aspect-ratio: 16/9; max-height: 320px;">
+          <iframe
+            id="fb-live-embed"
+            src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FYOUR_FACEBOOK_PAGE%2Flive_videos%2F&show_text=false&width=560"
+            width="100%"
+            height="100%"
+            style="border:none;overflow:hidden;"
+            scrolling="no"
+            frameborder="0"
+            allowfullscreen="true"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            title="Makeni Central SDA live stream">
+          </iframe>
+        </div>
+      </div>
+
     </div>
   </div>
+</section>
 
   <!-- ══════════════ LESSON + THEME (BENTO) ══════════════ -->
   <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap" aria-labelledby="lesson-heading">
@@ -1562,7 +1765,7 @@
   <!-- ══════════════ MISSION & VALUES ══════════════ -->
   <section id="mission" class="bg-surface-container-low py-section-gap" aria-labelledby="mission-heading">
     <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
 
         <!-- Left: content -->
         <div class="space-y-8">
@@ -1577,23 +1780,23 @@
         </div>
 
         <!-- Right: value tiles -->
-        <div class="grid grid-cols-2 gap-6">
-          <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:0ms;">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+          <div class="bg-surface-container-lowest p-6 sm:p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:0ms;">
             <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block transition-colors" aria-hidden="true">menu_book</span>
             <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary transition-colors">Scripture</h4>
             <p class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-on-primary/80 mt-1 transition-colors">The Bible as our only rule of faith</p>
           </div>
-          <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:80ms;">
+          <div class="bg-surface-container-lowest p-6 sm:p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:80ms;">
             <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block transition-colors" aria-hidden="true">campaign</span>
             <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary transition-colors">Discipleship</h4>
             <p class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-on-primary/80 mt-1 transition-colors">Proclaiming the everlasting gospel</p>
           </div>
-          <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:160ms;">
+          <div class="bg-surface-container-lowest p-6 sm:p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:160ms;">
             <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block transition-colors" aria-hidden="true">volunteer_activism</span>
             <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary transition-colors">Service</h4>
             <p class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-on-primary/80 mt-1 transition-colors">Ministering as Christ ministered</p>
           </div>
-          <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:240ms;">
+          <div class="bg-surface-container-lowest p-6 sm:p-8 rounded-xl sacred-shadow text-center group hover:bg-primary transition-all duration-300" style="transition-delay:240ms;">
             <span class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:text-secondary-fixed block transition-colors" aria-hidden="true">hourglass_top</span>
             <h4 class="font-title-lg text-title-lg text-primary group-hover:text-on-primary transition-colors">His Soon Return</h4>
             <p class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-on-primary/80 mt-1 transition-colors">Preparing hearts for Christ's coming</p>
@@ -1605,119 +1808,132 @@
   </section>
   
   <!-- ══════════════ FIND US ══════════════ -->
-  <section id="find-us" class="py-section-gap" aria-labelledby="find-us-heading">
-    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+<section id="find-us" class="py-section-gap" aria-labelledby="find-us-heading">
+  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
 
-      <div class="text-center mb-12">
-        <h2 id="find-us-heading" class="font-headline-lg text-headline-lg text-primary mb-4">Join Us This Sabbath</h2>
-        <div class="gold-divider mx-auto"></div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter items-stretch">
-
-        <!-- Map card -->
-        <div class="rounded-xl overflow-hidden sacred-shadow flex flex-col" style="min-height:460px;">
-          <div class="relative flex-1" style="min-height:360px;">
-            <iframe
-              id="church-map"
-              title="Map showing Makeni Central SDA Church location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3845.4445234150485!2d28.22506487408258!3d-15.460503514820086!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1940f3da5ac4a071%3A0xbf03e4f478ceb8d3!2sMakeni%20Central%20Seventh-Day%20Adventist%20Church!5e0!3m2!1sen!2szm!4v1779315899425!5m2!1sen!2szm"
-              width="100%"
-              height="100%"
-              class="absolute inset-0 w-full h-full"
-              style="border:0;"
-              allowfullscreen=""
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
-          </div>
-          <a
-            href="https://www.google.com/maps/dir/?api=1&destination=Makeni+Central+Seventh-Day+Adventist+Church+Lusaka+Zambia"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center justify-center gap-2 bg-primary text-on-primary font-label-md text-label-md px-6 py-4 hover:bg-secondary transition-colors"
-            style="text-decoration:none;">
-            <span class="material-symbols-outlined" style="font-size:20px;" aria-hidden="true">directions</span>
-            Get Directions
-          </a>
-        </div>
-
-        <!-- Info card -->
-        <div class="bg-surface-container-lowest rounded-xl sacred-shadow p-10 lg:p-12 flex flex-col justify-center space-y-8">
-
-          <div class="flex items-start gap-4">
-            <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">location_on</span>
-            </div>
-            <div>
-              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Physical Address</h5>
-              <p class="font-body-md text-body-md text-on-surface-variant">Plot 123, Makeni Road, Lusaka, Zambia</p>
-            </div>
-          </div>
-
-          <div class="flex items-start gap-4">
-            <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">schedule</span>
-            </div>
-            <div>
-              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Service Times</h5>
-              <div class="space-y-1 mt-1">
-                <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
-                  <span>Sabbath School</span><strong class="text-primary">09:00 AM</strong>
-                </div>
-                <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
-                  <span>Divine Service</span><strong class="text-primary">11:00 AM</strong>
-                </div>
-                <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
-                  <span>Bible Study</span><strong class="text-primary">03:00 PM</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex items-start gap-4">
-            <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">call</span>
-            </div>
-            <div class="w-full">
-              <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-2">Contact Us</h5>
-              <div class="contact-call-list">
-                <a href="tel:+260977695623" class="contact-call-btn">
-                  <div class="contact-call-icon">
-                    <span class="material-symbols-outlined">support_agent</span>
-                  </div>
-                  <div>
-                    <div class="contact-call-name">Admin Elder</div>
-                    <div class="contact-call-number">0977 695 623</div>
-                  </div>
-                </a>
-                <a href="tel:+260979992444" class="contact-call-btn">
-                  <div class="contact-call-icon">
-                    <span class="material-symbols-outlined">church</span>
-                  </div>
-                  <div>
-                    <div class="contact-call-name">Pastor</div>
-                    <div class="contact-call-number">0979 992 444</div>
-                  </div>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Plan Your Visit — now opens the modal -->
-          <button
-            id="plan-visit-btn"
-            class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-8 py-4 rounded-xl font-label-md text-label-md hover:bg-secondary transition-all active:scale-95 mt-2 w-full">
-            <span class="material-symbols-outlined" style="font-size:18px;" aria-hidden="true">calendar_month</span>
-            Plan Your Visit
-          </button>
-
-        </div>
-
-      </div>
+    <div class="text-center mb-12">
+      <h2 id="find-us-heading" class="font-headline-lg text-headline-lg text-primary mb-4">Join Us This Sabbath</h2>
+      <div class="gold-divider mx-auto"></div>
     </div>
-  </section>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter items-stretch">
+
+      <!-- Map card -->
+      <div class="rounded-xl overflow-hidden sacred-shadow flex flex-col" style="min-height:460px;">
+        <div class="relative flex-1" style="min-height:360px;">
+          <iframe
+            id="church-map"
+            title="Map showing Makeni Central SDA Church location"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3845.4445234150485!2d28.22506487408258!3d-15.460503514820086!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1940f3da5ac4a071%3A0xbf03e4f478ceb8d3!2sMakeni%20Central%20Seventh-Day%20Adventist%20Church!5e0!3m2!1sen!2szm!4v1779315899425!5m2!1sen!2szm"
+            width="100%"
+            height="100%"
+            class="absolute inset-0 w-full h-full"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+        <a
+          id="map-directions-btn"
+          href="https://www.google.com/maps/dir/?api=1&destination=Makeni+Central+Seventh-Day+Adventist+Church+Lusaka+Zambia"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center justify-center gap-2 bg-primary text-on-primary font-label-md text-label-md px-6 py-4 hover:bg-secondary transition-colors"
+          style="text-decoration:none;">
+          <span class="material-symbols-outlined" style="font-size:20px;" aria-hidden="true">directions</span>
+          Get Directions
+        </a>
+      </div>
+
+      <!-- Info card -->
+      <div class="bg-surface-container-lowest rounded-xl sacred-shadow p-10 lg:p-12 flex flex-col justify-center space-y-8">
+
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">location_on</span>
+          </div>
+          <div>
+            <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Physical Address</h5>
+            <p class="font-body-md text-body-md text-on-surface-variant">Plot 123, Makeni Road, Lusaka, Zambia</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">schedule</span>
+          </div>
+          <div>
+            <h5 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Service Times</h5>
+            <div class="space-y-1 mt-1">
+              <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+                <span>Sabbath School</span><strong class="text-primary">09:00 AM</strong>
+              </div>
+              <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+                <span>Divine Service</span><strong class="text-primary">11:00 AM</strong>
+              </div>
+              <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+                <span>Bible Study</span><strong class="text-primary">03:00 PM</strong>
+              </div>
+              <div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+                <span>Friday Vespers</span><strong class="text-primary">05:30 PM</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">call</span>
+          </div>
+          <div class="w-full">
+            <button
+              type="button"
+              id="contact-toggle-btn"
+              class="contact-toggle-btn"
+              aria-expanded="false"
+              aria-controls="contact-call-list">
+              <span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Contact Us</span>
+              <span class="material-symbols-outlined contact-toggle-caret" aria-hidden="true">expand_more</span>
+            </button>
+
+            <div class="contact-call-list" id="contact-call-list">
+              <a href="tel:+260977695623" class="contact-call-btn">
+                <div class="contact-call-icon">
+                  <span class="material-symbols-outlined">support_agent</span>
+                </div>
+                <div>
+                  <div class="contact-call-name">Admin Elder</div>
+                  <div class="contact-call-number">0977 695 623</div>
+                </div>
+              </a>
+              <a href="tel:+260979992444" class="contact-call-btn">
+                <div class="contact-call-icon">
+                  <span class="material-symbols-outlined">church</span>
+                </div>
+                <div>
+                  <div class="contact-call-name">Pastor</div>
+                  <div class="contact-call-number">0979 992 444</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plan Your Visit — now opens the modal -->
+        <button
+          id="plan-visit-btn"
+          class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-8 py-4 rounded-xl font-label-md text-label-md hover:bg-secondary transition-all active:scale-95 mt-2 w-full">
+          <span class="material-symbols-outlined" style="font-size:18px;" aria-hidden="true">calendar_month</span>
+          Plan Your Visit
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+  
 </main>
 
 <!-- ══════════════ FOOTER ══════════════ -->
@@ -2141,34 +2357,110 @@
     else if (refEl)         refEl.style.display = 'none';
   }
 
-  /* ── Announcements ticker ── */
-  async function loadAnnouncements() {
-    const data = await apiFetch('/api/announcements');
-    if (!data || !data.length) return; // keep static fallback
+  /* ── Announcements: card carousel ── */
+let announceCards = [];
+let announceIndex = 0;
+let announceTimer = null;
+const ANNOUNCE_INTERVAL = 7000; // slow — legible for all ages
 
-    const track = document.getElementById('ticker-track');
-    if (!track) return;
-
-    // Build items (duplicate for seamless loop)
-    function makeItem(text) {
-      const span = document.createElement('span');
-      span.className = 'ticker-item';
-      span.innerHTML = `<span class="ticker-dot" aria-hidden="true"></span>${esc(text)}`;
-      return span;
-    }
-
-    const items = data.map(a => makeItem(a.text));
-
-    // Clear fallback and insert real items × 2 for seamless loop
-    track.innerHTML = '';
-    items.forEach(el => track.appendChild(el));
-    items.forEach(el => track.appendChild(el.cloneNode(true)));
-
-    // Adjust ticker speed based on content length
-    const totalChars = data.reduce((n, a) => n + a.text.length, 0);
-    const duration   = Math.max(20, Math.min(60, totalChars * 0.3));
-    track.style.animationDuration = duration + 's';
+async function loadAnnouncements() {
+  const data = await apiFetch('/api/announcements');
+  if (!data || !data.length) {
+    // Keep static fallback cards already in the HTML — just wire them up
+    initAnnounceCarousel();
+    return;
   }
+
+  const track = document.getElementById('announce-track');
+  if (!track) return;
+
+  const icons = ['campaign', 'church', 'event', 'volunteer_activism', 'menu_book'];
+
+  track.innerHTML = data.map(function (a, i) {
+    return `
+      <div class="announce-card${i === 0 ? ' active' : ''}" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${data.length}">
+        <span class="material-symbols-outlined announce-icon" aria-hidden="true">${icons[i % icons.length]}</span>
+        <p class="announce-text">${esc(a.text)}</p>
+      </div>
+    `;
+  }).join('');
+
+  initAnnounceCarousel();
+}
+
+function initAnnounceCarousel() {
+  const track    = document.getElementById('announce-track');
+  const dotsWrap = document.getElementById('announce-dots');
+  const prevBtn  = document.getElementById('announce-prev');
+  const nextBtn  = document.getElementById('announce-next');
+  const viewport = document.querySelector('.announce-viewport');
+  if (!track) return;
+
+  announceCards = Array.from(track.querySelectorAll('.announce-card'));
+  announceIndex = announceCards.findIndex(function (c) { return c.classList.contains('active'); });
+  if (announceIndex < 0) announceIndex = 0;
+
+  // Single card — hide controls, nothing to rotate
+  if (announceCards.length <= 1) {
+    if (prevBtn) prevBtn.style.display = 'none';
+    if (nextBtn) nextBtn.style.display = 'none';
+    if (dotsWrap) dotsWrap.style.display = 'none';
+    return;
+  }
+
+  // Build dots
+  if (dotsWrap) {
+    dotsWrap.innerHTML = announceCards.map(function (_, i) {
+      return `<button class="announce-dot${i === announceIndex ? ' active' : ''}" role="tab" aria-label="Go to announcement ${i + 1}" aria-selected="${i === announceIndex}"></button>`;
+    }).join('');
+    dotsWrap.querySelectorAll('.announce-dot').forEach(function (dot, i) {
+      dot.addEventListener('click', function () { goToAnnounce(i); restartAnnounceTimer(); });
+    });
+  }
+
+  function render() {
+    announceCards.forEach(function (c, i) { c.classList.toggle('active', i === announceIndex); });
+    if (dotsWrap) {
+      dotsWrap.querySelectorAll('.announce-dot').forEach(function (d, i) {
+        d.classList.toggle('active', i === announceIndex);
+        d.setAttribute('aria-selected', i === announceIndex);
+      });
+    }
+  }
+
+  function goToAnnounce(i) {
+    announceIndex = (i + announceCards.length) % announceCards.length;
+    render();
+  }
+
+  function nextAnnounce() { goToAnnounce(announceIndex + 1); }
+  function prevAnnounce() { goToAnnounce(announceIndex - 1); }
+
+  function restartAnnounceTimer() {
+    clearInterval(announceTimer);
+    announceTimer = setInterval(nextAnnounce, ANNOUNCE_INTERVAL);
+  }
+
+  if (prevBtn) prevBtn.addEventListener('click', function () { prevAnnounce(); restartAnnounceTimer(); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { nextAnnounce(); restartAnnounceTimer(); });
+
+  // Pause on hover/focus so someone reading slowly isn't rushed
+  if (viewport) {
+    viewport.addEventListener('mouseenter', function () { clearInterval(announceTimer); });
+    viewport.addEventListener('mouseleave', restartAnnounceTimer);
+    viewport.addEventListener('focusin', function () { clearInterval(announceTimer); });
+    viewport.addEventListener('focusout', restartAnnounceTimer);
+  }
+
+  // Pause when tab isn't visible (saves battery, avoids desync)
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) clearInterval(announceTimer);
+    else restartAnnounceTimer();
+  });
+
+  render();
+  restartAnnounceTimer();
+}
 
   /* Run all three on load */
   document.addEventListener('DOMContentLoaded', function () {

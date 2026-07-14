@@ -755,3 +755,34 @@ function initYouthBoard() {
     fab.addEventListener('click', window.openModal);
   }
 }
+/* ── Watch Live: status badge + button ── */
+function initWatchLive() {
+  const FB_PAGE_URL = 'https://www.facebook.com/YOUR_FACEBOOK_PAGE'; // TODO: replace
+
+  const dot        = document.getElementById('live-dot');
+  const statusText = document.getElementById('live-status-text');
+  const btnText    = document.getElementById('watch-live-btn-text');
+  const watchBtn   = document.getElementById('watch-live-btn');
+  if (!dot) return;
+
+  // Live window: Saturday, 10:30 AM – 1:00 PM (song service through end of sermon)
+  function isLiveNow() {
+    const now = new Date();
+    if (now.getDay() !== 6) return false; // 6 = Saturday
+    const minutes = now.getHours() * 60 + now.getMinutes();
+    const start = 10 * 60 + 30; // 10:30
+    const end   = 13 * 60;      // 13:00
+    return minutes >= start && minutes <= end;
+  }
+
+  function updateLiveStatus() {
+    const live = isLiveNow();
+    dot.classList.toggle('is-live', live);
+    if (statusText) statusText.textContent = live ? 'LIVE NOW' : 'Streams Every Saturday';
+    if (btnText)    btnText.textContent    = live ? 'Watch Live Now' : 'Watch on Facebook';
+    if (watchBtn)   watchBtn.href = live ? FB_PAGE_URL + '/live_videos' : FB_PAGE_URL;
+  }
+
+  updateLiveStatus();
+  setInterval(updateLiveStatus, 60000); // re-check every minute, in case a visit spans the start time
+}

@@ -1027,3 +1027,18 @@ function initGenericSlideshows() {
     restart();
   });
 }
+
+/* ── Contact Us: collapsed dropdown toggle ── */
+function initContactToggle() {
+  const btn  = document.getElementById('contact-toggle-btn');
+  const list = document.getElementById('contact-call-list');
+  if (!btn || !list) return;
+
+  btn.addEventListener('click', function () {
+    const isOpen = list.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', initContactToggle);
