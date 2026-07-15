@@ -702,6 +702,37 @@
   .lesson-btn:hover::after { opacity: 1; }
   .lesson-btn:active { transform: translateY(0); }
 
+  /* ── Lesson day switcher tabs ── */
+  .lesson-day-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .lesson-day-tab {
+    font-family: Inter, sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 2px solid #e2e2e2;
+    background: #fff;
+    color: #45464e;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .lesson-day-tab:hover { border-color: #755b00; color: #041534; }
+  .lesson-day-tab.active {
+    background: #041534;
+    border-color: #041534;
+    color: #fff;
+  }
+  .lesson-day-tab.is-today::after {
+    content: '•';
+    color: #e6c364;
+    margin-left: 4px;
+  }
+
   /* ── Directions button ── */
   #map-directions-btn {
     opacity: 1 !important;
@@ -1677,7 +1708,7 @@
           </div>
         </div>
 
-        id="watch-live-btn"
+       ,<a id="watch-live-btn"
           href="https://www.facebook.com/YOUR_FACEBOOK_PAGE"
           target="_blank"
           rel="noopener noreferrer"
@@ -1692,7 +1723,7 @@
         <div class="rounded-xl overflow-hidden bg-black/20" style="aspect-ratio: 16/9; max-height: 320px;">
           <iframe
             id="fb-live-embed"
-            src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FYOUR_FACEBOOK_PAGE%2Flive_videos%2F&show_text=false&width=560"
+            src="https://www.facebook.com/profile.php?id=100091185906540"
             width="100%"
             height="100%"
             style="border:none;overflow:hidden;"
@@ -1710,57 +1741,54 @@
 </section>
 
   <!-- ══════════════ LESSON + THEME (BENTO) ══════════════ -->
-  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap" aria-labelledby="lesson-heading">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap" aria-labelledby="lesson-heading">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
 
-      <!-- Lesson of the Week -->
-      <article class="lg:col-span-7 bg-surface-container-lowest p-10 rounded-xl sacred-shadow border-t-4 border-secondary flex flex-col justify-between">
-        <div>
-          <div class="flex items-center gap-2 mb-6">
-            <span class="material-symbols-outlined text-secondary" aria-hidden="true">menu_book</span>
-            <span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Lesson of the Week</span>
-          </div>
+    <!-- Lesson of the Week -->
+    <article class="lg:col-span-12 relative overflow-hidden bg-surface-container-lowest p-10 md:p-12 rounded-xl sacred-shadow border-t-4 border-secondary">
 
-          <!-- These three elements are populated from /api/lesson -->
+      <!-- decorative watermark icon -->
+      <span class="material-symbols-outlined absolute -right-6 -top-6 text-[180px] leading-none text-secondary/5 pointer-events-none select-none" aria-hidden="true">
+        menu_book
+      </span>
+
+      <div class="relative flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary" aria-hidden="true">menu_book</span>
+          <span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Sabbath School Lesson</span>
+        </div>
+
+        <!-- Day switcher -->
+        <div class="lesson-day-tabs" id="lesson-day-tabs" role="tablist" aria-label="Choose a day"></div>
+      </div>
+
+      <div class="relative grid md:grid-cols-12 gap-10 md:gap-14 items-center">
+        <!-- Left: title + body -->
+        <div class="md:col-span-7">
           <h2 id="lesson-heading" data-lesson="title" class="font-headline-md text-headline-md text-primary mb-4">
             The Promise of Restoration
           </h2>
-          <p data-lesson="verse" class="font-title-lg text-title-lg text-on-surface-variant italic mb-6">
-            "He restores my soul; He leads me in the paths of righteousness for His name's sake." — Psalm 23:3
-          </p>
-          <p data-lesson="body" class="font-body-md text-body-md text-on-surface-variant mb-8 leading-relaxed">
+          <p data-lesson="body" class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
             This week, we explore the transformative power of God's restorative love. Through the study of the life of David, we see how even in our deepest valleys, the Good Shepherd is working to bring us back to wholeness. Join us as we dive into the depths of grace and the certainty of His guidance.
           </p>
         </div>
-        <div>
-          <!-- href gets set to lesson.url when data loads; falls back to # -->
-          <a id="lesson-btn" href="#" class="lesson-btn" target="_blank" rel="noopener noreferrer">
+
+        <!-- Right: verse pull-quote + CTA -->
+        <div class="md:col-span-5 md:border-l md:border-outline-variant/60 md:pl-10 flex flex-col justify-between h-full">
+          <p data-lesson="verse" class="font-title-lg text-title-lg text-on-surface-variant italic leading-snug mb-8">
+            "He restores my soul; He leads me in the paths of righteousness for His name's sake."
+            <span class="block mt-2 not-italic text-secondary font-semibold text-sm tracking-wide">— PSALM 23:3</span>
+          </p>
+          <a id="lesson-btn" href="#" class="lesson-btn self-start" target="_blank" rel="noopener noreferrer">
             <span class="material-symbols-outlined" style="font-size:18px;" aria-hidden="true">open_in_new</span>
-            Read Full Lesson
+            Read Full Lesson on Sabbath School Net
           </a>
         </div>
-      </article>
-
-      <!-- Theme of the Month -->
-      <div class="lg:col-span-5 bg-primary p-10 rounded-xl relative overflow-hidden flex flex-col justify-center" aria-labelledby="theme-heading">
-        <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 70% 30%, #fff 1px, transparent 1px); background-size: 24px 24px;" aria-hidden="true"></div>
-
-        <!-- Populated from /api/theme -->
-        <div data-func="theme" id="theme-block" class="relative z-10 flex flex-col justify-center h-full">
-          <!-- Skeleton / default while loading -->
-          <p class="font-label-md text-label-md text-secondary-fixed uppercase tracking-widest mb-4">Theme of the Month</p>
-          <h3 id="theme-heading" class="font-headline-md text-headline-md text-on-primary mb-4 leading-snug">
-            Abiding in Christ
-          </h3>
-          <p class="font-body-md text-body-md text-on-primary/70 leading-relaxed">
-            "I am the vine; you are the branches. If you remain in me and I in you, you will bear much fruit."
-          </p>
-        </div>
-        <cite id="theme-ref" class="font-label-md text-label-md text-secondary-fixed block text-right relative z-10 mt-4">— John 15:5</cite>
       </div>
+    </article>
 
-    </div>
-  </section>
+  </div>
+</section>
 
   <!-- ══════════════ MISSION & VALUES ══════════════ -->
   <section id="mission" class="bg-surface-container-low py-section-gap" aria-labelledby="mission-heading">
@@ -2303,58 +2331,68 @@
       .replace(/"/g, '&quot;');
   }
 
-  /* ── Lesson of the Week ── */
+  /* ── Sabbath School Lesson: day switcher, live from ssnet.org ── */
+  let lessonWeekData = null;
+  let selectedDayKey = null;
+
   async function loadLesson() {
-    const data = await apiFetch('/api/lesson');
-    if (!data) return; // keep static fallback
+    const data = await apiFetch('/api/daily-lesson');
+    if (!data || !data.days || !data.days.length) return; // keep static fallback in HTML
+
+    lessonWeekData  = data;
+    selectedDayKey  = data.todayKey;
+
+    const tabsEl = document.getElementById('lesson-day-tabs');
+    if (tabsEl) {
+      tabsEl.innerHTML = data.days.map(function (d) {
+        return `
+          <button
+            type="button"
+            class="lesson-day-tab${d.key === selectedDayKey ? ' active' : ''}${d.key === data.todayKey ? ' is-today' : ''}"
+            data-day="${d.key}"
+            aria-pressed="${d.key === selectedDayKey}">
+            ${esc(d.label)}
+          </button>
+        `;
+      }).join('');
+
+      tabsEl.querySelectorAll('.lesson-day-tab').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          selectedDayKey = btn.dataset.day;
+          renderLessonDay();
+          tabsEl.querySelectorAll('.lesson-day-tab').forEach(function (b) {
+            b.classList.toggle('active', b.dataset.day === selectedDayKey);
+            b.setAttribute('aria-pressed', b.dataset.day === selectedDayKey);
+          });
+        });
+      });
+    }
+
+    renderLessonDay();
+  }
+
+  function renderLessonDay() {
+    if (!lessonWeekData) return;
+    const day = lessonWeekData.days.find(function (d) { return d.key === selectedDayKey; })
+             || lessonWeekData.days[0];
 
     const titleEl = document.querySelector('[data-lesson="title"]');
     const verseEl = document.querySelector('[data-lesson="verse"]');
     const bodyEl  = document.querySelector('[data-lesson="body"]');
     const btnEl   = document.getElementById('lesson-btn');
 
-    if (titleEl && data.title) titleEl.textContent = data.title;
-    if (verseEl && data.verse) verseEl.textContent = data.verse;
-    if (bodyEl  && data.body)  bodyEl.textContent  = data.body;
-
-    // "Read Full Lesson" button — link to URL if provided, else hide icon + button
-    if (btnEl) {
-      if (data.url) {
-        btnEl.href = data.url;
-      } else {
-        // No external URL — disable the link behaviour; it scrolls nowhere useful
-        btnEl.removeAttribute('href');
-        btnEl.style.display = 'none';
-      }
+    if (titleEl) titleEl.textContent = day.label + ' — ' + day.title;
+    if (verseEl) {
+      verseEl.textContent = lessonWeekData.memoryText
+        ? 'Memory Text: "' + lessonWeekData.memoryText + '"'
+        : lessonWeekData.weekTitle;
     }
-
-    // Also load theme that comes bundled with the lesson response
-    if (data.theme) renderTheme(data.theme);
-  }
-
-  /* ── Theme of the Month ── */
-  async function loadTheme() {
-    // Only fetch standalone if lesson didn't already load the theme
-    const data = await apiFetch('/api/theme');
-    if (!data) return;
-    renderTheme(data);
-  }
-
-  function renderTheme(data) {
-    const block  = document.getElementById('theme-block');
-    const refEl  = document.getElementById('theme-ref');
-    if (!block) return;
-
-    block.innerHTML = `
-      <p class="font-label-md text-label-md text-secondary-fixed uppercase tracking-widest mb-4">Theme of the Month</p>
-      <h3 id="theme-heading" class="font-headline-md text-headline-md text-on-primary mb-4 leading-snug">
-        ${esc(data.heading || 'Theme of the Month')}
-      </h3>
-      ${data.body ? `<p class="font-body-md text-body-md text-on-primary/70 leading-relaxed">${esc(data.body)}</p>` : ''}
-    `;
-
-    if (refEl && data.ref) refEl.textContent = '— ' + data.ref;
-    else if (refEl)         refEl.style.display = 'none';
+    if (bodyEl) {
+      bodyEl.textContent = day.excerpt
+        ? day.excerpt + '…'
+        : 'Tap "Read Full Lesson" to study today\'s section in full.';
+    }
+    if (btnEl) btnEl.href = lessonWeekData.lessonUrl + '#' + day.key;
   }
 
   /* ── Announcements: card carousel ── */

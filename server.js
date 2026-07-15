@@ -622,6 +622,182 @@ app.delete('/api/stories/:id', async (req, res) => {
   }
 });
 
+const cheerio = require('cheerio');
+
+/* ═══════════════════════════════════════════════
+   DAILY LESSON — pulled live from ssnet.org
+═══════════════════════════════════════════════ */
+
+// Update this array ~4x/year when ssnet.org publishes a new quarter.
+// `start` = the Sabbath (Saturday) that begins Lesson 1 — find it by
+// opening https://ssnet.org/lessons/<code>/index.html and reading the
+// date range shown for Lesson 01.
+const LESSON_QUARTERS = [
+  { code: '26a', start: '2025-12-27' }, // Q1 2026: Uniting Heaven and Earth
+  { code: '26b', start: '2026-03-28' }, // Q2 2026 — unverified guess, double check when you're rested
+  { code: '26c', start: '2026-06-27' }, // Q3 2026: First and Second Corinthians — confirmed (Lesson 3 = July 11–17)
+];
+
+const DAY_KEYS = ['sab', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
+const DAY_LABELS = {
+  sab: 'Sabbath', sun: 'Sunday', mon: 'Monday', tue: 'Tuesday',
+  wed: 'Wednesday', thu: 'Thursday', fri: 'Friday',
+};
+
+const TIMEZONE = 'Africa/Lusaka'; // UTC+2 year-round, no DST
+
+const lessonCache = new Map(); // url -> { fetchedAt, data }
+const LESSON_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
+
+// ── Timezone-safe date helpers ──────────────────────────────
+
+// Parse a 'YYYY-MM-DD' string into a UTC-anchored midnight Date.
+// This makes all downstream day-math immune to the server's local TZ.
+function parseDateOnlyUTC(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+}
+
+// What calendar date is it *in Zambia* right now, regardless of
+// what timezone the server (Render, etc.) is actually running in?
+function getTodayInZambia() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: TIMEZONE,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(new Date()); // en-CA formats as YYYY-MM-DD
+}
+
+// ── Lesson lookup ────────────────────────────────────────────
+
+function findQuarter(date) {
+  const sorted = [...LESSON_QUARTERS].sort(
+    (a, b) => parseDateOnlyUTC(a.start) - parseDateOnlyUTC(b.start)
+  );
+  let match = sorted[0];
+  for (const q of sorted) {
+    if (parseDateOnlyUTC(q.start) <= date) match = q;
+  }
+  return match;
+}
+
+// `date` must be a UTC-midnight Date — always pass output of parseDateOnlyUTC()
+function getLessonInfo(date) {
+  const quarter = findQuarter(date);
+  const start = parseDateOnlyUTC(quarter.start);
+  const diffDays = Math.round((date - start) / 86400000);
+  let lessonNum = Math.floor(diffDays / 7) + 1;
+  lessonNum = Math.min(Math.max(lessonNum, 1), 13);
+
+  const weekSabbath = new Date(start);
+  weekSabbath.setUTCDate(weekSabbath.getUTCDate() + (lessonNum - 1) * 7);
+
+  // Which day-of-week (0=sab...6=fri) is `date` within this lesson week?
+  const dayOffset = Math.round((date - weekSabbath) / 86400000);
+  const dayKey = DAY_KEYS[Math.min(Math.max(dayOffset, 0), 6)];
+
+  const num = String(lessonNum).padStart(2, '0');
+  const url = `https://ssnet.org/lessons/${quarter.code}/less${num}.html`;
+
+  return { url, lessonNum, dayKey, weekSabbath };
+}
+
+async function fetchLessonPage(url) {
+  const cached = lessonCache.get(url);
+  if (cached && Date.now() - cached.fetchedAt < LESSON_CACHE_TTL) return cached.data;
+
+  const response = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MakeniCentralSDA-site/1.0)' },
+  });
+  if (!response.ok) throw new Error(`ssnet.org responded ${response.status}`);
+  const html = await response.text();
+  const $ = cheerio.load(html);
+
+  const weekTitle = $('h2').first().text().trim();
+  let memoryText = '';
+  $('p').each((i, el) => {
+    const t = $(el).text().trim();
+    if (!memoryText && /^Memory Text/i.test(t)) {
+      memoryText = t.replace(/^Memory Text:\s*/i, '').trim();
+    }
+  });
+
+  // Split the page into day sections using the #sab #sun #mon... anchors.
+  // Each anchor is immediately followed by a date line and an <h3> section
+  // title, then paragraphs, until the next day's anchor.
+  const days = {};
+  DAY_KEYS.forEach((key, i) => {
+    const anchor = $(`#${key}`).first();
+    if (!anchor.length) return;
+
+    const nextKey = DAY_KEYS[i + 1] || 'is';
+    const startNode = anchor.get(0);
+    const stopNode = $(`#${nextKey}`).first().get(0);
+
+    let title = '';
+    const bodyParts = [];
+    let collecting = false;
+
+    $('body').find('*').each((_, el) => {
+      if (el === startNode) { collecting = true; return; }
+      if (el === stopNode) { collecting = false; return false; }
+      if (!collecting) return;
+
+      const tag = el.tagName ? el.tagName.toLowerCase() : '';
+      if (tag === 'h3' && !title) {
+        title = $(el).text().trim();
+      } else if (tag === 'p') {
+        const text = $(el).text().trim();
+        if (text && !/^Discuss on the Daily Blog/i.test(text)) bodyParts.push(text);
+      }
+    });
+
+    days[key] = {
+      key,
+      label: DAY_LABELS[key],
+      title: title || weekTitle,
+      // Short excerpt only — see copyright note above. Full text stays on ssnet.org.
+      excerpt: (bodyParts[0] || '').slice(0, 420),
+    };
+  });
+
+  const data = { weekTitle, memoryText, days };
+  lessonCache.set(url, { fetchedAt: Date.now(), data });
+  return data;
+}
+
+// ── GET /api/daily-lesson?date=YYYY-MM-DD ──
+// Live-pulls the current week's lesson from ssnet.org, split by day.
+// Defaults `date` to "today in Zambia" (Africa/Lusaka), not raw server
+// time — fixes the day-boundary bug when the server runs in UTC.
+// Falls back gracefully (502) if ssnet.org is unreachable or changed
+// their markup — the frontend keeps its static placeholder in that case.
+app.get('/api/daily-lesson', async (req, res) => {
+  try {
+    const dateStr = req.query.date || getTodayInZambia();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      return res.status(400).json({ error: 'Invalid date' });
+    }
+
+    const date = parseDateOnlyUTC(dateStr);
+    if (isNaN(date.getTime())) return res.status(400).json({ error: 'Invalid date' });
+
+    const { url, lessonNum, dayKey } = getLessonInfo(date);
+    const lessonData = await fetchLessonPage(url);
+
+    res.json({
+      lessonNum,
+      lessonUrl: url,
+      weekTitle: lessonData.weekTitle,
+      memoryText: lessonData.memoryText,
+      todayKey: dayKey,
+      days: DAY_KEYS.filter(k => lessonData.days[k]).map(k => lessonData.days[k]),
+    });
+
+  } catch (err) {
+    console.error('GET /api/daily-lesson:', err.message);
+    res.status(502).json({ error: 'Could not reach ssnet.org' });
+  }
+});
 
 /* ═══════════════════════════════════════════════
    START SERVER

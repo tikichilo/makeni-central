@@ -757,7 +757,7 @@ function initYouthBoard() {
 }
 /* ── Watch Live: status badge + button ── */
 function initWatchLive() {
-  const FB_PAGE_URL = 'https://www.facebook.com/YOUR_FACEBOOK_PAGE'; // TODO: replace
+  const FB_PAGE_URL = 'https://www.facebook.com/profile.php?id=100091185906540'; // TODO: replace
 
   const dot        = document.getElementById('live-dot');
   const statusText = document.getElementById('live-status-text');
