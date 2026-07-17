@@ -1,0 +1,288 @@
+/* ═══════════════════════════════════════════════
+   DEPARTMENT DETAIL PAGE — shared styles
+   Used by: health-ministries.html, family-life.html,
+   womens-ministries.html, and any future department page.
+═══════════════════════════════════════════════ */
+
+:root{
+  --navy:#041534;
+  --gold:#755b00;
+  --gold-light:#e6c364;
+  --cream:#faf7ef;
+  --surface:#ffffff;
+  --ink:#21232b;
+  --ink-soft:#5a5d68;
+  --line:#e7e2d4;
+  /* Each page overrides this to match its card color on departments.html */
+  --accent:#755b00;
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  background:var(--cream);
+  color:var(--ink);
+  font-family:'Inter', sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.material-symbols-outlined{
+  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+  line-height:1;
+}
+
+/* ── Breadcrumb ── */
+.crumb{
+  max-width:900px;
+  margin:0 auto;
+  padding:22px 24px 0;
+}
+.crumb a{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:13.5px;
+  font-weight:600;
+  color:var(--ink-soft);
+  text-decoration:none;
+}
+.crumb a:hover{ color:var(--navy); }
+.crumb .material-symbols-outlined{ font-size:18px; }
+
+/* ── Hero ── */
+.dept-hero{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(120% 140% at 15% -10%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 55%),
+    var(--navy);
+  padding:48px 24px 64px;
+  text-align:center;
+  margin-top:18px;
+}
+.dept-hero-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:56px;
+  height:56px;
+  border-radius:14px;
+  background:var(--accent);
+  color:#fff;
+  margin-bottom:20px;
+}
+.dept-hero-icon .material-symbols-outlined{ font-size:28px; }
+.dept-hero h1{
+  font-family:'Fraunces', serif;
+  font-weight:600;
+  font-size:clamp(30px, 4.5vw, 44px);
+  color:#fff;
+  margin:0 0 14px;
+  letter-spacing:-0.01em;
+}
+.dept-hero p{
+  max-width:520px;
+  margin:0 auto;
+  color:rgba(255,255,255,0.72);
+  font-size:15.5px;
+  line-height:1.65;
+}
+
+/* ── Content shell ── */
+main{
+  max-width:900px;
+  margin:0 auto;
+  padding:0 24px 90px;
+}
+
+/* ── Leader card ── */
+.leader-card{
+  position:relative;
+  margin-top:-40px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:28px;
+  display:flex;
+  gap:22px;
+  align-items:center;
+  flex-wrap:wrap;
+  box-shadow:0 20px 40px -24px rgba(4,21,52,0.25);
+}
+.leader-photo{
+  width:96px;
+  height:96px;
+  border-radius:50%;
+  object-fit:cover;
+  background:var(--cream);
+  border:3px solid color-mix(in srgb, var(--accent) 30%, white);
+  flex-shrink:0;
+}
+.leader-info{ flex:1; min-width:180px; }
+.leader-label{
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin:0 0 6px;
+}
+.leader-name{
+  font-family:'Fraunces', serif;
+  font-weight:600;
+  font-size:21px;
+  color:var(--navy);
+  margin:0 0 3px;
+}
+.leader-role{
+  font-size:13.5px;
+  color:var(--ink-soft);
+  margin:0;
+}
+
+/* Placeholder badge — remove this element once real photo/name/number are in */
+.placeholder-flag{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-top:8px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.04em;
+  color:#a8562f;
+  background:#fbeee6;
+  border:1px dashed #d99a70;
+  border-radius:999px;
+  padding:3px 10px;
+}
+
+/* ── Call reveal button ──
+   The real phone number is NOT present in the page source as plain text.
+   It's assembled from three separate data-attributes only when the button
+   is clicked, then used to open the phone app via a tel: link. This keeps
+   it invisible to scrapers while working normally for real visitors. */
+.call-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  background:var(--navy);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  padding:13px 22px;
+  font-family:Inter, sans-serif;
+  font-size:13.5px;
+  font-weight:700;
+  letter-spacing:0.04em;
+  cursor:pointer;
+  text-decoration:none;
+  transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.call-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 22px -10px rgba(4,21,52,0.4);
+}
+.call-btn .material-symbols-outlined{ font-size:18px; }
+.call-btn.is-revealed{ background:var(--accent); }
+.call-btn small{
+  font-weight:500;
+  opacity:0.75;
+  letter-spacing:0;
+}
+
+/* ── Info sections ── */
+.dept-section{ margin-top:46px; }
+.dept-section h2{
+  font-family:'Fraunces', serif;
+  font-weight:600;
+  font-size:22px;
+  color:var(--navy);
+  margin:0 0 14px;
+}
+.dept-section p{
+  font-size:15px;
+  line-height:1.75;
+  color:var(--ink-soft);
+  margin:0 0 16px;
+}
+.activity-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:grid;
+  gap:10px;
+}
+.activity-list li{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px 16px;
+  font-size:14.5px;
+  color:var(--ink);
+  line-height:1.55;
+}
+.activity-list .material-symbols-outlined{
+  color:var(--accent);
+  font-size:20px;
+  flex-shrink:0;
+  margin-top:1px;
+}
+
+.meet-card{
+  display:flex;
+  gap:14px;
+  align-items:center;
+  background:color-mix(in srgb, var(--accent) 7%, white);
+  border:1px solid color-mix(in srgb, var(--accent) 20%, white);
+  border-radius:14px;
+  padding:18px 20px;
+}
+.meet-card .material-symbols-outlined{ color:var(--accent); font-size:26px; }
+.meet-card h3{
+  font-size:14px;
+  font-weight:700;
+  color:var(--navy);
+  margin:0 0 3px;
+}
+.meet-card p{ margin:0; font-size:13.5px; color:var(--ink-soft); }
+
+/* ── Back to departments ── */
+.back-cta{
+  margin-top:56px;
+  display:flex;
+  justify-content:center;
+}
+.back-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:var(--surface);
+  border:1.5px solid var(--line);
+  color:var(--navy);
+  border-radius:999px;
+  padding:13px 26px;
+  font-size:13.5px;
+  font-weight:700;
+  letter-spacing:0.03em;
+  text-decoration:none;
+  transition:transform .2s ease, border-color .2s ease, background .2s ease;
+}
+.back-btn:hover{
+  transform:translateY(-2px);
+  border-color:var(--accent);
+  background:color-mix(in srgb, var(--accent) 6%, white);
+}
+.back-btn .material-symbols-outlined{ font-size:18px; }
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  .call-btn, .back-btn{ transition:none; }
+}
+
+@media (max-width:560px){
+  .leader-card{ padding:22px; }
+  .leader-photo{ width:80px; height:80px; }
+}
