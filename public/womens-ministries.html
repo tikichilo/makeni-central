@@ -29,10 +29,12 @@
   <main>
 
     <!-- Leader card -->
-    <section class="leader-card">
-      <img class="leader-photo"
-           src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' fill='%23f1ece0'/%3E%3Ccircle cx='48' cy='38' r='18' fill='%23d8cdb0'/%3E%3Cellipse cx='48' cy='86' rx='30' ry='24' fill='%23d8cdb0'/%3E%3C/svg%3E"
-           alt="Placeholder — add Women's Ministries leader photo">
+    <section class="leader-card leader-card--featured">
+      <div class="leader-photo-frame">
+        <img class="leader-photo leader-photo--large"
+             src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' fill='%23f1ece0'/%3E%3Ccircle cx='48' cy='38' r='18' fill='%23d8cdb0'/%3E%3Cellipse cx='48' cy='86' rx='30' ry='24' fill='%23d8cdb0'/%3E%3C/svg%3E"
+             alt="Placeholder — add Women's Ministries leader photo">
+      </div>
       <div class="leader-info">
         <p class="leader-label">Department Leader</p>
         <h2 class="leader-name">Leader Name</h2>
@@ -82,16 +84,14 @@
       </ul>
     </section>
 
-    <!-- Meet -->
-    <section class="dept-section">
-      <h2>Get Involved</h2>
-      <div class="meet-card">
-        <span class="material-symbols-outlined" aria-hidden="true">event</span>
-        <div>
-          <h3>Placeholder — meeting schedule</h3>
-          <p>Add the regular day/time this ministry meets or runs programs, e.g. "Second Sabbath of every month, after service."</p>
-        </div>
-      </div>
+    <!-- Get in touch -->
+    <section class="dept-section dept-section--cta">
+      <h2>Want to Get Involved?</h2>
+      <p>Reach out to the department leader directly to join Bible study, outreach, or mentorship.</p>
+      <button class="call-btn call-btn--wide" data-p1="+260" data-p2="000" data-p3="000000">
+        <span class="material-symbols-outlined" aria-hidden="true">chat</span>
+        <span class="call-label">Get in Touch with Leader</span>
+      </button>
     </section>
 
     <div class="back-cta">

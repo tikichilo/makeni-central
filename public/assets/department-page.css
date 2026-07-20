@@ -286,3 +286,181 @@ main{
   .leader-card{ padding:22px; }
   .leader-photo{ width:80px; height:80px; }
 }
+ /* ═══════════════════════════════════════════════
+   ADDITIONS — featured leader photo + get-in-touch CTA
+   Append to department-page.css
+═══════════════════════════════════════════════ */
+
+/* ── Featured leader photo (larger, more visible) ── */
+.leader-photo-frame{
+  flex-shrink:0;
+}
+.leader-photo--large{
+  width:120px;
+  height:120px;
+  border-radius:20px;      /* squircle instead of circle, reads as "featured" */
+  object-fit:cover;
+  background:var(--cream);
+  border:3px solid color-mix(in srgb, var(--accent) 30%, white);
+  box-shadow:0 12px 28px -12px rgba(4,21,52,0.35);
+}
+
+@media (max-width:560px){
+  .leader-photo--large{ width:96px; height:96px; border-radius:16px; }
+}
+
+/* ── Get in touch CTA section ── */
+.dept-section--cta{
+  text-align:center;
+  background:color-mix(in srgb, var(--accent) 6%, white);
+  border:1px solid color-mix(in srgb, var(--accent) 18%, white);
+  border-radius:18px;
+  padding:32px 24px;
+}
+.dept-section--cta h2{ margin-bottom:8px; }
+.dept-section--cta p{
+  max-width:420px;
+  margin:0 auto 20px;
+}
+.call-btn--wide{
+  width:100%;
+  max-width:320px;
+  justify-content:center;
+}
+
+/* ── Hero ── */
+.dept-hero{
+  position:relative;
+  overflow:hidden;
+  background:var(--navy);
+  padding:48px 24px 64px;
+  text-align:center;
+  margin-top:18px;
+  isolation:isolate;           /* keeps blend modes contained to this element */
+}
+
+/* Layer 1: the leader photo, blown up + heavily blurred so it reads as
+   soft color/shape rather than a recognizable picture */
+.dept-hero::before{
+  content:'';
+  position:absolute;
+  inset:-20px;                 /* overscan so the blur never shows a hard edge */
+  background-image:var(--hero-photo, none);
+  background-size:cover;
+  background-position:center 30%;
+  filter:blur(32px) saturate(115%);
+  transform:scale(1.15);
+  opacity:.4;
+  z-index:0;
+}
+
+/* Layer 2: navy + accent wash on top, so the photo reads as ambient
+   color/light rather than content — plus a faint dot-grid for texture */
+.dept-hero::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255,255,255,0.05) 1px, transparent 1.5px) 0 0/26px 26px,
+    linear-gradient(180deg, color-mix(in srgb, var(--navy) 45%, transparent) 0%, var(--navy) 88%),
+    radial-gradient(120% 140% at 15% -10%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 55%);
+  z-index:1;
+}
+
+.dept-hero-icon,
+.dept-hero h1,
+.dept-hero p{
+  position:relative;
+  z-index:2;
+}
+
+/* ═══════════════════════════════════════════════
+   ADDITIONS — leader photo lightbox + scroll reveal
+   Append to department-page.css
+═══════════════════════════════════════════════ */
+
+/* ── Leader photo: clickable affordance ── */
+.leader-photo-frame{
+  position:relative;
+  cursor:pointer;
+  border-radius:20px;
+}
+.leader-photo-frame::after{
+  content:'zoom_in';
+  font-family:'Material Symbols Outlined';
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  color:#fff;
+  background:rgba(4,21,52,0.45);
+  border-radius:inherit;
+  opacity:0;
+  transition:opacity .2s ease;
+}
+.leader-photo-frame:hover::after,
+.leader-photo-frame:focus-visible::after{ opacity:1; }
+.leader-photo-frame:focus-visible{
+  outline:3px solid var(--gold-light);
+  outline-offset:3px;
+}
+
+/* ── Lightbox ── */
+.photo-lightbox{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(2,12,32,0.88);
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .25s ease;
+  padding:40px 24px;
+}
+.photo-lightbox.is-open{ opacity:1; visibility:visible; }
+.photo-lightbox-img{
+  max-width:min(480px, 90vw);
+  max-height:80vh;
+  border-radius:20px;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,0.5);
+  transform:scale(.94);
+  transition:transform .25s ease;
+}
+.photo-lightbox.is-open .photo-lightbox-img{ transform:scale(1); }
+.photo-lightbox-close{
+  position:absolute;
+  top:22px;
+  right:22px;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,0.12);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:background .2s ease;
+}
+.photo-lightbox-close:hover{ background:rgba(255,255,255,0.22); }
+
+/* ── Scroll reveal ── */
+.dept-section, .leader-card{
+  opacity:0;
+  transform:translateY(16px);
+  transition:opacity .5s ease, transform .5s ease;
+}
+.dept-section.is-visible, .leader-card.is-visible{
+  opacity:1;
+  transform:none;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .photo-lightbox, .photo-lightbox-img{ transition:none; }
+  .dept-section, .leader-card{ opacity:1; transform:none; transition:none; }
+}
