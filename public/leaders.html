@@ -254,28 +254,30 @@
   .leader-card-body { cursor: pointer; }
 
   /* ── Filter pills ── */
-  .dept-filter {
+  .role-filter {
     padding: 10px 24px; border-radius: 9999px;
     font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.08em; font-weight: 600;
     background: #f3f3f4; color: #041534; border: 1px solid #c5c6cf;
     cursor: pointer; transition: all 0.2s ease;
   }
-  .dept-filter:hover { border-color: #755b00; }
-  .dept-filter.active { background: #041534; color: #ffffff; border-color: #041534; }
+  .role-filter:hover { border-color: #755b00; }
+  .role-filter.active { background: #041534; color: #ffffff; border-color: #041534; }
 
   /* ═══════════════════════════════════════════
      LEADER PROFILE MODAL
   ═══════════════════════════════════════════ */
   .leader-modal-overlay {
     position: fixed; inset: 0; z-index: 70;
-    background: rgba(4,21,52,0.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    background: rgba(4,21,52,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     display: flex; align-items: center; justify-content: center;
     padding: 20px;
     opacity: 0; visibility: hidden; pointer-events: none;
     transition: opacity 0.25s ease, visibility 0.25s ease;
   }
   .leader-modal-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
+
   .leader-modal {
+    position: relative;
     background: #ffffff; border-radius: 20px; max-width: 520px; width: 100%;
     max-height: 88vh; overflow-y: auto;
     box-shadow: 0 30px 60px -15px rgba(4,21,52,0.35);
@@ -283,14 +285,46 @@
     transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
   }
   .leader-modal-overlay.open .leader-modal { transform: translateY(0) scale(1); opacity: 1; }
-  .leader-modal-close {
-    position: absolute; top: 18px; right: 18px; z-index: 2;
-    width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.9);
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
-    border: none; color: #041534; transition: background 0.2s;
+
+  /* Photo — taller ratio + top-anchored crop so faces never get cut off */
+  .leader-modal-photo {
+    position: relative; width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #eeeeee;
+    overflow: hidden;
+    border-radius: 20px 20px 0 0;
   }
-  .leader-modal-close:hover { background: #fed977; }
-  .leader-modal-photo { position: relative; width: 100%; aspect-ratio: 16/10; background: #eeeeee; }
+  .leader-modal-photo img,
+  .leader-modal-photo .img-placeholder {
+    width: 100%; height: 100%; border-radius: 0;
+  }
+  .leader-modal-photo img {
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+  }
+  /* scrim so the close button stays visible on any photo */
+  .leader-modal-photo::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 96px;
+    background: linear-gradient(to bottom, rgba(4,21,52,0.5), rgba(4,21,52,0));
+    pointer-events: none;
+  }
+
+  .leader-modal-close {
+    position: absolute; top: 16px; right: 16px; z-index: 3;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(4,21,52,0.55);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.85); color: #ffffff;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.28);
+    transition: background 0.2s, transform 0.15s, border-color 0.2s;
+  }
+  .leader-modal-close:hover { background: #755b00; border-color: #fed977; }
+  .leader-modal-close:active { transform: scale(0.92); }
+  .leader-modal-close .material-symbols-outlined { font-size: 22px; }
+
   .leader-modal-body { padding: 32px; }
   .leader-modal-call {
     display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -305,6 +339,55 @@
     background: #f3f3f4; color: #75777f; cursor: not-allowed;
   }
   .leader-modal-call.unavailable:hover { background: #f3f3f4; }
+
+  /* ── Mobile: bottom-sheet style modal ── */
+  @media (max-width: 640px) {
+    .leader-modal-overlay {
+      padding: 0;
+      align-items: flex-end;
+    }
+    .leader-modal {
+      max-width: 100%; width: 100%;
+      max-height: 92vh;
+      border-radius: 20px 20px 0 0;
+      transform: translateY(100%);
+    }
+    .leader-modal-overlay.open .leader-modal { transform: translateY(0); }
+    .leader-modal-photo {
+      aspect-ratio: 3 / 4; /* taller crop, narrow screen shows more of a portrait photo */
+      max-height: 46vh;
+    }
+    .leader-modal-close {
+      top: 14px; right: 14px; width: 44px; height: 44px;
+    }
+    .leader-modal-body {
+      padding: 24px 20px;
+      padding-bottom: max(28px, env(safe-area-inset-bottom));
+    }
+    .leader-modal-call {
+      padding: 16px 24px; /* bigger tap target */
+    }
+  }
+  /* ── Footer: collapsible Resources ── */
+  .footer-resources summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .footer-resources summary::-webkit-details-marker { display: none; }
+  .footer-resources-caret {
+    transition: transform 0.25s ease;
+    font-size: 20px;
+  }
+  .footer-resources[open] .footer-resources-caret { transform: rotate(180deg); }
+
+  /* ── Footer: call card ── */
+  .contact-call-name {
+    font-family: Inter, sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.65);
+  }
+  .contact-call-number {
+    font-family: Inter, sans-serif; font-size: 15px; font-weight: 700; color: #ffffff;
+  }
 </style>
 </head>
 
@@ -474,10 +557,9 @@
     </p>
   </section>
 
-  <!-- ══════════════ DEPARTMENT FILTER ══════════════
-       Filter pills are generated from CHURCH_DEPARTMENTS in the
-       script below, so this list and the leader cards always stay
-       in sync — edit the data once, both update automatically. ══════════════ -->
+  <!-- ══════════════ ROLE FILTER ══════════════
+       Filter pills are generated from LEADER_ROLES in the script
+       below, so this list and the leader cards always stay in sync. ══════════════ -->
   <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop flex flex-wrap justify-center gap-4 mb-16" id="leader-filters"></section>
 
   <!-- ══════════════ LEADERSHIP GRID ══════════════
@@ -488,7 +570,7 @@
 
 </main>
 
-<!-- ══════════════ LEADER / DEPARTMENT PROFILE MODAL ══════════════ -->
+<!-- ══════════════ LEADER PROFILE MODAL ══════════════ -->
 <div class="leader-modal-overlay" id="leader-modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="leader-modal" id="leader-modal">
     <div class="relative">
@@ -498,17 +580,11 @@
       <div class="leader-modal-photo" id="leader-modal-photo"></div>
     </div>
     <div class="leader-modal-body">
-      <span class="font-label-md text-label-md text-secondary uppercase tracking-[0.08em] block mb-2" id="leader-modal-dept"></span>
-      <h3 class="font-headline-md text-headline-md text-primary mb-1" id="leader-modal-name"></h3>
-      <p class="font-body-md text-body-md text-on-surface-variant mb-6" id="leader-modal-role"></p>
-
-      <div class="mb-6">
-        <h4 class="font-title-lg text-title-lg text-primary mb-2">About this Department</h4>
-        <p class="font-body-md text-body-md text-on-surface-variant" id="leader-modal-dept-desc"></p>
-      </div>
+      <span class="font-label-md text-label-md text-secondary uppercase tracking-[0.08em] block mb-2" id="leader-modal-role-tag"></span>
+      <h3 class="font-headline-md text-headline-md text-primary mb-6" id="leader-modal-name"></h3>
 
       <div class="mb-8">
-        <h4 class="font-title-lg text-title-lg text-primary mb-2">Leader's Responsibilities</h4>
+        <h4 class="font-title-lg text-title-lg text-primary mb-2">About</h4>
         <p class="font-body-md text-body-md text-on-surface-variant" id="leader-modal-bio"></p>
       </div>
 
@@ -522,8 +598,8 @@
 
 <!-- ══════════════ FOOTER ══════════════ -->
 <footer class="bg-primary text-on-primary w-full py-12 border-t-4 border-secondary">
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
-    <div class="md:col-span-1">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+    <div>
       <div class="flex items-center gap-3 mb-6">
         <div class="logo-badge logo-badge-sm" style="background-color:#0a1a3a; border-color:#e6c364;">
           <img alt="Makeni Central SDA Logo" src="sda.png"/>
@@ -532,6 +608,7 @@
       </div>
       <p class="font-body-md text-body-md text-on-primary/80">Proclaiming the everlasting gospel to every nation, kindred, tongue, and people.</p>
     </div>
+
     <div>
       <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
       <ul class="space-y-3" role="list">
@@ -542,32 +619,33 @@
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="building.html">New Building</a></li>
       </ul>
     </div>
-    <div>
-      <h4 class="font-title-lg text-title-lg mb-6">Resources</h4>
-      <ul class="space-y-3">
-        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Sermon Archive</a></li>
-        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Study Guides</a></li>
-        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="#">Privacy Policy</a></li>
-      </ul>
-    </div>
+
     <div>
       <h4 class="font-title-lg text-title-lg mb-6">Contact</h4>
       <p class="font-body-md text-body-md text-on-primary/80 mb-4">123 Makeni Road<br/>Lusaka, Zambia</p>
-      <div class="flex gap-4">
-        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
-          <span class="material-symbols-outlined">public</span>
+
+      <div class="flex gap-4 mb-4">
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="https://www.facebook.com/profile.php?id=100091185906540" target="_blank" rel="noopener noreferrer" aria-label="Makeni Central SDA Church on Facebook">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>
         </a>
-        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#" aria-label="Email the church">
           <span class="material-symbols-outlined">mail</span>
         </a>
-        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#">
-          <span class="material-symbols-outlined">call</span>
-        </a>
       </div>
+
+      <a href="tel:+260977695623" class="flex items-center gap-3 p-3 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors">
+        <span class="material-symbols-outlined">call</span>
+        <div>
+          <div class="contact-call-name">Admin Elder</div>
+          <div class="contact-call-number">0977 695 623</div>
+        </div>
+      </a>
     </div>
   </div>
-  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 text-center">
+
+  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 flex flex-col md:flex-row items-center justify-center md:justify-between gap-3 text-center">
     <p class="font-body-md text-body-md text-on-primary/60">© 2026 Makeni Central SDA Church. All rights reserved.</p>
+    <a href="developer.html" class="font-label-md text-label-md text-on-primary/50 hover:text-secondary-container transition-colors">Developer</a>
   </div>
 </footer>
 
@@ -576,76 +654,134 @@
 
 <!-- ══════════════════════════════════════════════════════════════
      LEADERS PAGE — STATIC DATA + RENDER LOGIC
-     No database / API call. Everything on this page is generated
-     from the two arrays below. To update the church leadership,
-     edit CHURCH_DEPARTMENTS and CHURCH_LEADERS directly.
+     No database / API call. Leaders are shown by ROLE only —
+     departments are intentionally NOT shown anywhere on this page.
+     To add or update a leader, edit CHURCH_LEADERS directly.
 ════════════════════════════════════════════════════════════════ -->
 <script>
 (function () {
   'use strict';
 
-  // ── Fallback number for departments without a confirmed leader yet.
+  // ── Fallback number for leaders without a confirmed phone yet.
   // Leave as null to show "Contact Church Office" disabled state instead.
   var CHURCH_OFFICE_PHONE = null; // e.g. '+260971234567'
 
-  // ── Standard local-church department structure.
-  // id must be unique and lowercase-hyphenated — used to link leaders to departments.
-  var CHURCH_DEPARTMENTS = [
-    { id: 'elders',              name: 'Elders / Eldership',        shortDesc: 'Spiritual oversight, preaching, and pastoral care for the congregation.', fullDesc: 'The Board of Elders provides spiritual leadership and pastoral oversight for the congregation, sharing preaching duties, leading out in worship, visiting members, and supporting the pastor in the day-to-day spiritual life of the church.' },
-    { id: 'deacons',              name: 'Deacons',                   shortDesc: 'Care for church property, ushering, and practical support during services.', fullDesc: 'Deacons care for the practical and physical needs of the church — ushering, offering collection, building and grounds upkeep, baptismal and communion preparation, and assisting members with material needs.' },
-    { id: 'deaconesses',          name: 'Deaconesses',               shortDesc: 'Support hospitality, communion preparation, and care for women members.', fullDesc: 'Deaconesses work alongside the deacons to prepare for communion and baptism, welcome visitors, support the sick and bereaved, and help maintain order and hospitality during services.' },
-    { id: 'sabbath-school',       name: 'Sabbath School',            shortDesc: 'Coordinates weekly Bible study classes for all age groups.', fullDesc: 'The Sabbath School department organizes and coordinates weekly Bible study for every age group, from cradle roll to adults, promoting Scripture study, fellowship, community outreach, and world mission emphasis.' },
-    { id: 'personal-ministries',  name: 'Personal Ministries',       shortDesc: 'Leads outreach, evangelism, and soul-winning initiatives.', fullDesc: 'Personal Ministries equips and mobilizes members for evangelism and outreach — organizing Bible studies with interested persons, community witnessing, literature distribution, and evangelistic campaigns.' },
-    { id: 'pathfinders',          name: 'Pathfinders',               shortDesc: 'Leads youth (ages 10-15) in leadership, service, and outdoor skills.', fullDesc: 'The Pathfinder Club leads young people through a structured program of spiritual growth, leadership development, community service, and outdoor skills, following the worldwide Adventist Pathfinder curriculum.' },
-    { id: 'adventurers',          name: 'Adventurers',               shortDesc: 'A guided program for children ages 4-9 and their families.', fullDesc: 'The Adventurer Club engages children ages 4 to 9 together with their families in faith-building activities, character development, and family bonding, laying the foundation for later Pathfinder involvement.' },
-    { id: 'ay',                   name: 'AY (Adventist Youth)',      shortDesc: 'Coordinates worship, fellowship, and service for young adults.', fullDesc: 'The Adventist Youth (AY) department coordinates worship programs, fellowship activities, and service projects for teens and young adults, nurturing their spiritual growth and leadership within the church.' },
-    { id: 'dorcas',                name: 'Community Services (Dorcas)', shortDesc: 'Provides practical relief and welfare support to those in need.', fullDesc: 'The Dorcas Society (Community Services) provides practical relief to members and the wider community — clothing, food parcels, home visits, and support during hardship, disaster, or bereavement.' },
-    { id: 'womens-ministries',    name: "Women's Ministries",        shortDesc: 'Nurtures and empowers the women of the congregation.', fullDesc: "Women's Ministries nurtures the spiritual, emotional, and practical wellbeing of the women in the congregation through fellowship programs, mentorship, seminars, and community outreach initiatives." },
-    { id: 'mens-ministries',      name: "Men's Ministries",          shortDesc: 'Builds fellowship and spiritual accountability among the men.', fullDesc: "Men's Ministries fosters fellowship, discipleship, and spiritual accountability among the men of the church, encouraging their leadership at home, in the church, and in the wider community." },
-    { id: 'health-ministries',    name: 'Health Ministries',         shortDesc: 'Promotes wholistic health through education and lifestyle programs.', fullDesc: 'Health Ministries promotes physical, mental, and spiritual wellbeing through health education, lifestyle programs, cooking classes, and screenings, reflecting the Adventist emphasis on wholistic health.' },
-    { id: 'communication',        name: 'Communication',             shortDesc: 'Manages the church website, social media, and public messaging.', fullDesc: 'The Communication department manages the church website, social media channels, bulletins, and public messaging, helping share the church\'s programs and message effectively within and beyond the congregation.' },
-    { id: 'family-life',          name: 'Family Life Ministries',    shortDesc: 'Strengthens marriages, parenting, and household spiritual life.', fullDesc: 'Family Life Ministries supports marriages, parenting, and household spiritual life through seminars, counseling referrals, and programs designed to strengthen family relationships within the church.' },
-    { id: 'stewardship',          name: 'Stewardship',               shortDesc: 'Educates members on faithful giving and personal stewardship.', fullDesc: 'The Stewardship department educates members on faithful management of time, talents, and resources, including tithing and offerings, encouraging a lifestyle of generous, faithful giving.' },
-    { id: 'clerk',                 name: 'Church Clerk',              shortDesc: 'Maintains official membership records and church minutes.', fullDesc: 'The Church Clerk maintains official membership records, church board and business meeting minutes, and handles correspondence related to membership transfers and church statistics.' },
-    { id: 'treasurer',            name: 'Church Treasurer',          shortDesc: 'Manages tithes, offerings, and the church\'s financial records.', fullDesc: 'The Church Treasurer manages tithes, offerings, and church funds, maintaining accurate financial records and ensuring funds are remitted and used according to church policy.' }
+  // ── Fixed role categories, in the order the filter pills should show.
+  // A leader's `role` must exactly match one of these strings, or their
+  // card will only ever appear under "All" and never get its own filter pill.
+  // NOTE: this list was updated to match the roles actually used below
+  // (Admin Elder / District Pastor / Brother removed since unused — add
+  // them back here the moment you add a leader with that role).
+  var LEADER_ROLES = [
+    'Elder',
+    'Deacon',
+    'Stewardship Leader',
+    'Youth Leader',
+    'Personal Ministries Leader',
+    'Church Clerk',
+    'Sister'
   ];
 
-  // ── Individual leaders. Currently placeholders — replace name, phone,
-  // photo and bio as leaders are confirmed for each department.
-  // phone: use international format e.g. '+260971234567', or null if not yet available.
-  // photo: image URL, or null to show the placeholder icon.
-  var CHURCH_LEADERS = CHURCH_DEPARTMENTS.map(function (dept) {
-    return {
-      id: dept.id + '-leader',
-      deptId: dept.id,
-      name: 'Leader TBA',
-      role: dept.name,
-      photo: null,
-      phone: null,
-      bio: 'Awaiting appointment. Details for this leader will be added here once confirmed by the nominating committee.'
-    };
-  });
+  // ── Leaders. One entry per person — no department shown here.
+  // role: must be one of LEADER_ROLES above.
+  // phone: international format e.g. '+260971234567', or null if not yet available.
+  // photo: filename in your images folder, or null to show the placeholder icon.
+  // bio: a short general line about their service — keep it department-free.
+  var CHURCH_LEADERS = [
+    {
+      id: 'leader-aori',
+      name: 'Elder Aori',
+      role: 'Elder',
+      phone: '+260772041304',
+      photo: 'images/aori.jpg',
+      bio: 'Serves the congregation with spiritual oversight and pastoral care.'
+    },
+    {
+      id: 'leader-moyo',
+      name: 'Mrs Moyo',
+      role: 'Stewardship Leader',
+      phone: '+260971234567',
+      photo: 'images/sterwardship.jpg',
+      bio: 'Guides the congregation in faithful stewardship of time, talents, and resources.'
+    },
+    {
+      id: 'leader-musowe',
+      name: 'Mrs Musowe',
+      role: 'Youth Leader',
+      phone: '+260977803376',
+      photo: 'images/youth leader.jpg',
+      bio: 'Serves the congregation faithfully, with a heart for young people.'
+    },
+    {
+      id: 'leader-Mrs Chilomo',
+      name: 'Mrs Chilomo',
+      role: 'Personal Ministries Leader',
+      phone: '+260977845634',
+      photo: 'images/mrs chilomo.jpg',
+      bio: 'Leads efforts in soul-winning, outreach, and personal evangelism.'
+    },
+    {
+      id: 'leader-Kalonga',
+      name: 'Elder Kalonga',
+      role: 'Elder',
+      phone: '+260977408058',
+      photo: 'images/kalonga.jpg',
+      bio: 'Serves the congregation with spiritual oversight and pastoral care.'
+    },
+    {
+      id: 'leader-Tembo',
+      name: 'Elder Tembo',
+      role: 'Elder',
+      phone: '+260978088776',
+      photo: 'images/tembo.jpg',
+      bio: 'Serves the congregation with spiritual oversight and pastoral care.'
+    },
+    {
+      id: 'leader-Mrs Zimindo',
+      name: 'Mrs Zimindo',
+      role: 'Church Clerk',
+      phone: '+260977729232',
+      photo: 'images/mrs zimindo.jpg',
+      bio: 'Maintains church records and keeps the congregation\'s membership documentation in order.'
+    },
+    {
+      id: 'leader-deacon-1',
+      name: 'Deacon Hamatimba Mweene',
+      role: 'Deacon',
+      phone: '+260977800947',
+      photo: 'images/hamatimba.jpg',
+      bio: 'Serves the congregation faithfully in his area of ministry.'
+    },
+    {
+      id: 'leader-dorcas-1',
+      name: 'Sister Name',
+      role: 'Sister',
+      phone: '+260000000000',
+      photo: 'images/dorcas.jpg',
+      bio: 'Serves the congregation faithfully in her area of ministry.'
+    }
+    // ── Add more leaders here as they're confirmed. Example:
+    // {
+    //   id: 'leader-unique-id',
+    //   name: 'Full Name',
+    //   role: 'Brother',            // must match one of LEADER_ROLES
+    //   phone: '+260XXXXXXXXX',
+    //   photo: 'images/filename.jpg',
+    //   bio: 'Short general line about their service.'
+    // },
+  ];
 
   // ── DOM refs ──
   var filtersEl = document.getElementById('leader-filters');
   var gridEl = document.getElementById('leaders-grid');
   var overlayEl = document.getElementById('leader-modal-overlay');
   var modalPhotoEl = document.getElementById('leader-modal-photo');
-  var modalDeptEl = document.getElementById('leader-modal-dept');
+  var modalRoleTagEl = document.getElementById('leader-modal-role-tag');
   var modalNameEl = document.getElementById('leader-modal-name');
-  var modalRoleEl = document.getElementById('leader-modal-role');
-  var modalDeptDescEl = document.getElementById('leader-modal-dept-desc');
   var modalBioEl = document.getElementById('leader-modal-bio');
   var modalCallEl = document.getElementById('leader-modal-call');
   var modalCallLabelEl = document.getElementById('leader-modal-call-label');
   var closeBtn = document.getElementById('leader-modal-close');
-
-  function deptById(id) {
-    for (var i = 0; i < CHURCH_DEPARTMENTS.length; i++) {
-      if (CHURCH_DEPARTMENTS[i].id === id) return CHURCH_DEPARTMENTS[i];
-    }
-    return null;
-  }
 
   function escapeHtml(str) {
     var div = document.createElement('div');
@@ -653,21 +789,25 @@
     return div.innerHTML;
   }
 
+  function roleToSlug(role) {
+    return role.toLowerCase().replace(/\s+/g, '-');
+  }
+
   // ── Render filter pills ──
   function renderFilters() {
-    var html = '<button class="dept-filter active" data-dept="all" type="button">All</button>';
-    CHURCH_DEPARTMENTS.forEach(function (dept) {
-      html += '<button class="dept-filter" data-dept="' + dept.id + '" type="button">' + escapeHtml(dept.name) + '</button>';
+    var html = '<button class="role-filter active" data-role="all" type="button">All</button>';
+    LEADER_ROLES.forEach(function (role) {
+      html += '<button class="role-filter" data-role="' + roleToSlug(role) + '" type="button">' + escapeHtml(role) + '</button>';
     });
     filtersEl.innerHTML = html;
 
-    filtersEl.querySelectorAll('.dept-filter').forEach(function (btn) {
+    filtersEl.querySelectorAll('.role-filter').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        filtersEl.querySelectorAll('.dept-filter').forEach(function (b) { b.classList.remove('active'); });
+        filtersEl.querySelectorAll('.role-filter').forEach(function (b) { b.classList.remove('active'); });
         btn.classList.add('active');
-        var dept = btn.dataset.dept;
+        var role = btn.dataset.role;
         gridEl.querySelectorAll('.leader-card').forEach(function (card) {
-          card.style.display = (dept === 'all' || card.dataset.dept === dept) ? '' : 'none';
+          card.style.display = (role === 'all' || card.dataset.role === role) ? '' : 'none';
         });
       });
     });
@@ -677,9 +817,6 @@
   function renderLeaders() {
     var html = '';
     CHURCH_LEADERS.forEach(function (leader) {
-      var dept = deptById(leader.deptId);
-      if (!dept) return;
-
       var photoMarkup = leader.photo
         ? '<div class="img-wrap rounded-xl sacred-shadow border border-outline-variant/30"><img src="' + escapeHtml(leader.photo) + '" alt="' + escapeHtml(leader.name) + '" onerror="this.parentElement.outerHTML=\'<div class=&quot;img-placeholder rounded-xl sacred-shadow border border-outline-variant/30&quot;><span class=&quot;material-symbols-outlined ph-icon&quot;>account_circle</span><span class=&quot;ph-label&quot;>Photo coming soon</span></div>\'"/></div>'
         : '<div class="img-placeholder rounded-xl sacred-shadow border border-outline-variant/30"><span class="material-symbols-outlined ph-icon">account_circle</span><span class="ph-label">Photo TBA</span></div>';
@@ -689,12 +826,11 @@
         : '<span class="flex items-center gap-2 text-outline font-label-md text-label-md"><span class="material-symbols-outlined text-[18px]">phone</span><span>Available Soon</span></span>';
 
       html += '' +
-        '<article class="leader-card flex flex-col h-full" data-dept="' + dept.id + '">' +
+        '<article class="leader-card flex flex-col h-full" data-role="' + roleToSlug(leader.role) + '">' +
           '<div class="relative aspect-[3/4] mb-[-40px] z-10 px-4">' + photoMarkup + '</div>' +
           '<div class="leader-card-body bg-surface-container-lowest p-8 pt-16 rounded-xl sacred-shadow flex flex-col h-full" data-leader-id="' + leader.id + '" role="button" tabindex="0" aria-label="View profile for ' + escapeHtml(leader.name) + '">' +
-            '<span class="font-label-md text-label-md text-secondary uppercase tracking-[0.08em] block mb-2">' + escapeHtml(dept.name) + '</span>' +
+            '<span class="font-label-md text-label-md text-secondary uppercase tracking-[0.08em] block mb-2">' + escapeHtml(leader.role) + '</span>' +
             '<h3 class="font-title-lg text-title-lg text-primary mb-3">' + escapeHtml(leader.name) + '</h3>' +
-            '<p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">' + escapeHtml(dept.shortDesc) + '</p>' +
             '<div class="mt-auto space-y-4">' +
               phoneRow +
               '<span class="inline-flex items-center gap-1 text-secondary font-bold font-label-md text-label-md">View Full Profile <span aria-hidden="true">→</span></span>' +
@@ -719,17 +855,15 @@
       if (CHURCH_LEADERS[i].id === leaderId) { leader = CHURCH_LEADERS[i]; break; }
     }
     if (!leader) return;
-    var dept = deptById(leader.deptId);
-    if (!dept) return;
 
+    // No inline width/height/object-fit here — .leader-modal-photo CSS now
+    // owns the crop (object-position: top) so faces don't get cut off.
     modalPhotoEl.innerHTML = leader.photo
-      ? '<img src="' + escapeHtml(leader.photo) + '" alt="' + escapeHtml(leader.name) + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML=\'<div class=&quot;img-placeholder&quot; style=&quot;height:100%;border-radius:0;&quot;><span class=&quot;material-symbols-outlined ph-icon&quot;>account_circle</span><span class=&quot;ph-label&quot;>Photo coming soon</span></div>\'"/>'
-      : '<div class="img-placeholder" style="height:100%;border-radius:0;"><span class="material-symbols-outlined ph-icon">account_circle</span><span class="ph-label">Photo TBA</span></div>';
+      ? '<img src="' + escapeHtml(leader.photo) + '" alt="' + escapeHtml(leader.name) + '" onerror="this.parentElement.innerHTML=\'<div class=&quot;img-placeholder&quot;><span class=&quot;material-symbols-outlined ph-icon&quot;>account_circle</span><span class=&quot;ph-label&quot;>Photo coming soon</span></div>\'"/>'
+      : '<div class="img-placeholder"><span class="material-symbols-outlined ph-icon">account_circle</span><span class="ph-label">Photo TBA</span></div>';
 
-    modalDeptEl.textContent = dept.name;
+    modalRoleTagEl.textContent = leader.role;
     modalNameEl.textContent = leader.name;
-    modalRoleEl.textContent = leader.role;
-    modalDeptDescEl.textContent = dept.fullDesc;
     modalBioEl.textContent = leader.bio;
 
     // Call button — the actual number is only ever assembled here at click-time,

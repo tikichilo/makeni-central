@@ -425,7 +425,14 @@
       min-height: 280px !important;
     }
   }
-  
+  /* ── Footer: call card ── */
+  .contact-call-name {
+    font-family: Inter, sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.65);
+  }
+  .contact-call-number {
+    font-family: Inter, sans-serif; font-size: 15px; font-weight: 700; color: #ffffff;
+  }
 </style>
 </head>
 
@@ -878,7 +885,7 @@
     </div>
     <div>
       <h4 class="font-title-lg text-title-lg mb-6">Connect</h4>
-      <ul class="space-y-3">
+      <ul class="space-y-3 mb-4">
         <li class="flex items-center gap-2 font-body-md text-body-md text-on-primary/80">
           <span class="material-symbols-outlined text-secondary-container text-[20px]">location_on</span>
           Makeni Road, Lusaka
@@ -888,6 +895,18 @@
           info@makenicentralsda.org
         </li>
       </ul>
+
+      <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors inline-flex mb-4" href="https://www.facebook.com/profile.php?id=100091185906540" target="_blank" rel="noopener noreferrer" aria-label="Makeni Central SDA Church on Facebook">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>
+      </a>
+
+      <a href="tel:+260977695623" class="flex items-center gap-3 p-3 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors">
+        <span class="material-symbols-outlined">call</span>
+        <div>
+          <div class="contact-call-name">Admin Elder</div>
+          <div class="contact-call-number">0977 695 623</div>
+        </div>
+      </a>
     </div>
     <div>
       <h4 class="font-title-lg text-title-lg mb-6">Legal</h4>
@@ -897,8 +916,9 @@
       </ul>
     </div>
   </div>
-  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 text-center">
+  <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 flex flex-col md:flex-row items-center justify-center md:justify-between gap-3 text-center">
     <p class="font-body-md text-body-md text-on-primary/60">© 2026 Makeni Central SDA Church. All rights reserved.</p>
+    <a href="developer.html" class="font-label-md text-label-md text-on-primary/50 hover:text-secondary-container transition-colors">Developer</a>
   </div>
 </footer>
 

@@ -11,7 +11,6 @@
  *  GET  /api/lesson                — Lesson of the week
  *  GET  /api/theme                 — Theme of the month
  *  GET  /api/announcements         — Active announcements
- *  GET  /api/stories               — Kids bible stories
  *  POST /api/visits                — Save a "Plan Your Visit" submission
  *
  *  — Admin endpoints —
@@ -22,9 +21,6 @@
  *  POST   /api/theme                — Save theme of the month
  *  POST   /api/announcements        — Add announcement
  *  DELETE /api/announcements/:id    — Remove announcement
- *  POST   /api/stories              — Publish a story
- *  POST   /api/stories/:id/feature  — Feature a story
- *  DELETE /api/stories/:id          — Delete a story
  *  GET    /api/visits                — List planned visits
  */
 
@@ -59,13 +55,25 @@ app.get('/', (req, res) => {
 
 /* ═══════════════════════════════════════════════
    MONGODB CONNECTION
+   Non-fatal on failure — the server keeps running and serving
+   static pages (like leaders.html) even if the DB is unreachable.
+   Any /api routes that touch the DB will simply return a 500 error
+   until MongoDB reconnects.
 ═══════════════════════════════════════════════ */
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✦ MongoDB connected'))
   .catch(err => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
+    console.error('MongoDB connection error:', err.message);
+    console.warn('⚠ Continuing without a database connection — static pages will still work, but any /api routes that touch the DB will fail until MongoDB reconnects.');
   });
+
+// Keep the process alive and log if the connection drops later too
+mongoose.connection.on('error', err => {
+  console.error('MongoDB runtime error:', err.message);
+});
+mongoose.connection.on('disconnected', () => {
+  console.warn('⚠ MongoDB disconnected — API routes needing the DB will fail until it reconnects.');
+});
 
 
 /* ═══════════════════════════════════════════════
@@ -131,20 +139,6 @@ const announcementSchema = new mongoose.Schema({
   createdAt: { type: Date,   default: Date.now },
 });
 const Announcement = mongoose.model('Announcement', announcementSchema);
-
-
-// ── Story — kids corner ──
-const storySchema = new mongoose.Schema({
-  title:     { type: String, required: true, maxlength: 100 },
-  tag:       { type: String, default: '',    maxlength: 60 },
-  ageGroup:  { type: String, default: 'All Ages' },
-  preview:   { type: String, default: '',    maxlength: 200 },
-  body:      { type: String, required: true, maxlength: 3000 },
-  imageUrl:  { type: String, default: '' },
-  featured:  { type: Boolean, default: false },
-  createdAt: { type: Date,   default: Date.now },
-});
-const Story = mongoose.model('Story', storySchema);
 
 
 // ── Visit — "Plan Your Visit" modal submissions ──
@@ -321,24 +315,6 @@ app.get('/api/announcements', async (req, res) => {
 
   } catch (err) {
     console.error('GET /api/announcements:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-
-// ── GET /api/stories ──
-// Featured stories sort to the top.
-app.get('/api/stories', async (req, res) => {
-  try {
-    const stories = await Story
-      .find()
-      .sort({ featured: -1, createdAt: -1 })
-      .lean();
-
-    res.json(stories);
-
-  } catch (err) {
-    console.error('GET /api/stories:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -553,74 +529,6 @@ app.delete('/api/announcements/:id', async (req, res) => {
   }
 });
 
-
-// ── POST /api/stories ──
-app.post('/api/stories', async (req, res) => {
-  try {
-    const { title, tag, ageGroup, preview, body, imageUrl, featured } = req.body;
-
-    if (!title || !body) {
-      return res.status(400).json({ error: 'Title and body are required' });
-    }
-
-    // Only one story can be featured at a time
-    if (featured) await Story.updateMany({ featured: true }, { featured: false });
-
-    const story = await Story.create({
-      title:    title.slice(0, 100),
-      tag:      (tag     || '').slice(0, 60),
-      ageGroup: ageGroup || 'All Ages',
-      preview:  (preview || '').slice(0, 200),
-      body:     body.slice(0, 3000),
-      imageUrl: imageUrl || '',
-      featured: !!featured,
-    });
-
-    res.status(201).json({ success: true, id: story._id });
-
-  } catch (err) {
-    console.error('POST /api/stories:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-
-// ── POST /api/stories/:id/feature ──
-app.post('/api/stories/:id/feature', async (req, res) => {
-  try {
-    await Story.updateMany({ featured: true }, { featured: false });
-
-    const story = await Story.findByIdAndUpdate(
-      req.params.id,
-      { featured: true },
-      { new: true }
-    );
-
-    if (!story) return res.status(404).json({ error: 'Not found' });
-
-    res.json({ success: true });
-
-  } catch (err) {
-    console.error('POST /api/stories/:id/feature:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-
-// ── DELETE /api/stories/:id ──
-app.delete('/api/stories/:id', async (req, res) => {
-  try {
-    const story = await Story.findByIdAndDelete(req.params.id);
-
-    if (!story) return res.status(404).json({ error: 'Not found' });
-
-    res.json({ success: true });
-
-  } catch (err) {
-    console.error('DELETE /api/stories/:id:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
 
 const cheerio = require('cheerio');
 

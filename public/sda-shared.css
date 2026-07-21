@@ -279,3 +279,23 @@ button, [role="button"], a {
 @media (max-width: 767px) {
   .mobile-give, .hamburger-btn { min-height: 44px; min-width: 44px; }
 }
+/* ── Footer: collapsible Resources ── */
+  .footer-resources summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .footer-resources summary::-webkit-details-marker { display: none; }
+  .footer-resources-caret {
+    transition: transform 0.25s ease;
+    font-size: 20px;
+  }
+  .footer-resources[open] .footer-resources-caret { transform: rotate(180deg); }
+
+  /* ── Footer: call card ── */
+  .contact-call-name {
+    font-family: Inter, sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.65);
+  }
+  .contact-call-number {
+    font-family: Inter, sans-serif; font-size: 15px; font-weight: 700; color: #ffffff;
+  }
