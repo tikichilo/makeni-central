@@ -1261,7 +1261,7 @@
     }
   }
 
-   /* ══════════════ QUICK CONTACT — click-to-call (modal) ══════════════ */
+/* ══════════════ QUICK CONTACT — click-to-call (modal) ══════════════ */
   .visit-quick-contact {
     padding: 16px 24px 4px;
   }
@@ -1335,7 +1335,7 @@
     flex-shrink: 0;
   }
 
-  /* ── Contact Us card (Find Us section) — click-to-call ── */
+  /* ── Contact Us card (Find Us section) — click-to-call — WHITE background ── */
 .contact-call-list {
   display: flex;
   flex-direction: column;
@@ -1408,6 +1408,18 @@
   color: #755b00;
 }
 
+/* ── Footer: collapsible Resources ── */
+  .footer-resources summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .footer-resources summary::-webkit-details-marker { display: none; }
+  .footer-resources-caret {
+    transition: transform 0.25s ease;
+    font-size: 20px;
+  }
+  .footer-resources[open] .footer-resources-caret { transform: rotate(180deg); }
+
   /* ── Watch Live status dot ── */
 .live-dot {
   width: 9px;
@@ -1425,12 +1437,13 @@
   0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
   50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
 }
-/* ── Footer: call card ── */
-  .contact-call-name {
+
+  /* ── Footer: call card — DARK background (renamed so it can't clash with the Find Us card above) ── */
+  .footer-contact-call-name {
     font-family: Inter, sans-serif; font-size: 11px; font-weight: 600;
     letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.65);
   }
-  .contact-call-number {
+  .footer-contact-call-number {
     font-family: Inter, sans-serif; font-size: 15px; font-weight: 700; color: #ffffff;
   }
 </style>
@@ -1685,8 +1698,7 @@
     <div class="announce-dots" id="announce-dots" role="tablist" aria-label="Announcement navigation"></div>
   </div>
 </div>
-
-  <!-- ══════════════ WATCH LIVE ══════════════ -->
+<!-- ══════════════ WATCH LIVE ══════════════ -->
 <section id="watch-live" class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pt-section-gap" aria-labelledby="watch-live-heading">
   <div class="bg-primary rounded-xl sacred-shadow overflow-hidden relative">
     <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 20% 80%, #fff 1px, transparent 1px); background-size: 24px 24px;" aria-hidden="true"></div>
@@ -1716,8 +1728,8 @@
           </div>
         </div>
 
-       ,<a id="watch-live-btn"
-          href="https://www.facebook.com/YOUR_FACEBOOK_PAGE"
+        <a id="watch-live-btn"
+          href="https://web.facebook.com/profile.php?id=100091185906540"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container px-7 py-3.5 rounded-xl font-label-md text-label-md hover:bg-secondary-fixed transition-all active:scale-95">
@@ -1726,75 +1738,32 @@
         </a>
       </div>
 
-      <!-- Right: Facebook video embed -->
+      <!-- Right: Facebook video embed — plays inline, no redirect to Facebook -->
       <div class="lg:col-span-5">
-        <div class="rounded-xl overflow-hidden bg-black/20" style="aspect-ratio: 16/9; max-height: 320px;">
-          <iframe
-            id="fb-live-embed"
-            src="https://www.facebook.com/profile.php?id=100091185906540"
-            width="100%"
-            height="100%"
-            style="border:none;overflow:hidden;"
-            scrolling="no"
-            frameborder="0"
-            allowfullscreen="true"
-            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            title="Makeni Central SDA live stream">
-          </iframe>
+        <div class="rounded-xl overflow-hidden bg-black/20" style="max-height: 320px;">
+
+          <!-- Required once per page: Facebook JS SDK root + loader -->
+          <div id="fb-root"></div>
+          <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v20.0">
+          </script>
+
+          <!-- The actual embedded widget: renders the Page's Videos tab, plays inline -->
+          <div class="fb-page"
+            data-href="https://www.facebook.com/profile.php?id=100091185906540"
+            data-tabs="videos"
+            data-width="500"
+            data-height="320"
+            data-small-header="true"
+            data-adapt-container-width="true"
+            data-hide-cover="true"
+            data-show-facepile="false">
+          </div>
+
         </div>
       </div>
 
     </div>
-  </div>
-</section>
-
-  <!-- ══════════════ LESSON + THEME (BENTO) ══════════════ -->
-<section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap" aria-labelledby="lesson-heading">
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-
-    <!-- Lesson of the Week -->
-    <article class="lg:col-span-12 relative overflow-hidden bg-surface-container-lowest p-10 md:p-12 rounded-xl sacred-shadow border-t-4 border-secondary">
-
-      <!-- decorative watermark icon -->
-      <span class="material-symbols-outlined absolute -right-6 -top-6 text-[180px] leading-none text-secondary/5 pointer-events-none select-none" aria-hidden="true">
-        menu_book
-      </span>
-
-      <div class="relative flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-secondary" aria-hidden="true">menu_book</span>
-          <span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Sabbath School Lesson</span>
-        </div>
-
-        <!-- Day switcher -->
-        <div class="lesson-day-tabs" id="lesson-day-tabs" role="tablist" aria-label="Choose a day"></div>
-      </div>
-
-      <div class="relative grid md:grid-cols-12 gap-10 md:gap-14 items-center">
-        <!-- Left: title + body -->
-        <div class="md:col-span-7">
-          <h2 id="lesson-heading" data-lesson="title" class="font-headline-md text-headline-md text-primary mb-4">
-            The Promise of Restoration
-          </h2>
-          <p data-lesson="body" class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-            This week, we explore the transformative power of God's restorative love. Through the study of the life of David, we see how even in our deepest valleys, the Good Shepherd is working to bring us back to wholeness. Join us as we dive into the depths of grace and the certainty of His guidance.
-          </p>
-        </div>
-
-        <!-- Right: verse pull-quote + CTA -->
-        <div class="md:col-span-5 md:border-l md:border-outline-variant/60 md:pl-10 flex flex-col justify-between h-full">
-          <p data-lesson="verse" class="font-title-lg text-title-lg text-on-surface-variant italic leading-snug mb-8">
-            "He restores my soul; He leads me in the paths of righteousness for His name's sake."
-            <span class="block mt-2 not-italic text-secondary font-semibold text-sm tracking-wide">— PSALM 23:3</span>
-          </p>
-          <a id="lesson-btn" href="#" class="lesson-btn self-start" target="_blank" rel="noopener noreferrer">
-            <span class="material-symbols-outlined" style="font-size:18px;" aria-hidden="true">open_in_new</span>
-            Read Full Lesson on Sabbath School Net
-          </a>
-        </div>
-      </div>
-    </article>
-
   </div>
 </section>
 
@@ -2010,11 +1979,8 @@
     <div>
       <h4 class="font-title-lg text-title-lg mb-6">Follow Us</h4>
       <div class="flex gap-4 mb-4">
-        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="https://www.facebook.com/profile.php?id=100091185906540" target="_blank" rel="noopener noreferrer" aria-label="Makeni Central SDA Church on Facebook">
+        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="https://web.facebook.com/profile.php?id=100091185906540" target="_blank" rel="noopener noreferrer" aria-label="Makeni Central SDA Church on Facebook">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>
-        </a>
-        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#" aria-label="Video channel">
-          <span class="material-symbols-outlined" aria-hidden="true">video_library</span>
         </a>
       </div>
 
