@@ -234,52 +234,73 @@
   .mobile-drawer .accordion-panel a:hover { padding-left: 62px; }
 
   /* ── Image placeholder fallback ── */
-  .img-wrap { position: relative; width: 100%; height: 100%; overflow: hidden; }
+  .img-wrap {
+    position: relative; width: 100%; height: 100%; overflow: hidden;
+  }
   .img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .img-placeholder {
+    display: none;
+    width: 100%; height: 100%;
+    background: #eeeeee;
+    border: 2px dashed #c5c6cf;
+    border-radius: 12px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .img-placeholder .ph-icon { font-size: 36px; color: #c5c6cf; }
+  .img-placeholder .ph-label {
+    font-family: Inter, sans-serif; font-size: 11px; font-weight: 600;
+    color: #75777f; letter-spacing: 0.08em; text-transform: uppercase;
+  }
 
-  /* ── Timeline ── */
-  .timeline-rail { position: relative; padding-left: 32px; }
-  .timeline-rail::before {
-    content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: #e2e2e2;
+  /* ── Core-values badge grid (mirrors adventurers' law-badge) ── */
+  .value-badge {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    gap: 10px; padding: 20px 12px;
+    background: #ffffff; border-radius: 14px; border: 1px solid #e2e2e2;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
-  .timeline-item { position: relative; padding-bottom: 40px; }
-  .timeline-item:last-child { padding-bottom: 0; }
-  .timeline-dot {
-    position: absolute; left: -32px; top: 4px;
-    width: 16px; height: 16px; border-radius: 50%;
-    background: #755b00; border: 3px solid #fed977;
-  }
-  .timeline-year {
-    font-family: Inter, sans-serif; font-weight: 700; font-size: 14px;
-    color: #755b00; letter-spacing: 0.06em; margin-bottom: 4px; display: block;
+  .value-badge:hover { transform: translateY(-3px); box-shadow: 0 10px 24px -8px rgba(4,21,52,0.14); border-color: #fed977; }
+  .value-badge .value-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #fed977; color: #041534;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
   }
 
-  /* ── Age ladder ── */
-  .class-chip { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  /* ── Division ladder (mirrors adventurers' class-chip) ── */
+  .class-chip {
+    display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+  }
   .class-chip .chip-circle {
     width: 56px; height: 56px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: #fff; background: #041534;
+    font-size: 24px; color: #fff; background: #755b00;
     border: 3px solid #fed977;
   }
 
-  /* ── Info table ── */
-  .info-table { width: 100%; border-collapse: collapse; }
-  .info-table th {
-    text-align: left; font-family: Inter, sans-serif; font-size: 12px; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase; color: #755b00;
-    padding: 14px 16px; border-bottom: 2px solid #e2e2e2;
+  /* ═══════════════════════════════════════════
+     MOBILE USABILITY IMPROVEMENTS
+  ═══════════════════════════════════════════ */
+  #mission, #announcements, #find-us {
+    scroll-margin-top: 80px;
   }
-  .info-table td {
-    padding: 14px 16px; border-bottom: 1px solid #e2e2e2;
-    font-family: Inter, sans-serif; font-size: 14px; color: #45464e;
+  #divisions, #stories, #join {
+    scroll-margin-top: 90px;
   }
-  .info-table tr:last-child td { border-bottom: none; }
-
-  #history, #structure, #ages, #service, #join { scroll-margin-top: 90px; }
+  @media (max-width: 480px) {
+    .hero-h1 { font-size: 36px !important; line-height: 1.15; }
+    .hero-p { font-size: 15px; }
+  }
+  @media (max-width: 360px) {
+    .hero-cta { flex-direction: column; width: 100%; }
+    .hero-cta > * { width: 100%; text-align: center; }
+  }
 
   /* ═══════════════════════════════════════════
-     HERO SLIDESHOW (5 auto-rotating background slides)
+     HERO SLIDESHOW (5 auto-rotating images)
   ═══════════════════════════════════════════ */
   .hero-slideshow {
     position: absolute; inset: 0; background: #041534; overflow: hidden;
@@ -322,7 +343,7 @@
 </style>
 </head>
 
-<body data-page="ay" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+<body data-page="kids" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
 
 <!-- ══════════════ TOP NAV ══════════════ -->
 <header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-2 border-secondary-container shadow-sm">
@@ -369,8 +390,8 @@
         </button>
         <div class="nav-dropdown" role="menu" aria-label="Youth submenu">
           <a href="adventurers.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Adventurers</a>
-          <a href="pathfinders.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Pathfinders</a>
-          <a href="ay.html" class="active" aria-current="page" role="menuitem"><span class="dot" aria-hidden="true"></span>AY (Adventist Youth)</a>
+          <a href="pathfinders.html#pathfinders" role="menuitem"><span class="dot" aria-hidden="true"></span>Pathfinders</a>
+          <a href="ay.html#ay" role="menuitem"><span class="dot" aria-hidden="true"></span>AY (Adventist Youth)</a>
           <a href="youth.html#discussion" role="menuitem"><span class="dot" aria-hidden="true"></span>Discussion</a>
         </div>
       </div>
@@ -381,7 +402,7 @@
           <span class="material-symbols-outlined nav-caret" aria-hidden="true">expand_more</span>
         </button>
         <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
-          <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
+          <a href="kids.html" class="active" aria-current="page" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
           <a href="ministries.html#dorcas" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
           <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
         </div>
@@ -430,25 +451,25 @@
       <a href="news.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">newspaper</span>News</a>
 
       <div class="accordion-item">
-        <button class="accordion-trigger open" aria-expanded="true">
+        <button class="accordion-trigger" aria-expanded="false">
           <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span>Youth</span>
           <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
         </button>
         <div class="accordion-panel">
           <a href="adventurers.html">Adventurers</a>
-          <a href="pathfinders.html">Pathfinders</a>
-          <a href="ay.html" class="active" aria-current="page">AY (Adventist Youth)</a>
+          <a href="youth.html#pathfinders">Pathfinders</a>
+          <a href="ay.html#ay">AY (Adventist Youth)</a>
           <a href="youth.html#discussion">Discussion</a>
         </div>
       </div>
 
       <div class="accordion-item">
-        <button class="accordion-trigger" aria-expanded="false">
+        <button class="accordion-trigger open" aria-expanded="true">
           <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">volunteer_activism</span>Ministries</span>
           <span class="material-symbols-outlined accordion-caret" aria-hidden="true">expand_more</span>
         </button>
         <div class="accordion-panel">
-          <a href="kids.html">Children's Ministry</a>
+          <a href="kids.html" class="active" aria-current="page">Children's Ministry</a>
           <a href="ministries.html#dorcas">Dorcas</a>
           <a href="ministries.html#womens-ministries">Women's Ministries</a>
         </div>
@@ -480,247 +501,281 @@
 <main class="pt-20">
 
   <!-- ══════════════ HERO ══════════════ -->
-  <section class="relative h-[60vh] min-h-[420px] flex items-end overflow-hidden">
-    <div class="hero-slideshow" id="ay-hero-slideshow">
-      <div class="hero-slide active" style="background-image:url('images/ay-hero-1.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('images/ay-hero-2.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('images/ay-hero-3.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('images/ay-hero-4.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('images/ay-hero-5.jpg');"></div>
+  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pt-section-gap pb-16 text-center">
+    <div class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full mb-8 shadow-sm">
+      <span class="material-symbols-outlined text-[18px]">child_care</span>
+      <span class="font-label-md text-label-md uppercase tracking-widest">Birth – Age 12 · Sabbath School</span>
     </div>
-    <div class="hero-slideshow-dots" id="ay-hero-dots" aria-hidden="true">
-      <button class="hero-dot active" data-index="0" aria-label="Slide 1"></button>
-      <button class="hero-dot" data-index="1" aria-label="Slide 2"></button>
-      <button class="hero-dot" data-index="2" aria-label="Slide 3"></button>
-      <button class="hero-dot" data-index="3" aria-label="Slide 4"></button>
-      <button class="hero-dot" data-index="4" aria-label="Slide 5"></button>
-    </div>
-    <div class="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/50 to-primary/10"></div>
-    <div class="relative z-10 w-full max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pb-14">
-      <div class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full mb-6 shadow-sm">
-        <span class="material-symbols-outlined text-[18px]">groups_3</span>
-        <span class="font-label-md text-label-md uppercase tracking-widest">Ages 16 &amp; Up · Senior Youth</span>
+    <h1 class="hero-h1 font-display-lg text-display-lg text-primary mb-6">Children's Ministry</h1>
+    <p class="hero-p font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto italic mb-12">
+      "Let the little children come to me, and do not hinder them, for the kingdom of heaven belongs to such as these." — Matthew 19:14
+    </p>
+
+    <!--
+      HERO SLIDESHOW — 5 auto-rotating images
+      Drop your files in as:
+        images/kids-hero-1.jpg
+        images/kids-hero-2.jpg
+        images/kids-hero-3.jpg
+        images/kids-hero-4.jpg
+        images/kids-hero-5.jpg
+      No code changes needed — just add the files with these exact names.
+    -->
+    <div class="w-full h-[400px] rounded-xl overflow-hidden sacred-shadow relative group">
+      <div class="hero-slideshow" id="kids-hero-slideshow">
+        <div class="hero-slide active" style="background-image:url('images/kids-hero-1.jpg');"></div>
+        <div class="hero-slide" style="background-image:url('images/kids-hero-2.jpg');"></div>
+        <div class="hero-slide" style="background-image:url('images/kids-hero-3.jpg');"></div>
+        <div class="hero-slide" style="background-image:url('images/kids-hero-4.jpg');"></div>
+        <div class="hero-slide" style="background-image:url('images/kids-hero-5.jpg');"></div>
       </div>
-      <h1 class="font-display-lg text-display-lg text-on-primary mb-4">AY — Adventist Youth</h1>
-      <p class="font-body-lg text-body-lg text-on-primary/85 max-w-2xl">
-        The senior youth ministry of the Seventh-day Adventist Church, leading teens and young adults into a saving relationship with Jesus Christ and an active role in His mission.
+      <div class="hero-slideshow-dots" id="kids-hero-dots" aria-hidden="true">
+        <button class="hero-dot active" data-index="0" aria-label="Slide 1"></button>
+        <button class="hero-dot" data-index="1" aria-label="Slide 2"></button>
+        <button class="hero-dot" data-index="2" aria-label="Slide 3"></button>
+        <button class="hero-dot" data-index="3" aria-label="Slide 4"></button>
+        <button class="hero-dot" data-index="4" aria-label="Slide 5"></button>
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent flex items-end p-12 pointer-events-none">
+        <div class="text-left">
+          <span class="text-secondary-fixed font-label-md mb-2 block">Every Sabbath · 9:00 AM</span>
+          <h2 class="text-white font-headline-lg text-headline-lg">Growing Little Disciples</h2>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ WHAT IS CHILDREN'S MINISTRY ══════════════ -->
+  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pb-section-gap grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
+    <div class="space-y-6">
+      <span class="font-label-md text-label-md text-secondary tracking-[0.2em] uppercase block">Our Purpose</span>
+      <h2 class="font-headline-lg text-headline-lg text-primary leading-tight">Nurturing Faith from the Very First Sabbath</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        Children's Ministry at Makeni Central exists to make sure every child, from the newest baby carried into church to the busy twelve-year-old on the edge of the teen years, has a place where the gospel is taught in a way they can understand and hold onto for life. It is here, long before a young person joins Adventurers or Pathfinders, that the seeds of faith are first planted.
+      </p>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        Every Sabbath, our children's Sabbath School divisions run alongside the main service, led by trained, background-checked teachers who prepare lessons, songs, and activities suited to each age group. Parents are always welcome to stay, and every class is built on the same conviction: children are not the church of tomorrow — they are full members of the church today.
       </p>
     </div>
-  </section>
-
-  <!-- ══════════════ QUICK FACTS ══════════════ -->
-  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-16">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
-        <p class="font-headline-md text-headline-md text-primary">1907</p>
-        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-2">Society Formalized</p>
-      </div>
-      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
-        <p class="font-headline-md text-headline-md text-primary">10M+</p>
-        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-2">Young People Worldwide</p>
-      </div>
-      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
-        <p class="font-headline-md text-headline-md text-primary">16+</p>
-        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-2">Ages Served</p>
-      </div>
-      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
-        <p class="font-headline-md text-headline-md text-primary">1852</p>
-        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mt-2">Youth's Instructor Founded</p>
-      </div>
+    <div class="rounded-xl overflow-hidden sacred-shadow h-[380px]">
+      <img
+        class="w-full h-full object-cover"
+        src="images/kids-story.jpg"
+        alt="Children's Ministry teacher reading a Bible story to a group of children"
+        onerror="this.outerHTML='<div style=\'width:100%;height:380px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>auto_stories</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/kids-story.jpg</span></div>'"
+      />
     </div>
   </section>
 
-  <!-- ══════════════ MISSION · AIM · MOTTO · PLEDGE ══════════════ -->
+  <!-- ══════════════ CORE VALUES ══════════════ -->
   <section class="bg-surface-container-low py-section-gap">
     <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+
       <div class="text-center mb-14">
-        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Mission, Aim, Motto &amp; Pledge</h2>
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">What Every Child Learns Here</h2>
         <div class="gold-divider mx-auto"></div>
       </div>
 
-      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow border-l-4 border-secondary mb-10">
-        <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-3">Mission</span>
-        <p class="font-headline-md text-headline-md text-primary leading-snug">To lead young people into a saving relationship with Jesus Christ and help them embrace His call to discipleship.</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-10">
-        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow border-l-4 border-secondary">
-          <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-3">Aim</span>
-          <p class="font-headline-md text-headline-md text-primary leading-snug">The Advent message to all the world in my generation.</p>
-        </div>
-        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow border-l-4 border-secondary">
-          <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-3">Motto</span>
-          <p class="font-headline-md text-headline-md text-primary leading-snug">The love of Christ compels me.</p>
-        </div>
-      </div>
-
-      <div class="bg-primary text-on-primary rounded-xl p-10 md:p-14 relative overflow-hidden sacred-shadow">
+      <!-- Memory verse card -->
+      <div class="bg-primary text-on-primary rounded-xl p-10 md:p-14 text-center relative overflow-hidden sacred-shadow mb-12">
         <div class="absolute top-0 right-0 w-56 h-56 bg-secondary/10 rounded-full -translate-y-1/3 translate-x-1/3"></div>
-        <span class="font-label-md text-label-md text-secondary-fixed uppercase tracking-widest block mb-4 relative z-10">Pledge</span>
-        <p class="font-headline-md text-headline-md italic relative z-10 max-w-2xl">
-          "Loving the Lord Jesus, I promise to take an active part in the work of the Adventist Youth Society, doing what I can to help others and to finish the work of the Gospel in all the world."
+        <span class="material-symbols-outlined text-secondary-fixed text-5xl mb-4 relative z-10">favorite</span>
+        <p class="font-headline-md text-headline-md italic relative z-10 max-w-2xl mx-auto">
+          "Train up a child in the way he should go: and when he is old, he will not depart from it."
         </p>
+        <p class="font-label-md text-label-md text-secondary-fixed uppercase tracking-widest mt-4 relative z-10">Proverbs 22:6</p>
       </div>
+
+      <!-- Values grid -->
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div class="value-badge"><div class="value-icon"><span class="material-symbols-outlined">menu_book</span></div><span class="font-label-md text-[13px] text-primary">Bible Truth</span></div>
+        <div class="value-badge"><div class="value-icon"><span class="material-symbols-outlined">volunteer_activism</span></div><span class="font-label-md text-[13px] text-primary">Prayer</span></div>
+        <div class="value-badge"><div class="value-icon"><span class="material-symbols-outlined">music_note</span></div><span class="font-label-md text-[13px] text-primary">Worship &amp; Song</span></div>
+        <div class="value-badge"><div class="value-icon"><span class="material-symbols-outlined">groups</span></div><span class="font-label-md text-[13px] text-primary">Belonging</span></div>
+        <div class="value-badge"><div class="value-icon"><span class="material-symbols-outlined">psychology</span></div><span class="font-label-md text-[13px] text-primary">Memory Verses</span></div>
+        <div class="value-badge"><div class="value-icon"><span class="material-symbols-outlined">palette</span></div><span class="font-label-md text-[13px] text-primary">Crafts</span></div>
+        <div class="value-badge"><div class="value-icon"><span class="material-symbols-outlined">diversity_3</span></div><span class="font-label-md text-[13px] text-primary">Family</span></div>
+        <div class="value-badge"><div class="value-icon"><span class="material-symbols-outlined">back_hand</span></div><span class="font-label-md text-[13px] text-primary">Kindness</span></div>
+        <div class="value-badge"><div class="value-icon"><span class="material-symbols-outlined">sentiment_satisfied</span></div><span class="font-label-md text-[13px] text-primary">Joyful Faith</span></div>
+        <div class="value-badge"><div class="value-icon"><span class="material-symbols-outlined">church</span></div><span class="font-label-md text-[13px] text-primary">Reverence</span></div>
+      </div>
+
     </div>
   </section>
 
-  <!-- ══════════════ HISTORY TIMELINE ══════════════ -->
-  <section id="history" class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+  <!-- ══════════════ SABBATH SCHOOL DIVISIONS ══════════════ -->
+  <section id="divisions" class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
     <div class="text-center mb-16">
-      <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Over a Century of Youth Ministry</h2>
-      <div class="gold-divider mx-auto"></div>
+      <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Our Sabbath School Divisions</h2>
+      <div class="gold-divider mx-auto mb-6"></div>
+      <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+        From the cradle roll to the junior years, every child has a class built around how they learn and grow.
+      </p>
     </div>
 
-    <div class="timeline-rail max-w-3xl mx-auto">
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <span class="timeline-year">1852</span>
-        <p class="font-body-md text-body-md text-on-surface-variant">James White publishes the first edition of The Youth's Instructor, the church's earliest dedicated outreach to young people.</p>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="class-chip">
+        <div class="chip-circle"><span class="material-symbols-outlined">child_friendly</span></div>
+        <span class="font-label-md text-[13px] text-primary block">Cradle Roll</span>
+        <span class="font-body-md text-[12px] text-on-surface-variant">Birth – Age 2</span>
       </div>
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <span class="timeline-year">Late 1800s</span>
-        <p class="font-body-md text-body-md text-on-surface-variant">Local youth societies begin forming in churches across the United States, including early efforts by Luther Warren and Harry Fenner, laying the groundwork for organized youth ministry.</p>
+      <div class="class-chip">
+        <div class="chip-circle"><span class="material-symbols-outlined">toys</span></div>
+        <span class="font-label-md text-[13px] text-primary block">Kindergarten</span>
+        <span class="font-body-md text-[12px] text-on-surface-variant">Ages 3 – 5</span>
       </div>
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <span class="timeline-year">1907</span>
-        <p class="font-body-md text-body-md text-on-surface-variant">At a meeting in Mount Vernon, Ohio, more than 100 delegates adopt the name "Seventh-day Adventist Young People's Society of Missionary Volunteers" (MV), along with an aim, motto, and pledge.</p>
+      <div class="class-chip">
+        <div class="chip-circle"><span class="material-symbols-outlined">school</span></div>
+        <span class="font-label-md text-[13px] text-primary block">Primary</span>
+        <span class="font-body-md text-[12px] text-on-surface-variant">Ages 6 – 9</span>
       </div>
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <span class="timeline-year">1909</span>
-        <p class="font-body-md text-body-md text-on-surface-variant">The General Conference session votes to create a separate Junior Missionary Volunteer Society (JMV) for children 10 to 16, distinguishing junior ministry from senior youth work.</p>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <span class="timeline-year">Mid-1900s</span>
-        <p class="font-body-md text-body-md text-on-surface-variant">The senior society becomes widely known as the Adventist Youth (AY) Society, continuing to serve teens and young adults beyond Pathfinder age with its own Aim, Motto, and Pledge.</p>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <span class="timeline-year">Today</span>
-        <p class="font-body-md text-body-md text-on-surface-variant">Adventist Youth Ministries now links more than ten million young people worldwide through AY societies, campus ministry, young adult programs, and mission initiatives such as "I Will Go."</p>
+      <div class="class-chip">
+        <div class="chip-circle"><span class="material-symbols-outlined">groups_2</span></div>
+        <span class="font-label-md text-[13px] text-primary block">Juniors</span>
+        <span class="font-body-md text-[12px] text-on-surface-variant">Ages 10 – 12</span>
       </div>
     </div>
   </section>
 
-  <!-- ══════════════ WHERE AY FITS ══════════════ -->
-  <section id="ages" class="bg-surface-container-low py-section-gap">
+  <!-- ══════════════ STORIES FROM OUR CLASSROOMS ══════════════ -->
+  <section id="stories" class="bg-surface-container-low py-section-gap">
     <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
       <div class="text-center mb-16">
-        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Where AY Fits in Youth Ministry</h2>
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Stories from Our Classrooms</h2>
         <div class="gold-divider mx-auto mb-6"></div>
         <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
-          Adventist Youth Ministries spans every age, from early childhood through young adulthood.
+          A few moments from our own Children's Ministry family here at Makeni Central.
         </p>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-14">
-        <div class="class-chip">
-          <div class="chip-circle"><span class="material-symbols-outlined">explore</span></div>
-          <span class="font-label-md text-[13px] text-primary block">Adventurers</span>
-          <span class="font-body-md text-[12px] text-on-surface-variant">Ages 4–9</span>
-        </div>
-        <div class="class-chip">
-          <div class="chip-circle"><span class="material-symbols-outlined">hiking</span></div>
-          <span class="font-label-md text-[13px] text-primary block">Pathfinders</span>
-          <span class="font-body-md text-[12px] text-on-surface-variant">Ages 10–15</span>
-        </div>
-        <div class="class-chip">
-          <div class="chip-circle"><span class="material-symbols-outlined">groups_3</span></div>
-          <span class="font-label-md text-[13px] text-primary block">AY / Ambassadors</span>
-          <span class="font-body-md text-[12px] text-on-surface-variant">Ages 16–21</span>
-        </div>
-        <div class="class-chip">
-          <div class="chip-circle"><span class="material-symbols-outlined">school</span></div>
-          <span class="font-label-md text-[13px] text-primary block">Young Adults</span>
-          <span class="font-body-md text-[12px] text-on-surface-variant">Ages 22–30+</span>
-        </div>
-      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
 
-      <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden overflow-x-auto">
-        <table class="info-table min-w-[560px]">
-          <thead>
-            <tr>
-              <th>Ministry</th>
-              <th>Ages</th>
-              <th>Focus</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="font-semibold text-primary">Adventurer Club</td>
-              <td>4–9</td>
-              <td>Family-based discovery and early faith formation</td>
-            </tr>
-            <tr>
-              <td class="font-semibold text-primary">Pathfinder Club</td>
-              <td>10–15</td>
-              <td>Outdoor adventure, skill-building honors, character</td>
-            </tr>
-            <tr>
-              <td class="font-semibold text-primary">AY / Ambassadors</td>
-              <td>16–21</td>
-              <td>Discipleship, service, leadership development</td>
-            </tr>
-            <tr>
-              <td class="font-semibold text-primary">Young Adults</td>
-              <td>22–30+</td>
-              <td>Mentoring, mission, campus and career-stage ministry</td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- Story 1 — Cradle Roll -->
+        <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden flex flex-col">
+          <div class="h-52 w-full">
+            <img class="w-full h-full object-cover" src="images/kids-story-cradle.jpg" alt="Cradle Roll parents singing with their babies"
+              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>child_friendly</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>kids-story-cradle.jpg</span></div>'"
+            />
+          </div>
+          <div class="p-8 flex flex-col grow">
+            <span class="font-label-md text-[12px] text-secondary uppercase tracking-widest mb-2">Cradle Roll · First Songs</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-3">Jesus Loves Me, Even in Arms</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant grow">
+              Every week, a handful of parents settle onto the mat with their babies and toddlers, clapping along to simple songs about Jesus' love. Long before these little ones can say a full sentence, they are already learning to associate church with warmth, singing, and gentle hands.
+            </p>
+          </div>
+        </div>
+
+        <!-- Story 2 — Kindergarten -->
+        <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden flex flex-col">
+          <div class="h-52 w-full">
+            <img class="w-full h-full object-cover" src="images/kids-story-kindergarten.jpg" alt="Kindergarten class acting out a Bible story"
+              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>toys</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>kids-story-kindergarten.jpg</span></div>'"
+            />
+          </div>
+          <div class="p-8 flex flex-col grow">
+            <span class="font-label-md text-[12px] text-secondary uppercase tracking-widest mb-2">Kindergarten · Acting It Out</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-3">Noah's Ark, Cardboard and All</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant grow">
+              Our kindergarten teacher built a cardboard ark and let the children take turns being the animals walking in two by two. Weeks later, parents still hear their five-year-olds retelling the story unprompted at home — proof that a lesson acted out is a lesson remembered.
+            </p>
+          </div>
+        </div>
+
+        <!-- Story 3 — Primary -->
+        <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden flex flex-col">
+          <div class="h-52 w-full">
+            <img class="w-full h-full object-cover" src="images/kids-story-primary.jpg" alt="Primary class collecting an offering for a mission project"
+              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>school</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>kids-story-primary.jpg</span></div>'"
+            />
+          </div>
+          <div class="p-8 flex flex-col grow">
+            <span class="font-label-md text-[12px] text-secondary uppercase tracking-widest mb-2">Primary · Giving Hearts</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-3">Coins for a Mission Field They'll Never See</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant grow">
+              When the Primary class learned about a mission project overseas, they started a jar for spare coins right there in the classroom. By the end of the quarter they had gathered enough to make a real difference — and learned that giving isn't just for grown-ups.
+            </p>
+          </div>
+        </div>
+
+        <!-- Story 4 — Juniors -->
+        <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden flex flex-col">
+          <div class="h-52 w-full">
+            <img class="w-full h-full object-cover" src="images/kids-story-juniors.jpg" alt="Juniors class discussing a Bible passage together"
+              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>groups_2</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>kids-story-juniors.jpg</span></div>'"
+            />
+          </div>
+          <div class="p-8 flex flex-col grow">
+            <span class="font-label-md text-[12px] text-secondary uppercase tracking-widest mb-2">Juniors · Real Questions</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-3">Asking the Hard Questions Out Loud</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant grow">
+              Our Juniors are old enough to wonder "why" — why bad things happen, why the Sabbath matters, why they should believe. Rather than brushing those questions aside, their teacher opens the floor every week, walking through Scripture together until the answers make sense to them, not just to the adults.
+            </p>
+          </div>
+        </div>
+
+        <!-- Story 5 — VBS -->
+        <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden flex flex-col">
+          <div class="h-52 w-full">
+            <img class="w-full h-full object-cover" src="images/kids-story-vbs.jpg" alt="Children at Vacation Bible School doing a craft activity"
+              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>celebration</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>kids-story-vbs.jpg</span></div>'"
+            />
+          </div>
+          <div class="p-8 flex flex-col grow">
+            <span class="font-label-md text-[12px] text-secondary uppercase tracking-widest mb-2">Vacation Bible School · Community</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-3">A Week That Filled the Whole Hall</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant grow">
+              Last school holiday, our Vacation Bible School brought in children from well beyond our own congregation — neighbours, cousins, classmates — for a week of games, crafts, and Bible stories. Several families who first walked in for VBS are still with us on Sabbath mornings.
+            </p>
+          </div>
+        </div>
+
+        <!-- Story 6 — Family Sabbath -->
+        <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden flex flex-col">
+          <div class="h-52 w-full">
+            <img class="w-full h-full object-cover" src="images/kids-story-family.jpg" alt="Families worshipping together on a Family Sabbath"
+              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>diversity_3</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>kids-story-family.jpg</span></div>'"
+            />
+          </div>
+          <div class="p-8 flex flex-col grow">
+            <span class="font-label-md text-[12px] text-secondary uppercase tracking-widest mb-2">Family Sabbath · Together</span>
+            <h3 class="font-title-lg text-title-lg text-primary mb-3">The Sabbath Every Class Shares</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant grow">
+              Once a quarter, every division — Cradle Roll through Juniors — joins the main congregation for a Family Sabbath program, where the children themselves lead a song, a reading, or a short item. It's a small reminder that they belong to the whole church family, not a room tucked away from it.
+            </p>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- ══════════════ LEGION OF HONOR ══════════════ -->
-  <section class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
-    <div class="img-wrap rounded-xl overflow-hidden sacred-shadow h-[340px] order-2 md:order-1">
-      <img src="images/ay-legion.jpg" alt="Adventist Youth in personal devotion and study"
-        onerror="this.parentElement.outerHTML='<div style=\'height:340px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>military_tech</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/ay-legion.jpg</span></div>'"/>
+  <!-- ══════════════ WHAT WE DO ══════════════ -->
+  <section class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="text-center mb-16">
+      <h2 class="font-headline-lg text-headline-lg text-primary mb-4">What Children's Ministry Does</h2>
+      <div class="gold-divider mx-auto"></div>
     </div>
-    <div class="space-y-6 order-1 md:order-2">
-      <span class="font-label-md text-label-md text-secondary tracking-[0.2em] uppercase block">A Deeper Commitment</span>
-      <h2 class="font-headline-lg text-headline-lg text-primary leading-tight">The AY Legion of Honor</h2>
-      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-        Beyond the Aim, Motto, and Pledge, many AY societies invite members into a further voluntary commitment known as the Legion of Honor — a set of six personal resolutions to honor Christ in what one chooses to behold, listen to, the places one goes, one's associations, one's speech, and the care given to the body.
-      </p>
-      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-        It reflects the heart of AY ministry: not a badge to be earned, but a daily discipleship that shapes how young people live, long after any meeting ends.
-      </p>
-    </div>
-  </section>
-
-  <!-- ══════════════ ACTIVITIES / SERVICE ══════════════ -->
-  <section id="service" class="bg-surface-container-low py-section-gap">
-    <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
-      <div class="text-center mb-16">
-        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">What AY Members Do</h2>
-        <div class="gold-divider mx-auto"></div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">auto_stories</span>
+        <h3 class="font-title-lg text-title-lg text-primary mb-2">Sabbath School Classes</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">Weekly age-graded Bible lessons, songs, and memory verses every Sabbath morning.</p>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center">
-          <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">menu_book</span>
-          <h3 class="font-title-lg text-title-lg text-primary mb-2">Discipleship</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant">Bible study, Sabbath School classes, and Weeks of Prayer that ground faith in Scripture.</p>
-        </div>
-        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center">
-          <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">campaign</span>
-          <h3 class="font-title-lg text-title-lg text-primary mb-2">Evangelism &amp; Missions</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant">Local outreach and mission trips carrying the Advent message into communities near and far.</p>
-        </div>
-        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center">
-          <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">supervisor_account</span>
-          <h3 class="font-title-lg text-title-lg text-primary mb-2">Leadership Training</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant">Preparing young people to serve as Sabbath School leaders, Pathfinder staff, and church officers.</p>
-        </div>
-        <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center">
-          <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">workspace_premium</span>
-          <h3 class="font-title-lg text-title-lg text-primary mb-2">AY Silver &amp; Gold Awards</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant">Recognition for young adults who demonstrate exceptional physical, mental, and cultural development.</p>
-        </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">celebration</span>
+        <h3 class="font-title-lg text-title-lg text-primary mb-2">Vacation Bible School</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">A holiday program of games, crafts, and Bible stories that welcomes the wider community.</p>
+      </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">diversity_3</span>
+        <h3 class="font-title-lg text-title-lg text-primary mb-2">Family Involvement</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">Parents and guardians are welcomed into every class — faith formation as a shared journey.</p>
+      </div>
+      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
+        <span class="material-symbols-outlined text-secondary text-4xl mb-4 block">volunteer_activism</span>
+        <h3 class="font-title-lg text-title-lg text-primary mb-2">Service Projects</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">Age-appropriate giving and outreach that teaches children faith is lived, not just heard.</p>
       </div>
     </div>
   </section>
@@ -742,8 +797,8 @@
     <div>
       <h4 class="font-title-lg text-title-lg mb-6">Quick Links</h4>
        <ul class="space-y-3" role="list">
-        <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="#" aria-current="page">Home</a></li>
-        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="adventures.html">Adventures</a></li>
+        <li><a class="font-label-md text-label-md text-secondary-fixed font-bold hover:text-secondary-container transition-colors" href="index.html" aria-current="page">Home</a></li>
+        <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="adventurers.html">Adventures</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="news.html">News</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="youth.html">Youth Board</a></li>
         <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-secondary-container transition-colors" href="building.html">New Building</a></li>
@@ -780,12 +835,12 @@
 <script src="sda.js" defer></script>
 <script src="func.js" defer></script>
 <script>
-  // ── AY hero slideshow: auto-rotates 5 background slides ──
+  // ── Children's Ministry hero slideshow: auto-rotates 5 background slides ──
   (function () {
-    var root = document.getElementById('ay-hero-slideshow');
+    var root = document.getElementById('kids-hero-slideshow');
     if (!root) return;
     var slides = root.querySelectorAll('.hero-slide');
-    var dots = document.querySelectorAll('#ay-hero-dots .hero-dot');
+    var dots = document.querySelectorAll('#kids-hero-dots .hero-dot');
     var current = 0;
     var intervalMs = 6000;
     var timer = null;
