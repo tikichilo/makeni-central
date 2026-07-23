@@ -253,6 +253,24 @@
   .leader-card:hover .leader-card-body { box-shadow: 0 20px 40px -15px rgba(4,21,52,0.14); }
   .leader-card-body { cursor: pointer; }
 
+  /* ── Leader card "View" button — matches site primary navy ── */
+  .leader-view-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    background: #041534;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .leader-view-btn:hover { background: #755b00; }
+  .leader-view-btn:active { transform: scale(0.96); }
+
   /* ── Filter pills ── */
   .role-filter {
     padding: 10px 24px; border-radius: 9999px;
@@ -286,10 +304,10 @@
   }
   .leader-modal-overlay.open .leader-modal { transform: translateY(0) scale(1); opacity: 1; }
 
-  /* Photo — taller ratio + top-anchored crop so faces never get cut off */
+  /* Photo — tighter portrait crop, top-anchored so faces never get cut off */
   .leader-modal-photo {
     position: relative; width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1 / 1;
     background: #eeeeee;
     overflow: hidden;
     border-radius: 20px 20px 0 0;
@@ -354,8 +372,8 @@
     }
     .leader-modal-overlay.open .leader-modal { transform: translateY(0); }
     .leader-modal-photo {
-      aspect-ratio: 3 / 4; /* taller crop, narrow screen shows more of a portrait photo */
-      max-height: 46vh;
+      aspect-ratio: 1 / 1; /* tighter crop, mostly face/shoulders on narrow screens */
+      max-height: 40vh;
     }
     .leader-modal-close {
       top: 14px; right: 14px; width: 44px; height: 44px;
@@ -628,9 +646,6 @@
         <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="https://web.facebook.com/profile.php?id=100091185906540" target="_blank" rel="noopener noreferrer" aria-label="Makeni Central SDA Church on Facebook">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg>
         </a>
-        <a class="p-2 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors" href="#" aria-label="Email the church">
-          <span class="material-symbols-outlined">mail</span>
-        </a>
       </div>
 
       <a href="tel:+260977695623" class="flex items-center gap-3 p-3 bg-on-primary/10 rounded-lg hover:bg-secondary transition-colors">
@@ -669,16 +684,16 @@
   // ── Fixed role categories, in the order the filter pills should show.
   // A leader's `role` must exactly match one of these strings, or their
   // card will only ever appear under "All" and never get its own filter pill.
-  // NOTE: this list was updated to match the roles actually used below
-  // (Admin Elder / District Pastor / Brother removed since unused — add
-  // them back here the moment you add a leader with that role).
   var LEADER_ROLES = [
+    'Admin',
     'Elder',
     'Deacon',
-    'Stewardship Leader',
+    'Church Clerk',
+    'Treasurer, Chorister & Adventurer Leader',
     'Youth Leader',
     'Personal Ministries Leader',
-    'Church Clerk',
+    'Health Ministries Leader',
+    'Adventist Men Leader, Deacon & Chorister',
     'Sister'
   ];
 
@@ -689,17 +704,87 @@
   // bio: a short general line about their service — keep it department-free.
   var CHURCH_LEADERS = [
     {
+      id: 'leader-admin',
+      name: 'Joseph Chilimina',
+      role: 'Admin',
+      phone: null,
+      photo: null,
+      bio: 'Provides administrative support to the leadership team.'
+    },
+    {
+      id: 'leader-chilomo-champion',
+      name: 'Champion Chilomo',
+      role: 'Elder',
+      phone: null,
+      photo: null,
+      bio: 'Serves the congregation with spiritual oversight and pastoral care.'
+    },
+    {
       id: 'leader-aori',
-      name: 'Elder Aori',
+      name: 'Geoffrey Aori',
       role: 'Elder',
       phone: '+260772041304',
       photo: 'images/aori.jpg',
       bio: 'Serves the congregation with spiritual oversight and pastoral care.'
     },
     {
-      id: 'leader-moyo',
-      name: 'Mrs Moyo',
-      role: 'Stewardship Leader',
+      id: 'leader-moyo-chilende',
+      name: 'Chilende Moyo',
+      role: 'Elder',
+      phone: null,
+      photo: null,
+      bio: 'Serves the congregation with spiritual oversight and pastoral care.'
+    },
+    {
+      id: 'leader-hantumbu',
+      name: 'James Hantumbu',
+      role: 'Elder',
+      phone: null,
+      photo: 'images/hantumbu.jpg',
+      bio: 'Serves the congregation with spiritual oversight and pastoral care.'
+    },
+    {
+      id: 'leader-kalonga',
+      name: 'Kalonga chambawa',
+      role: 'Elder',
+      phone: '+260977408058',
+      photo: 'images/kalonga.jpg',
+      bio: 'Serves the congregation with spiritual oversight and pastoral care.'
+    },
+    {
+      id: 'leader-tembo',
+      name: 'Elder Tembo',
+      role: 'Elder',
+      phone: '+260978088776',
+      photo: 'images/tembo.jpg',
+      bio: 'Serves the congregation with spiritual oversight and pastoral care.'
+    },
+    // 5 provisional Elder slots — fill in as more Elders are confirmed
+    { id: 'leader-elder-provision-1', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Serves the congregation with spiritual oversight and pastoral care.' },
+    { id: 'leader-elder-provision-2', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Serves the congregation with spiritual oversight and pastoral care.' },
+    { id: 'leader-elder-provision-3', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Serves the congregation with spiritual oversight and pastoral care.' },
+    { id: 'leader-elder-provision-4', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Serves the congregation with spiritual oversight and pastoral care.' },
+    { id: 'leader-elder-provision-5', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Serves the congregation with spiritual oversight and pastoral care.' },
+    {
+      id: 'leader-zimindo',
+      name: 'Mrs Zimindo',
+      role: 'Church Clerk',
+      phone: '+260977729232',
+      photo: 'images/mrs zimindo.jpg',
+      bio: "Maintains church records and keeps the congregation's membership documentation in order."
+    },
+    {
+      id: 'leader-clerk-provision-1',
+      name: 'TBA',
+      role: 'Church Clerk',
+      phone: null,
+      photo: null,
+      bio: "Maintains church records and keeps the congregation's membership documentation in order."
+    },
+    {
+      id: 'leader-treasurer',
+      name: 'Cider Moyo',
+      role: 'Treasurer, Chorister & Adventurer Leader',
       phone: '+260971234567',
       photo: 'images/sterwardship.jpg',
       bio: 'Guides the congregation in faithful stewardship of time, talents, and resources.'
@@ -713,51 +798,43 @@
       bio: 'Serves the congregation faithfully, with a heart for young people.'
     },
     {
-      id: 'leader-Mrs Chilomo',
-      name: 'Mrs Chilomo',
+      id: 'leader-chilomo-personal-ministries',
+      name: 'Charity Chilomo',
       role: 'Personal Ministries Leader',
       phone: '+260977845634',
       photo: 'images/mrs chilomo.jpg',
       bio: 'Leads efforts in soul-winning, outreach, and personal evangelism.'
     },
     {
-      id: 'leader-Kalonga',
-      name: 'Elder Kalonga',
-      role: 'Elder',
-      phone: '+260977408058',
-      photo: 'images/kalonga.jpg',
-      bio: 'Serves the congregation with spiritual oversight and pastoral care.'
-    },
-    {
-      id: 'leader-Tembo',
-      name: 'Elder Tembo',
-      role: 'Elder',
-      phone: '+260978088776',
-      photo: 'images/tembo.jpg',
-      bio: 'Serves the congregation with spiritual oversight and pastoral care.'
-    },
-    {
-      id: 'leader-Hantumbu',
-      name: 'Elder Hantumbu',
-      role: 'Elder',
-      phone: '+260',
-      photo: 'images/hantumbu.jpg',
-      bio: 'Serves the congregation with spiritual oversight and pastoral care.'
-    },
-    {
-      id: 'leader-Mrs Zimindo',
-      name: 'Mrs Zimindo',
-      role: 'Church Clerk',
-      phone: '+260977729232',
-      photo: 'images/mrs zimindo.jpg',
-      bio: 'Maintains church records and keeps the congregation\'s membership documentation in order.'
-    },
-    {
-      id: 'leader-deacon-1',
-      name: 'Deacon Hamatimba Mweene',
+      id: 'leader-deacon-hamatimba',
+      name: 'Hamatimba Mweene',
       role: 'Deacon',
       phone: '+260977800947',
       photo: 'images/hamatimba.jpg',
+      bio: 'Serves the congregation faithfully in his area of ministry.'
+    },
+    {
+      id: 'leader-zandonda',
+      name: 'Bester Zandonda',
+      role: 'Health Ministries Leader',
+      phone: null,
+      photo: 'images/bester.jpg',
+      bio: 'Serves the congregation faithfully in her area of ministry.'
+    },
+    {
+      id: 'leader-munsanje',
+      name: 'Chimuka Munsanje',
+      role: 'Adventist Men Leader, Deacon & Chorister',
+      phone: null,
+      photo: 'images/chimuka.jpg',
+      bio: 'Serves the congregation faithfully in his area of ministry.'
+    },
+     {
+      id: 'leader-Enock',
+      name: 'Enock Chilimina',
+      role: 'Communications',
+      phone: '0765699759',
+      photo: 'images/enock.jpg',
       bio: 'Serves the congregation faithfully in his area of ministry.'
     },
     {
@@ -801,6 +878,52 @@
     return role.toLowerCase().replace(/\s+/g, '-');
   }
 
+  // Builds a placeholder <div> using real DOM methods (no string/attribute
+  // escaping needed — this is what fixed the stray '"/>' text bug).
+  function buildPlaceholder(label, extraClasses) {
+    var div = document.createElement('div');
+    div.className = 'img-placeholder' + (extraClasses ? ' ' + extraClasses : '');
+    var icon = document.createElement('span');
+    icon.className = 'material-symbols-outlined ph-icon';
+    icon.textContent = 'account_circle';
+    var labelEl = document.createElement('span');
+    labelEl.className = 'ph-label';
+    labelEl.textContent = label;
+    div.appendChild(icon);
+    div.appendChild(labelEl);
+    return div;
+  }
+
+  // Returns the HTML string to inject for a leader's photo (or a placeholder
+  // if no photo is set). No inline onerror attribute here anymore — the
+  // error handler gets attached separately after insertion, see
+  // attachPhotoErrorHandlers() below.
+  function photoMarkup(leader, extraClasses) {
+    var extra = extraClasses || '';
+    if (!leader.photo) {
+      return '<div class="img-placeholder ' + extra + '">' +
+        '<span class="material-symbols-outlined ph-icon">account_circle</span>' +
+        '<span class="ph-label">Photo TBA</span>' +
+      '</div>';
+    }
+    return '<div class="img-wrap ' + extra + '">' +
+      '<img class="leader-photo-img" src="' + escapeHtml(leader.photo) + '" alt="' + escapeHtml(leader.name) + '" data-extra="' + escapeHtml(extra) + '"/>' +
+    '</div>';
+  }
+
+  // Call this right after setting .innerHTML anywhere photoMarkup() output
+  // was inserted, so broken images swap to a clean placeholder instead of
+  // leaving a broken-image icon (or, previously, stray text) behind.
+  function attachPhotoErrorHandlers(root) {
+    root.querySelectorAll('.leader-photo-img').forEach(function (img) {
+      img.addEventListener('error', function () {
+        var wrap = img.closest('.img-wrap');
+        if (!wrap) return;
+        wrap.replaceWith(buildPlaceholder('Photo coming soon', img.dataset.extra));
+      }, { once: true });
+    });
+  }
+
   // ── Render filter pills ──
   function renderFilters() {
     var html = '<button class="role-filter active" data-role="all" type="button">All</button>';
@@ -825,33 +948,39 @@
   function renderLeaders() {
     var html = '';
     CHURCH_LEADERS.forEach(function (leader) {
-      var photoMarkup = leader.photo
-        ? '<div class="img-wrap rounded-xl sacred-shadow border border-outline-variant/30"><img src="' + escapeHtml(leader.photo) + '" alt="' + escapeHtml(leader.name) + '" onerror="this.parentElement.outerHTML=\'<div class=&quot;img-placeholder rounded-xl sacred-shadow border border-outline-variant/30&quot;><span class=&quot;material-symbols-outlined ph-icon&quot;>account_circle</span><span class=&quot;ph-label&quot;>Photo coming soon</span></div>\'"/></div>'
-        : '<div class="img-placeholder rounded-xl sacred-shadow border border-outline-variant/30"><span class="material-symbols-outlined ph-icon">account_circle</span><span class="ph-label">Photo TBA</span></div>';
+      var cardPhoto = photoMarkup(leader, 'rounded-xl sacred-shadow border border-outline-variant/30');
 
       var phoneRow = leader.phone
-        ? '<span class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md"><span class="material-symbols-outlined text-[18px]">phone</span><span>Tap "View Profile" to call</span></span>'
+        ? '<span class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md"><span class="material-symbols-outlined text-[18px]">phone</span><span>Tap "View" to call</span></span>'
         : '<span class="flex items-center gap-2 text-outline font-label-md text-label-md"><span class="material-symbols-outlined text-[18px]">phone</span><span>Available Soon</span></span>';
 
       html += '' +
         '<article class="leader-card flex flex-col h-full" data-role="' + roleToSlug(leader.role) + '">' +
-          '<div class="relative aspect-[3/4] mb-[-40px] z-10 px-4">' + photoMarkup + '</div>' +
-          '<div class="leader-card-body bg-surface-container-lowest p-8 pt-16 rounded-xl sacred-shadow flex flex-col h-full" data-leader-id="' + leader.id + '" role="button" tabindex="0" aria-label="View profile for ' + escapeHtml(leader.name) + '">' +
+          '<div class="relative aspect-[3/4] mb-[-40px] z-10 px-4">' + cardPhoto + '</div>' +
+          '<div class="leader-card-body bg-surface-container-lowest p-8 pt-16 rounded-xl sacred-shadow flex flex-col h-full" data-leader-id="' + leader.id + '">' +
             '<span class="font-label-md text-label-md text-secondary uppercase tracking-[0.08em] block mb-2">' + escapeHtml(leader.role) + '</span>' +
             '<h3 class="font-title-lg text-title-lg text-primary mb-3">' + escapeHtml(leader.name) + '</h3>' +
             '<div class="mt-auto space-y-4">' +
               phoneRow +
-              '<span class="inline-flex items-center gap-1 text-secondary font-bold font-label-md text-label-md">View Full Profile <span aria-hidden="true">→</span></span>' +
+              '<button type="button" class="leader-view-btn font-label-md text-label-md" data-leader-id="' + leader.id + '" aria-label="View profile for ' + escapeHtml(leader.name) + '">' +
+                'View <span aria-hidden="true">→</span>' +
+              '</button>' +
             '</div>' +
           '</div>' +
         '</article>';
     });
     gridEl.innerHTML = html;
+    attachPhotoErrorHandlers(gridEl);
 
-    gridEl.querySelectorAll('[data-leader-id]').forEach(function (card) {
+    // Whole card is clickable...
+    gridEl.querySelectorAll('.leader-card-body').forEach(function (card) {
       card.addEventListener('click', function () { openModal(card.dataset.leaderId); });
-      card.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(card.dataset.leaderId); }
+    });
+    // ...and the explicit View button works too (stopPropagation avoids double-firing).
+    gridEl.querySelectorAll('.leader-view-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openModal(btn.dataset.leaderId);
       });
     });
   }
@@ -866,9 +995,8 @@
 
     // No inline width/height/object-fit here — .leader-modal-photo CSS now
     // owns the crop (object-position: top) so faces don't get cut off.
-    modalPhotoEl.innerHTML = leader.photo
-      ? '<img src="' + escapeHtml(leader.photo) + '" alt="' + escapeHtml(leader.name) + '" onerror="this.parentElement.innerHTML=\'<div class=&quot;img-placeholder&quot;><span class=&quot;material-symbols-outlined ph-icon&quot;>account_circle</span><span class=&quot;ph-label&quot;>Photo coming soon</span></div>\'"/>'
-      : '<div class="img-placeholder"><span class="material-symbols-outlined ph-icon">account_circle</span><span class="ph-label">Photo TBA</span></div>';
+    modalPhotoEl.innerHTML = photoMarkup(leader, '');
+    attachPhotoErrorHandlers(modalPhotoEl);
 
     modalRoleTagEl.textContent = leader.role;
     modalNameEl.textContent = leader.name;
@@ -913,6 +1041,5 @@
   renderLeaders();
 })();
 </script>
-
 </body>
 </html>
