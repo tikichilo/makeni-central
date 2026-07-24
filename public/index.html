@@ -2331,6 +2331,16 @@
    (open then instantly close). This file only owns things
    sda.js does NOT already handle: the API data loaders,
    footer year, and the visit planner modal.
+
+   FIX (this version): the DOMContentLoaded handler used to
+   call loadTheme(), a function that no longer exists after
+   the Theme of the Month section was removed. Calling an
+   undefined function throws a ReferenceError, which silently
+   killed the rest of that callback — so loadAnnouncements()
+   and initVisitPlanner() never ran, and the Plan Your Visit
+   modal appeared "broken" even though its own code was fine.
+   loadTheme() has been removed, and each init call below is
+   now wrapped so a single failure can't take down the others.
 ══════════════════════════════════════════════════════ */
 (function () {
 
@@ -2428,116 +2438,120 @@
   }
 
   /* ── Announcements: card carousel ── */
-let announceCards = [];
-let announceIndex = 0;
-let announceTimer = null;
-const ANNOUNCE_INTERVAL = 7000; // slow — legible for all ages
+  let announceCards = [];
+  let announceIndex = 0;
+  let announceTimer = null;
+  const ANNOUNCE_INTERVAL = 7000; // slow — legible for all ages
 
-async function loadAnnouncements() {
-  const data = await apiFetch('/api/announcements');
-  if (!data || !data.length) {
-    // Keep static fallback cards already in the HTML — just wire them up
-    initAnnounceCarousel();
-    return;
-  }
+  async function loadAnnouncements() {
+    const data = await apiFetch('/api/announcements');
+    if (!data || !data.length) {
+      // Keep static fallback cards already in the HTML — just wire them up
+      initAnnounceCarousel();
+      return;
+    }
 
-  const track = document.getElementById('announce-track');
-  if (!track) return;
+    const track = document.getElementById('announce-track');
+    if (!track) return;
 
-  const icons = ['campaign', 'church', 'event', 'volunteer_activism', 'menu_book'];
+    const icons = ['campaign', 'church', 'event', 'volunteer_activism', 'menu_book'];
 
-  track.innerHTML = data.map(function (a, i) {
-    return `
-      <div class="announce-card${i === 0 ? ' active' : ''}" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${data.length}">
-        <span class="material-symbols-outlined announce-icon" aria-hidden="true">${icons[i % icons.length]}</span>
-        <p class="announce-text">${esc(a.text)}</p>
-      </div>
-    `;
-  }).join('');
-
-  initAnnounceCarousel();
-}
-
-function initAnnounceCarousel() {
-  const track    = document.getElementById('announce-track');
-  const dotsWrap = document.getElementById('announce-dots');
-  const prevBtn  = document.getElementById('announce-prev');
-  const nextBtn  = document.getElementById('announce-next');
-  const viewport = document.querySelector('.announce-viewport');
-  if (!track) return;
-
-  announceCards = Array.from(track.querySelectorAll('.announce-card'));
-  announceIndex = announceCards.findIndex(function (c) { return c.classList.contains('active'); });
-  if (announceIndex < 0) announceIndex = 0;
-
-  // Single card — hide controls, nothing to rotate
-  if (announceCards.length <= 1) {
-    if (prevBtn) prevBtn.style.display = 'none';
-    if (nextBtn) nextBtn.style.display = 'none';
-    if (dotsWrap) dotsWrap.style.display = 'none';
-    return;
-  }
-
-  // Build dots
-  if (dotsWrap) {
-    dotsWrap.innerHTML = announceCards.map(function (_, i) {
-      return `<button class="announce-dot${i === announceIndex ? ' active' : ''}" role="tab" aria-label="Go to announcement ${i + 1}" aria-selected="${i === announceIndex}"></button>`;
+    track.innerHTML = data.map(function (a, i) {
+      return `
+        <div class="announce-card${i === 0 ? ' active' : ''}" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${data.length}">
+          <span class="material-symbols-outlined announce-icon" aria-hidden="true">${icons[i % icons.length]}</span>
+          <p class="announce-text">${esc(a.text)}</p>
+        </div>
+      `;
     }).join('');
-    dotsWrap.querySelectorAll('.announce-dot').forEach(function (dot, i) {
-      dot.addEventListener('click', function () { goToAnnounce(i); restartAnnounceTimer(); });
-    });
+
+    initAnnounceCarousel();
   }
 
-  function render() {
-    announceCards.forEach(function (c, i) { c.classList.toggle('active', i === announceIndex); });
+  function initAnnounceCarousel() {
+    const track    = document.getElementById('announce-track');
+    const dotsWrap = document.getElementById('announce-dots');
+    const prevBtn  = document.getElementById('announce-prev');
+    const nextBtn  = document.getElementById('announce-next');
+    const viewport = document.querySelector('.announce-viewport');
+    if (!track) return;
+
+    announceCards = Array.from(track.querySelectorAll('.announce-card'));
+    announceIndex = announceCards.findIndex(function (c) { return c.classList.contains('active'); });
+    if (announceIndex < 0) announceIndex = 0;
+
+    // Single card — hide controls, nothing to rotate
+    if (announceCards.length <= 1) {
+      if (prevBtn) prevBtn.style.display = 'none';
+      if (nextBtn) nextBtn.style.display = 'none';
+      if (dotsWrap) dotsWrap.style.display = 'none';
+      return;
+    }
+
+    // Build dots
     if (dotsWrap) {
-      dotsWrap.querySelectorAll('.announce-dot').forEach(function (d, i) {
-        d.classList.toggle('active', i === announceIndex);
-        d.setAttribute('aria-selected', i === announceIndex);
+      dotsWrap.innerHTML = announceCards.map(function (_, i) {
+        return `<button class="announce-dot${i === announceIndex ? ' active' : ''}" role="tab" aria-label="Go to announcement ${i + 1}" aria-selected="${i === announceIndex}"></button>`;
+      }).join('');
+      dotsWrap.querySelectorAll('.announce-dot').forEach(function (dot, i) {
+        dot.addEventListener('click', function () { goToAnnounce(i); restartAnnounceTimer(); });
       });
     }
-  }
 
-  function goToAnnounce(i) {
-    announceIndex = (i + announceCards.length) % announceCards.length;
+    function render() {
+      announceCards.forEach(function (c, i) { c.classList.toggle('active', i === announceIndex); });
+      if (dotsWrap) {
+        dotsWrap.querySelectorAll('.announce-dot').forEach(function (d, i) {
+          d.classList.toggle('active', i === announceIndex);
+          d.setAttribute('aria-selected', i === announceIndex);
+        });
+      }
+    }
+
+    function goToAnnounce(i) {
+      announceIndex = (i + announceCards.length) % announceCards.length;
+      render();
+    }
+
+    function nextAnnounce() { goToAnnounce(announceIndex + 1); }
+    function prevAnnounce() { goToAnnounce(announceIndex - 1); }
+
+    function restartAnnounceTimer() {
+      clearInterval(announceTimer);
+      announceTimer = setInterval(nextAnnounce, ANNOUNCE_INTERVAL);
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', function () { prevAnnounce(); restartAnnounceTimer(); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { nextAnnounce(); restartAnnounceTimer(); });
+
+    // Pause on hover/focus so someone reading slowly isn't rushed
+    if (viewport) {
+      viewport.addEventListener('mouseenter', function () { clearInterval(announceTimer); });
+      viewport.addEventListener('mouseleave', restartAnnounceTimer);
+      viewport.addEventListener('focusin', function () { clearInterval(announceTimer); });
+      viewport.addEventListener('focusout', restartAnnounceTimer);
+    }
+
+    // Pause when tab isn't visible (saves battery, avoids desync)
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) clearInterval(announceTimer);
+      else restartAnnounceTimer();
+    });
+
     render();
+    restartAnnounceTimer();
   }
 
-  function nextAnnounce() { goToAnnounce(announceIndex + 1); }
-  function prevAnnounce() { goToAnnounce(announceIndex - 1); }
-
-  function restartAnnounceTimer() {
-    clearInterval(announceTimer);
-    announceTimer = setInterval(nextAnnounce, ANNOUNCE_INTERVAL);
-  }
-
-  if (prevBtn) prevBtn.addEventListener('click', function () { prevAnnounce(); restartAnnounceTimer(); });
-  if (nextBtn) nextBtn.addEventListener('click', function () { nextAnnounce(); restartAnnounceTimer(); });
-
-  // Pause on hover/focus so someone reading slowly isn't rushed
-  if (viewport) {
-    viewport.addEventListener('mouseenter', function () { clearInterval(announceTimer); });
-    viewport.addEventListener('mouseleave', restartAnnounceTimer);
-    viewport.addEventListener('focusin', function () { clearInterval(announceTimer); });
-    viewport.addEventListener('focusout', restartAnnounceTimer);
-  }
-
-  // Pause when tab isn't visible (saves battery, avoids desync)
-  document.addEventListener('visibilitychange', function () {
-    if (document.hidden) clearInterval(announceTimer);
-    else restartAnnounceTimer();
-  });
-
-  render();
-  restartAnnounceTimer();
-}
-
-  /* Run all three on load */
+  /* Run all inits on load.
+     Each call is wrapped in its own try/catch so that if any single
+     loader throws (missing element, bad API response, future typo,
+     etc.) it logs a warning instead of silently aborting every loader
+     that comes after it — this is exactly what let a stray loadTheme()
+     call take down the Visit Planner before. */
   document.addEventListener('DOMContentLoaded', function () {
-    loadLesson();
-    loadTheme();
-    loadAnnouncements();
-    initVisitPlanner();
+    try { loadLesson(); }        catch (e) { console.warn('[index] loadLesson failed:', e); }
+    try { loadAnnouncements(); } catch (e) { console.warn('[index] loadAnnouncements failed:', e); }
+    try { initVisitPlanner(); }  catch (e) { console.warn('[index] initVisitPlanner failed:', e); }
   });
 
 

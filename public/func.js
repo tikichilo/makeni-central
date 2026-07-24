@@ -278,43 +278,6 @@ function initFundTracker() {
     });
 }
 
-
-/* ═══════════════════════════════════════════════
-   STORIES — kids.html
-═══════════════════════════════════════════════ */
-function initStories() {
-  const container = document.querySelector('[data-func="stories"]');
-  if (!container) return;
-
-  const prevBtn = container.querySelector('[data-stories-prev]');
-  const nextBtn = container.querySelector('[data-stories-next]');
-  const track   = container.querySelector('[data-stories-track]');
-
-  if (!prevBtn || !nextBtn || !track) return;
-
-  const cards     = [...track.children];
-  const cardCount = cards.length;
-  let   current   = 0;
-
-  function goTo(index) {
-    current = (index + cardCount) % cardCount;
-    track.style.transform = `translateX(-${current * 100}%)`;
-    prevBtn.setAttribute('aria-disabled', current === 0 ? 'true' : 'false');
-    nextBtn.setAttribute('aria-disabled', current === cardCount - 1 ? 'true' : 'false');
-  }
-
-  prevBtn.addEventListener('click', () => goTo(current - 1));
-  nextBtn.addEventListener('click', () => goTo(current + 1));
-
-  container.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft')  goTo(current - 1);
-    if (e.key === 'ArrowRight') goTo(current + 1);
-  });
-
-  goTo(0);
-}
-
-
 /* ═══════════════════════════════════════════════
    §17. LEADERS GRID — leaders.html
    Fetches /api/leaders and renders cards into
