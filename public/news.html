@@ -347,6 +347,71 @@
     display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.2s;
   }
   .news-modal-close:hover { background: #041534; }
+
+  /* ── Event Recap cards ── */
+.recap-card {
+  background: #fff; border-radius: 14px; overflow: hidden; border: 1px solid #e2e2e2;
+  display: flex; flex-direction: column; cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.recap-card:hover { box-shadow: 0 14px 34px -12px rgba(4,21,52,0.16); transform: translateY(-2px); }
+.recap-card-cover-wrap { position: relative; width: 100%; aspect-ratio: 4 / 3; background: #eee; overflow: hidden; }
+.recap-card-cover-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+.recap-card:hover .recap-card-cover-img { transform: scale(1.04); }
+.recap-photo-count-badge {
+  position: absolute; bottom: 12px; right: 12px; background: rgba(4,21,52,0.75); color: #fff;
+  font-family: Inter, sans-serif; font-size: 12px; font-weight: 700; padding: 5px 11px;
+  border-radius: 999px; display: flex; align-items: center; gap: 5px; backdrop-filter: blur(4px);
+}
+.recap-card-body { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+.recap-card-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; color: #041534; margin-bottom: 6px; }
+.recap-card-desc {
+  font-family: Inter, sans-serif; font-size: 14px; color: #45464e; line-height: 1.5; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* ── Recap gallery modal ── */
+.recap-modal-box { max-width: 720px; }
+.recap-gallery-stage {
+  position: relative; width: 100%; aspect-ratio: 4 / 3; background: #000;
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+}
+.recap-gallery-track { position: relative; width: 100%; height: 100%; }
+.recap-gallery-img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.recap-gallery-img.active { opacity: 1; pointer-events: auto; }
+
+.recap-gallery-nav {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.15); color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px); transition: background 0.2s ease;
+}
+.recap-gallery-nav:hover { background: rgba(255,255,255,0.3); }
+.recap-gallery-prev { left: 14px; }
+.recap-gallery-next { right: 14px; }
+
+.recap-gallery-counter {
+  position: absolute; bottom: 14px; right: 14px; z-index: 3;
+  background: rgba(4,21,52,0.7); color: #fff; font-family: Inter, sans-serif;
+  font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px;
+}
+
+.recap-gallery-thumbs {
+  display: flex; gap: 8px; padding: 14px 16px; overflow-x: auto; background: #f3f3f4;
+  scrollbar-width: thin;
+}
+.recap-gallery-thumb {
+  flex-shrink: 0; width: 56px; height: 56px; border-radius: 8px; overflow: hidden;
+  border: 2px solid transparent; padding: 0; cursor: pointer; background: none;
+  transition: border-color 0.2s ease, opacity 0.2s ease; opacity: 0.6;
+}
+.recap-gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.recap-gallery-thumb.active { border-color: #755b00; opacity: 1; }
+.recap-gallery-thumb:hover { opacity: 1; }
 </style>
 </head>
 
@@ -647,6 +712,86 @@
   </div>
 </section>
 
+<!-- ══════════════ EVENT RECAPS ══════════════
+     JS hook: populate #news-recaps-grid with .recap-card elements.
+     Each recap needs:
+       - a cover image (first/designated image from its `images` array —
+         up to 10 photos per recap)
+       - .recap-card-title  (event title)
+       - .recap-card-desc   (short description)
+       - a photo-count badge (e.g. "8 photos")
+       - data-recap-id="<id>" so a click opens #recap-gallery-modal
+         with that recap's full image set, title, and description -->
+<section class="mb-20" aria-labelledby="recaps-heading">
+  <div class="mb-8 text-center">
+    <h2 id="recaps-heading" class="font-headline-md text-headline-md text-primary">Event Recaps</h2>
+    <div class="gold-divider mt-3 mx-auto"></div>
+    <p class="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto mt-4">A look back at recent moments from around the church.</p>
+  </div>
+
+  <div id="news-recaps-loading-skel" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="skel-card" style="height:280px;"></div>
+    <div class="skel-card" style="height:280px;"></div>
+    <div class="skel-card" style="height:280px;"></div>
+  </div>
+
+  <!-- Real cards get injected here by JS. Each card should be clickable
+       and carry data-recap-id="<id>" so the gallery modal knows which
+       recap's photos to load. -->
+  <div id="news-recaps-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" style="display:none;"></div>
+
+  <div id="news-recaps-empty-state" class="py-16 text-center" style="display:none;">
+    <div class="inline-flex items-center justify-center w-20 h-20 bg-surface-container rounded-full mb-4">
+      <span class="material-symbols-outlined text-outline text-[40px]" aria-hidden="true">photo_library</span>
+    </div>
+    <h3 class="font-headline-sm text-headline-sm text-on-surface-variant mb-2">No event recaps yet.</h3>
+    <p class="font-body-md text-body-md text-outline">Photos from recent events will show up here.</p>
+  </div>
+</section>
+
+<!-- ══════════════ EVENT RECAP GALLERY MODAL ══════════════
+     JS hook:
+       - fill #recap-gallery-title / #recap-gallery-desc
+       - build #recap-gallery-track with up to 10
+         <img class="recap-gallery-img"> — one per photo, JS toggles
+         which one has the `.active` class to show it
+       - build #recap-gallery-thumbs with one thumbnail button per
+         image; clicking a thumb should jump the track to that slide
+       - update #recap-gallery-counter (e.g. "3 / 8") on every slide change
+       - #recap-gallery-prev / #recap-gallery-next step the slide;
+         also wire ArrowLeft/ArrowRight while this modal is open
+       - toggle .active on #recap-gallery-modal to open/close -->
+<div id="recap-gallery-modal" class="news-modal recap-modal" role="dialog" aria-modal="true" aria-labelledby="recap-gallery-title">
+  <div class="news-modal-box recap-modal-box">
+    <button class="news-modal-close" id="recap-gallery-close" aria-label="Close event recap">✕</button>
+
+    <div class="recap-gallery-stage">
+      <button class="recap-gallery-nav recap-gallery-prev" id="recap-gallery-prev" aria-label="Previous photo">
+        <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+      </button>
+
+      <div class="recap-gallery-track" id="recap-gallery-track">
+        <!-- JS injects up to 10 <img class="recap-gallery-img"> here -->
+      </div>
+
+      <button class="recap-gallery-nav recap-gallery-next" id="recap-gallery-next" aria-label="Next photo">
+        <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+      </button>
+
+      <span class="recap-gallery-counter" id="recap-gallery-counter">1 / 1</span>
+    </div>
+
+    <div class="recap-gallery-thumbs" id="recap-gallery-thumbs">
+      <!-- JS injects one thumbnail button per image here -->
+    </div>
+
+    <div class="news-modal-body" style="padding-top:20px;">
+      <h2 id="recap-gallery-title" class="font-headline-md text-headline-md text-primary mb-2">Event Title</h2>
+      <p id="recap-gallery-desc" class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed"></p>
+    </div>
+  </div>
+</div>
+
   </div>
 </main>
 
@@ -749,6 +894,16 @@
     return d.toLocaleDateString('en-ZM', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
+  // Short "25 MAY" style badge for event poster cards.
+  function formatEventDateBadge(value) {
+    if (!value) return null;
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return null;
+    const day = d.getDate();
+    const month = d.toLocaleDateString('en-ZM', { month: 'short' }).toUpperCase();
+    return day + ' ' + month;
+  }
+
   // "3 hours left" / "1 day left" style countdown for expiresAt.
   function formatTimeLeft(expiresAt) {
     if (!expiresAt) return null;
@@ -761,9 +916,9 @@
     return days + (days === 1 ? ' day left' : ' days left');
   }
 
-  // Derive a short heading from the raw text since the Announcement
-  // model only stores `text` (no title field): prefer the first
-  // sentence, otherwise truncate at a word boundary near 70 chars.
+  // Derive a short heading from the raw text when the API doesn't
+  // supply a title: prefer the first sentence, otherwise truncate
+  // at a word boundary near 70 characters.
   function deriveTitle(text) {
     if (!text) return 'Announcement';
     const firstSentence = text.match(/^[^.!?\n]{5,90}[.!?]/);
@@ -774,13 +929,19 @@
     return (lastSpace > 30 ? cut.slice(0, lastSpace) : cut).trim() + '…';
   }
 
+  /* ══════════════════════════════════════════════════════
+     ANNOUNCEMENTS
+  ══════════════════════════════════════════════════════ */
+
   /* ── Reactions ──
-     No /api/announcements/:id/react endpoint exists yet, so reaction
-     state lives in localStorage (per-browser, not shared between
-     visitors). syncReaction() already POSTs to the endpoint this will
-     need — it just silently no-ops today since the route 404s. Once
-     that route exists server-side, reactions start persisting/syncing
-     with zero changes needed here. */
+     The server now persists real counts in `reactions.{amen,love,praise}`
+     and POST /api/announcements/:id/react actually exists — so this is
+     no longer purely local. Each visitor's own on/off state still lives
+     in localStorage (so a reaction button shows as "pressed" for the
+     person who pressed it), but the NUMBER shown next to each emoji now
+     comes from the server, and syncReaction()'s response is used to
+     reconcile the displayed count in case another visitor reacted at
+     the same time — no more silently ignoring what the server sends back. */
   const REACTIONS = [
     { key: 'amen',   emoji: '🙏', label: 'Amen'   },
     { key: 'love',   emoji: '❤️', label: 'Love'   },
@@ -804,14 +965,16 @@
     }
   }
 
+  // Returns the server's response ({ success, reactions }) so callers
+  // can reconcile the displayed count, or null if the request failed
+  // (offline, server down, etc.) — in that case the optimistic local
+  // update stands as-is until the next page load.
   async function syncReaction(announcementId, reactionKey, active) {
-    await apiFetch('/api/announcements/' + announcementId + '/react', {
+    return apiFetch('/api/announcements/' + announcementId + '/react', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reaction: reactionKey, active: active })
     });
-    // Intentionally fire-and-forget: this endpoint doesn't exist on the
-    // server yet, so failures here are expected and silent for now.
   }
 
   const CATEGORY_STYLES = {
@@ -824,16 +987,19 @@
   let allAnnouncements = [];
   let activeCategory = 'all';
 
-  function reactionsHtml(id) {
+  function reactionsHtml(id, counts) {
+    counts = counts || {};
     const local = loadLocalReactions();
     const mine  = local[id] || {};
     return `
       <div class="news-reactions" data-announcement-id="${esc(id)}">
         ${REACTIONS.map(function (r) {
           const isActive = !!mine[r.key];
+          const count = Number(counts[r.key]) || 0;
           return `
             <button type="button" class="news-reaction-btn${isActive ? ' active' : ''}" data-reaction="${r.key}" aria-pressed="${isActive}" aria-label="React with ${r.label}">
               <span aria-hidden="true">${r.emoji}</span>
+              <span class="news-reaction-count" data-count-for="${r.key}">${count > 0 ? count : ''}</span>
             </button>
           `;
         }).join('')}
@@ -860,7 +1026,7 @@
         </div>
         <h3 class="font-headline-sm text-headline-sm text-primary mb-3">${title}</h3>
         <p class="font-body-md text-body-md text-on-surface-variant mb-4 news-card-body" data-card-index="${i}">${body}</p>
-        ${reactionsHtml(id)}
+        ${reactionsHtml(id, a.reactions)}
         <div class="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/40">
           <span class="font-caption text-caption text-outline">${dateStr ? esc(dateStr) : ''}</span>
           <button type="button" class="text-secondary font-label-md text-label-md flex items-center gap-1 hover:underline news-read-more" data-card-index="${i}" aria-expanded="false">
@@ -875,7 +1041,7 @@
     grid.querySelectorAll('.news-reactions').forEach(function (wrap) {
       const id = wrap.dataset.announcementId;
       wrap.querySelectorAll('.news-reaction-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', async function () {
           const key    = btn.dataset.reaction;
           const local  = loadLocalReactions();
           const mine   = local[id] || {};
@@ -890,7 +1056,22 @@
           btn.classList.add('pop');
           setTimeout(function () { btn.classList.remove('pop'); }, 220);
 
-          syncReaction(id, key, active);
+          // Optimistic count update so the tap feels instant.
+          const countEl = btn.querySelector('.news-reaction-count[data-count-for="' + key + '"]');
+          if (countEl) {
+            const current = Number(countEl.textContent) || 0;
+            const next = Math.max(0, current + (active ? 1 : -1));
+            countEl.textContent = next > 0 ? String(next) : '';
+          }
+
+          // Reconcile with the server's real count once it responds —
+          // covers cases where someone else reacted at the same time,
+          // or the optimistic guess above didn't match server state.
+          const result = await syncReaction(id, key, active);
+          if (result && result.reactions && countEl) {
+            const serverCount = Number(result.reactions[key]) || 0;
+            countEl.textContent = serverCount > 0 ? String(serverCount) : '';
+          }
         });
       });
     });
@@ -912,8 +1093,9 @@
 
   // Staggered fade-up entrance so a full grid doesn't just snap into
   // place — small polish, respects prefers-reduced-motion via CSS.
+  // Shared by announcement cards, event poster cards, and recap cards.
   function animateCardsIn(grid) {
-    const cards = grid.querySelectorAll('.news-card');
+    const cards = grid.querySelectorAll('.news-card, .event-poster-card, .recap-card');
     cards.forEach(function (card, i) {
       card.classList.add('news-card-enter');
       setTimeout(function () { card.classList.add('news-card-enter-active'); }, 40 * i);
@@ -927,8 +1109,8 @@
     if (!grid) return;
 
     const now = Date.now();
-    // Drop anything past its expiresAt — the server has no filtering
-    // on GET yet, so this is the safety net until it does.
+    // Drop anything past its expiresAt — belt-and-suspenders on top of
+    // the server's own GET filtering.
     const active = allAnnouncements.filter(function (a) {
       return !a.expiresAt || new Date(a.expiresAt).getTime() > now;
     });
@@ -957,8 +1139,7 @@
   }
 
   // Only worth showing the filter pills once the data actually
-  // contains more than one distinct category — the current schema
-  // has none, so this stays hidden until categories exist.
+  // contains more than one distinct category.
   function setUpCategoryPills() {
     const pillsNav = document.getElementById('news-cat-pills');
     if (!pillsNav) return;
@@ -1010,10 +1191,350 @@
     }, REFRESH_INTERVAL_MS);
   }
 
+  /* ══════════════════════════════════════════════════════
+     UPCOMING EVENTS
+     GET /api/events now exists — returns upcoming events, soonest
+     first, each with { _id, title, posterUrl, date, time, location, info }.
+  ══════════════════════════════════════════════════════ */
+
+  let allEvents = [];
+
+  function eventCardHtml(ev, i) {
+    const id        = ev._id || ev.id || String(i);
+    const poster    = ev.posterUrl || '';
+    const title     = esc(ev.title || 'Event');
+    const info      = esc(ev.info || '');
+    const dateBadge = formatEventDateBadge(ev.date);
+
+    return `
+      <div class="event-poster-card" data-event-id="${esc(id)}" data-event-index="${i}" tabindex="0" role="button" aria-label="View details for ${title}">
+        <div class="event-poster-img-wrap">
+          ${poster ? `<img class="event-poster-img" src="${esc(poster)}" alt="${title}" loading="lazy"/>` : ''}
+          ${dateBadge ? `<span class="event-poster-date">${esc(dateBadge)}</span>` : ''}
+        </div>
+        <div class="event-poster-body">
+          <h3 class="event-poster-title">${title}</h3>
+          <p class="event-poster-info">${info}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderEvents() {
+    const grid  = document.getElementById('news-events-grid');
+    const skel  = document.getElementById('news-events-loading-skel');
+    const empty = document.getElementById('news-events-empty-state');
+    if (!grid) return;
+
+    if (skel) skel.style.display = 'none';
+
+    if (!allEvents.length) {
+      grid.style.display = 'none';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+
+    if (empty) empty.style.display = 'none';
+    grid.style.display = 'grid';
+    grid.innerHTML = allEvents.map(eventCardHtml).join('');
+
+    grid.querySelectorAll('.event-poster-card').forEach(function (card) {
+      function open() {
+        const idx = Number(card.dataset.eventIndex);
+        openEventModal(allEvents[idx]);
+      }
+      card.addEventListener('click', open);
+      card.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+      });
+    });
+
+    animateCardsIn(grid);
+  }
+
+  async function loadNewsEvents() {
+    const data = await apiFetch('/api/events');
+    allEvents = Array.isArray(data) ? data : [];
+    renderEvents();
+  }
+
+  function openEventModal(ev) {
+    if (!ev) return;
+    const modal   = document.getElementById('event-modal');
+    const imgEl   = document.getElementById('event-modal-image');
+    const dateEl  = document.getElementById('event-modal-date');
+    const titleEl = document.getElementById('event-modal-title');
+    const infoEl  = document.getElementById('event-modal-info');
+    if (!modal) return;
+
+    if (imgEl) {
+      if (ev.posterUrl) {
+        imgEl.src = ev.posterUrl;
+        imgEl.alt = ev.title || '';
+        imgEl.style.display = '';
+      } else {
+        imgEl.style.display = 'none';
+      }
+    }
+    if (dateEl)  dateEl.textContent  = formatDate(ev.date) + (ev.time ? ' · ' + ev.time : '');
+    if (titleEl) titleEl.textContent = ev.title || 'Event';
+    if (infoEl)  infoEl.textContent  = ev.info || '';
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeEventModal() {
+    const modal = document.getElementById('event-modal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function initEventModal() {
+    const modal    = document.getElementById('event-modal');
+    const closeBtn = document.getElementById('event-modal-close');
+    if (!modal) return;
+
+    if (closeBtn) closeBtn.addEventListener('click', closeEventModal);
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) closeEventModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (modal.classList.contains('active') && e.key === 'Escape') closeEventModal();
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════
+     FEATURED EVENT
+     GET /api/events/featured now exists — returns the one event
+     marked featured, or null. Section stays hidden with no featured
+     event rather than showing stale placeholder content.
+  ══════════════════════════════════════════════════════ */
+
+  let featuredEventData = null;
+
+  async function loadFeaturedEvent() {
+    const data = await apiFetch('/api/events/featured');
+    const section = document.getElementById('featured-event-section');
+    if (!section) return;
+
+    if (!data) {
+      featuredEventData = null;
+      section.style.display = 'none';
+      return;
+    }
+
+    featuredEventData = data;
+
+    const imgEl   = document.getElementById('featured-event-image');
+    const dateEl  = document.getElementById('featured-event-date');
+    const titleEl = document.getElementById('featured-event-title');
+    const infoEl  = document.getElementById('featured-event-info');
+
+    if (imgEl) { imgEl.src = data.posterUrl || ''; imgEl.alt = data.title || ''; }
+    if (dateEl) dateEl.textContent = formatDate(data.date) + (data.time ? ' · ' + data.time : '');
+    if (titleEl) titleEl.textContent = data.title || 'Featured Event';
+    if (infoEl) infoEl.textContent = data.info || '';
+
+    section.style.display = '';
+  }
+
+  function initFeaturedEventCta() {
+    const cta = document.getElementById('featured-event-cta');
+    if (!cta) return;
+    // Reuses the same detail modal as Upcoming Events — no separate
+    // modal needed for "Plan to Attend" since the info is identical.
+    cta.addEventListener('click', function () {
+      if (featuredEventData) openEventModal(featuredEventData);
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════
+     EVENT RECAPS
+     GET /api/recaps returns { _id, title, description, images: [url, ...] }
+     (max 10 images per recap).
+  ══════════════════════════════════════════════════════ */
+
+  let allRecaps = [];
+  let activeRecap = null;
+  let activeSlideIndex = 0;
+
+  function recapCardHtml(r, i) {
+    const id          = r._id || r.id || String(i);
+    const images      = Array.isArray(r.images) ? r.images.slice(0, 10) : [];
+    const cover       = images[0] || '';
+    const title       = esc(r.title || 'Untitled Event');
+    const desc        = esc(r.description || '');
+    const photoCount  = images.length;
+
+    return `
+      <div class="recap-card" data-recap-id="${esc(id)}" data-recap-index="${i}" tabindex="0" role="button" aria-label="View photos from ${title}">
+        <div class="recap-card-cover-wrap">
+          ${cover ? `<img class="recap-card-cover-img" src="${esc(cover)}" alt="${title}" loading="lazy"/>` : ''}
+          ${photoCount ? `
+            <span class="recap-photo-count-badge">
+              <span class="material-symbols-outlined" style="font-size:14px;" aria-hidden="true">photo_library</span>
+              ${photoCount} ${photoCount === 1 ? 'photo' : 'photos'}
+            </span>
+          ` : ''}
+        </div>
+        <div class="recap-card-body">
+          <h3 class="recap-card-title">${title}</h3>
+          <p class="recap-card-desc">${desc}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderRecaps() {
+    const grid  = document.getElementById('news-recaps-grid');
+    const skel  = document.getElementById('news-recaps-loading-skel');
+    const empty = document.getElementById('news-recaps-empty-state');
+    if (!grid) return;
+
+    if (skel) skel.style.display = 'none';
+
+    if (!allRecaps.length) {
+      grid.style.display = 'none';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+
+    if (empty) empty.style.display = 'none';
+    grid.style.display = 'grid';
+    grid.innerHTML = allRecaps.map(recapCardHtml).join('');
+
+    grid.querySelectorAll('.recap-card').forEach(function (card) {
+      function open() {
+        const idx = Number(card.dataset.recapIndex);
+        openRecapGallery(allRecaps[idx]);
+      }
+      card.addEventListener('click', open);
+      card.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+      });
+    });
+
+    animateCardsIn(grid);
+  }
+
+  async function loadNewsRecaps() {
+    const data = await apiFetch('/api/recaps');
+    allRecaps = Array.isArray(data) ? data : [];
+    renderRecaps();
+  }
+
+  /* ── Recap gallery modal ── */
+
+  function buildGalleryMarkup(images) {
+    const track  = document.getElementById('recap-gallery-track');
+    const thumbs = document.getElementById('recap-gallery-thumbs');
+    if (!track || !thumbs) return;
+
+    track.innerHTML = images.map(function (url, i) {
+      return `<img class="recap-gallery-img${i === 0 ? ' active' : ''}" src="${esc(url)}" alt="" data-slide-index="${i}"/>`;
+    }).join('');
+
+    thumbs.innerHTML = images.map(function (url, i) {
+      return `
+        <button type="button" class="recap-gallery-thumb${i === 0 ? ' active' : ''}" data-slide-index="${i}" aria-label="Photo ${i + 1}">
+          <img src="${esc(url)}" alt=""/>
+        </button>
+      `;
+    }).join('');
+
+    thumbs.querySelectorAll('.recap-gallery-thumb').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        showSlide(Number(btn.dataset.slideIndex));
+      });
+    });
+  }
+
+  function showSlide(index) {
+    if (!activeRecap) return;
+    const images = Array.isArray(activeRecap.images) ? activeRecap.images.slice(0, 10) : [];
+    if (!images.length) return;
+
+    activeSlideIndex = (index + images.length) % images.length;
+
+    document.querySelectorAll('.recap-gallery-img').forEach(function (img) {
+      img.classList.toggle('active', Number(img.dataset.slideIndex) === activeSlideIndex);
+    });
+    document.querySelectorAll('.recap-gallery-thumb').forEach(function (thumb) {
+      thumb.classList.toggle('active', Number(thumb.dataset.slideIndex) === activeSlideIndex);
+    });
+
+    const counter = document.getElementById('recap-gallery-counter');
+    if (counter) counter.textContent = (activeSlideIndex + 1) + ' / ' + images.length;
+  }
+
+  function openRecapGallery(recap) {
+    if (!recap) return;
+    const modal   = document.getElementById('recap-gallery-modal');
+    const titleEl = document.getElementById('recap-gallery-title');
+    const descEl  = document.getElementById('recap-gallery-desc');
+    if (!modal) return;
+
+    activeRecap = recap;
+    const images = Array.isArray(recap.images) ? recap.images.slice(0, 10) : [];
+
+    if (titleEl) titleEl.textContent = recap.title || 'Untitled Event';
+    if (descEl)  descEl.textContent  = recap.description || '';
+
+    buildGalleryMarkup(images);
+    showSlide(0);
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeRecapGallery() {
+    const modal = document.getElementById('recap-gallery-modal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+    activeRecap = null;
+  }
+
+  function initRecapGallery() {
+    const modal    = document.getElementById('recap-gallery-modal');
+    const closeBtn = document.getElementById('recap-gallery-close');
+    const prevBtn  = document.getElementById('recap-gallery-prev');
+    const nextBtn  = document.getElementById('recap-gallery-next');
+    if (!modal) return;
+
+    if (closeBtn) closeBtn.addEventListener('click', closeRecapGallery);
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) closeRecapGallery();
+    });
+
+    if (prevBtn) prevBtn.addEventListener('click', function () { showSlide(activeSlideIndex - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { showSlide(activeSlideIndex + 1); });
+
+    document.addEventListener('keydown', function (e) {
+      if (!modal.classList.contains('active')) return;
+      if (e.key === 'Escape')     closeRecapGallery();
+      if (e.key === 'ArrowLeft')  showSlide(activeSlideIndex - 1);
+      if (e.key === 'ArrowRight') showSlide(activeSlideIndex + 1);
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════
+     INIT
+  ══════════════════════════════════════════════════════ */
   document.addEventListener('DOMContentLoaded', function () {
     try { initCategoryPillClicks(); } catch (e) { console.warn('[news] initCategoryPillClicks failed:', e); }
     try { loadNewsAnnouncements(); }   catch (e) { console.warn('[news] loadNewsAnnouncements failed:', e); }
     try { startAutoRefresh(); }        catch (e) { console.warn('[news] startAutoRefresh failed:', e); }
+
+    try { initEventModal(); }          catch (e) { console.warn('[news] initEventModal failed:', e); }
+    try { loadNewsEvents(); }          catch (e) { console.warn('[news] loadNewsEvents failed:', e); }
+    try { loadFeaturedEvent(); }       catch (e) { console.warn('[news] loadFeaturedEvent failed:', e); }
+    try { initFeaturedEventCta(); }    catch (e) { console.warn('[news] initFeaturedEventCta failed:', e); }
+
+    try { initRecapGallery(); }        catch (e) { console.warn('[news] initRecapGallery failed:', e); }
+    try { loadNewsRecaps(); }          catch (e) { console.warn('[news] loadNewsRecaps failed:', e); }
   });
 
 })();

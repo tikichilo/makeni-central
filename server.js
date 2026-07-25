@@ -3,37 +3,49 @@
  * Node.js + Express + MongoDB (Mongoose)
  *
  *  — Public endpoints —
- *  POST /api/donate                — Give modal
- *  GET  /api/fund                  — Fund tracker stats
- *  GET  /api/discussions           — Youth board list
- *  POST /api/discussions           — Submit new discussion
- *  POST /api/discussions/:id/like  — Like a discussion
- *  GET  /api/lesson                — Lesson of the week
- *  GET  /api/theme                 — Theme of the month
- *  GET  /api/announcements         — Active announcements
- *  POST /api/visits                — Save a "Plan Your Visit" submission
+ *  POST /api/donate                    — Give modal
+ *  GET  /api/fund                      — Fund tracker stats
+ *  GET  /api/discussions               — Youth board list
+ *  POST /api/discussions               — Submit new discussion
+ *  POST /api/discussions/:id/like      — Like a discussion
+ *  GET  /api/lesson                    — Lesson of the week
+ *  GET  /api/theme                     — Theme of the month
+ *  GET  /api/announcements             — Active announcements
+ *  POST /api/announcements/:id/react   — React to an announcement (amen/love/praise)
+ *  POST /api/visits                    — Save a "Plan Your Visit" submission
+ *  GET  /api/events                    — Upcoming events
+ *  GET  /api/events/featured           — The single featured event (or null)
+ *  GET  /api/recaps                    — Event recap galleries
  *
  *  — Admin endpoints —
- *  GET    /api/donations            — List all donations
- *  DELETE /api/discussions/:id      — Delete a discussion
- *  POST   /api/fund/goal            — Update fundraising goal
- *  POST   /api/lesson               — Save lesson of the week
- *  POST   /api/theme                — Save theme of the month
- *  POST   /api/announcements        — Add announcement
- *  DELETE /api/announcements/:id    — Remove announcement
+ *  GET    /api/donations             — List all donations
+ *  DELETE /api/discussions/:id       — Delete a discussion
+ *  POST   /api/fund/goal             — Update fundraising goal
+ *  POST   /api/lesson                — Save lesson of the week
+ *  POST   /api/theme                 — Save theme of the month
+ *  POST   /api/announcements         — Add announcement (text, title, category, expiresAt)
+ *  DELETE /api/announcements/:id     — Remove announcement
  *  GET    /api/visits                — List planned visits
+ *  POST   /api/events                — Add event (multipart: poster + fields)
+ *  PATCH  /api/events/:id/feature    — Mark an event as the featured one
+ *  DELETE /api/events/:id            — Remove an event
+ *  POST   /api/recaps                — Add event recap (multipart: up to 10 images + fields)
+ *  DELETE /api/recaps/:id            — Remove a recap
  */
 
 'use strict';
 
 const path     = require('path');
+const fs       = require('fs');
 const express  = require('express');
 const mongoose = require('mongoose');
 const cors     = require('cors');
+const multer   = require('multer');
 require('dotenv').config();
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+
 
 /* ═══════════════════════════════════════════════
    MIDDLEWARE
@@ -50,6 +62,63 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
+
+/* ═══════════════════════════════════════════════
+   UPLOADS (event posters + recap gallery images)
+   Stored under public/uploads/... so express.static above serves them
+   directly at /uploads/events/<file> and /uploads/recaps/<file> —
+   no extra route needed. Non-image files and anything over 5MB are
+   rejected before they touch disk.
+═══════════════════════════════════════════════ */
+const UPLOAD_ROOT       = path.join(__dirname, 'public', 'uploads');
+const EVENT_UPLOAD_DIR  = path.join(UPLOAD_ROOT, 'events');
+const RECAP_UPLOAD_DIR  = path.join(UPLOAD_ROOT, 'recaps');
+[EVENT_UPLOAD_DIR, RECAP_UPLOAD_DIR].forEach(dir => fs.mkdirSync(dir, { recursive: true }));
+
+const IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+function makeStorage(dir) {
+  return multer.diskStorage({
+    destination: (req, file, cb) => cb(null, dir),
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase();
+      const safeExt = ['.jpg', '.jpeg', '.png', '.webp'].includes(ext) ? ext : '.jpg';
+      cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${safeExt}`);
+    },
+  });
+}
+
+function imageFileFilter(req, file, cb) {
+  if (!IMAGE_MIME_TYPES.includes(file.mimetype)) {
+    return cb(new Error('Only JPG, PNG, and WEBP images are allowed'));
+  }
+  cb(null, true);
+}
+
+const uploadEventPoster = multer({
+  storage: makeStorage(EVENT_UPLOAD_DIR),
+  fileFilter: imageFileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+});
+
+const uploadRecapImages = multer({
+  storage: makeStorage(RECAP_UPLOAD_DIR),
+  fileFilter: imageFileFilter,
+  limits: { fileSize: 5 * 1024 * 1024, files: 10 }, // 5MB each, 10 max
+});
+
+// Best-effort file deletion — never throws, just logs if it fails
+// (e.g. file already gone). Used when deleting events/recaps.
+function deleteUploadedFile(publicUrl) {
+  if (!publicUrl) return;
+  const filePath = path.join(__dirname, 'public', publicUrl);
+  fs.unlink(filePath, err => {
+    if (err && err.code !== 'ENOENT') {
+      console.warn('Could not delete uploaded file:', filePath, err.message);
+    }
+  });
+}
 
 
 /* ═══════════════════════════════════════════════
@@ -132,9 +201,22 @@ const Theme = mongoose.model('Theme', themeSchema);
 
 
 // ── Announcement ──
+// title/category are optional additions on top of your original `text`
+// field — fully backward compatible. Existing text-only announcements
+// keep working; the news page derives a title from `text` when `title`
+// is blank, and treats a blank `category` as "general".
+const ANNOUNCEMENT_REACTION_KEYS = ['amen', 'love', 'praise'];
+
 const announcementSchema = new mongoose.Schema({
   text:      { type: String, required: true, maxlength: 200 },
+  title:     { type: String, default: '',        maxlength: 100 },
+  category:  { type: String, default: 'general', maxlength: 40, lowercase: true, trim: true },
   expiresAt: { type: Date,   default: null },
+  reactions: {
+    amen:   { type: Number, default: 0, min: 0 },
+    love:   { type: Number, default: 0, min: 0 },
+    praise: { type: Number, default: 0, min: 0 },
+  },
   createdAt: { type: Date,   default: Date.now },
 });
 const Announcement = mongoose.model('Announcement', announcementSchema);
@@ -154,6 +236,37 @@ const Visit = mongoose.model('Visit', visitSchema);
 // Allowed values, kept in sync with the service buttons in index.html
 const VISIT_SERVICES = ['Sabbath School', 'Divine Service', 'Bible Study', 'Full Day'];
 const VISIT_NEEDS     = ['prayer', 'welcome', 'kids', 'transport'];
+
+
+// ── Event — Upcoming Events + Featured Event on news.html ──
+const eventSchema = new mongoose.Schema({
+  title:     { type: String,  required: true, maxlength: 120 },
+  posterUrl: { type: String,  default: '' },                  // /uploads/events/<file>
+  date:      { type: Date,    required: true },
+  time:      { type: String,  default: '',    maxlength: 60  }, // e.g. "09:00 AM – 04:00 PM"
+  location:  { type: String,  default: '',    maxlength: 150 },
+  info:      { type: String,  default: '',    maxlength: 1000 },
+  featured:  { type: Boolean, default: false },                 // only one should be true at a time
+  createdAt: { type: Date,    default: Date.now },
+});
+const Event = mongoose.model('Event', eventSchema);
+
+
+// ── Recap — Event Recaps gallery on news.html ──
+const recapSchema = new mongoose.Schema({
+  title:       { type: String, required: true, maxlength: 120 },
+  description: { type: String, default: '',    maxlength: 1000 },
+  images: {
+    type: [String],   // /uploads/recaps/<file>, up to 10
+    default: [],
+    validate: {
+      validator: arr => arr.length > 0 && arr.length <= 10,
+      message: 'A recap needs between 1 and 10 images',
+    },
+  },
+  createdAt: { type: Date, default: Date.now },
+});
+const Recap = mongoose.model('Recap', recapSchema);
 
 
 /* ═══════════════════════════════════════════════
@@ -319,6 +432,46 @@ app.get('/api/announcements', async (req, res) => {
 });
 
 
+// ── POST /api/announcements/:id/react ──
+// Increments/decrements a reaction counter. No user accounts exist yet,
+// so this trusts the client's `active` flag (toggle on/off) rather than
+// tracking who reacted — matches the news.html frontend, which already
+// tracks each visitor's own toggle state in localStorage and just tells
+// the server whether to add or remove one from the count.
+app.post('/api/announcements/:id/react', async (req, res) => {
+  try {
+    const { reaction, active } = req.body;
+
+    if (!ANNOUNCEMENT_REACTION_KEYS.includes(reaction)) {
+      return res.status(400).json({ error: 'Invalid reaction type' });
+    }
+
+    const delta = active ? 1 : -1;
+    let ann = await Announcement.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { [`reactions.${reaction}`]: delta } },
+      { new: true }
+    );
+
+    if (!ann) return res.status(404).json({ error: 'Not found' });
+
+    // Guard against the count dipping below 0 (e.g. a stale toggle from
+    // a second tab). $min could do this atomically, but a follow-up
+    // clamp is simpler and this endpoint is low-stakes/low-traffic.
+    if (ann.reactions[reaction] < 0) {
+      ann.reactions[reaction] = 0;
+      await ann.save();
+    }
+
+    res.json({ success: true, reactions: ann.reactions });
+
+  } catch (err) {
+    console.error('POST /api/announcements/:id/react:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
 // ── POST /api/visits ──
 // Saves a "Plan Your Visit" submission: date, service, name, needs.
 app.post('/api/visits', async (req, res) => {
@@ -355,6 +508,60 @@ app.post('/api/visits', async (req, res) => {
 
   } catch (err) {
     console.error('POST /api/visits:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── GET /api/events ──
+// Upcoming events only, soonest first — matches the "Upcoming Events"
+// grid on news.html. Past events simply stop appearing once their
+// date passes; nothing needs to delete them.
+app.get('/api/events', async (req, res) => {
+  try {
+    const now = new Date();
+    const events = await Event
+      .find({ date: { $gte: now } })
+      .sort({ date: 1 })
+      .lean();
+
+    res.json(events);
+
+  } catch (err) {
+    console.error('GET /api/events:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── GET /api/events/featured ──
+// The single event currently marked featured (if any, and if it's
+// still upcoming) — feeds the Featured Event section on news.html.
+app.get('/api/events/featured', async (req, res) => {
+  try {
+    const event = await Event
+      .findOne({ featured: true, date: { $gte: new Date() } })
+      .sort({ date: 1 })
+      .lean();
+
+    res.json(event || null);
+
+  } catch (err) {
+    console.error('GET /api/events/featured:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── GET /api/recaps ──
+// Newest recap galleries first.
+app.get('/api/recaps', async (req, res) => {
+  try {
+    const recaps = await Recap.find().sort({ createdAt: -1 }).lean();
+    res.json(recaps);
+
+  } catch (err) {
+    console.error('GET /api/recaps:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -493,7 +700,7 @@ app.post('/api/theme', async (req, res) => {
 // ── POST /api/announcements ──
 app.post('/api/announcements', async (req, res) => {
   try {
-    const { text, expiresAt } = req.body;
+    const { text, title, category, expiresAt } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'Text is required' });
@@ -501,6 +708,8 @@ app.post('/api/announcements', async (req, res) => {
 
     const ann = await Announcement.create({
       text:      text.slice(0, 200),
+      title:     (title || '').slice(0, 100),
+      category:  (category || 'general').slice(0, 40).toLowerCase(),
       expiresAt: expiresAt ? new Date(expiresAt) : null,
     });
 
@@ -524,6 +733,133 @@ app.delete('/api/announcements/:id', async (req, res) => {
 
   } catch (err) {
     console.error('DELETE /api/announcements/:id:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── POST /api/events ──
+// multipart/form-data: fields (title, date, time, location, info) +
+// a single `poster` file. Poster is optional — an event without one
+// just renders without a cover image on the frontend.
+app.post('/api/events', uploadEventPoster.single('poster'), async (req, res) => {
+  try {
+    const { title, date, time, location, info } = req.body;
+
+    if (!title || !date) {
+      if (req.file) deleteUploadedFile(`/uploads/events/${req.file.filename}`);
+      return res.status(400).json({ error: 'Title and date are required' });
+    }
+
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      if (req.file) deleteUploadedFile(`/uploads/events/${req.file.filename}`);
+      return res.status(400).json({ error: 'Invalid date' });
+    }
+
+    const event = await Event.create({
+      title:     title.slice(0, 120),
+      posterUrl: req.file ? `/uploads/events/${req.file.filename}` : '',
+      date:      parsedDate,
+      time:      (time || '').slice(0, 60),
+      location:  (location || '').slice(0, 150),
+      info:      (info || '').slice(0, 1000),
+    });
+
+    res.status(201).json({ success: true, id: event._id });
+
+  } catch (err) {
+    console.error('POST /api/events:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── PATCH /api/events/:id/feature ──
+// Marks one event as featured, unmarking any other — only one event
+// can be featured at a time, matching the single Featured Event section.
+app.patch('/api/events/:id/feature', async (req, res) => {
+  try {
+    const exists = await Event.exists({ _id: req.params.id });
+    if (!exists) return res.status(404).json({ error: 'Not found' });
+
+    await Event.updateMany({}, { $set: { featured: false } });
+    await Event.findByIdAndUpdate(req.params.id, { $set: { featured: true } });
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error('PATCH /api/events/:id/feature:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── DELETE /api/events/:id ──
+app.delete('/api/events/:id', async (req, res) => {
+  try {
+    const event = await Event.findByIdAndDelete(req.params.id);
+
+    if (!event) return res.status(404).json({ error: 'Not found' });
+
+    deleteUploadedFile(event.posterUrl);
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error('DELETE /api/events/:id:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── POST /api/recaps ──
+// multipart/form-data: fields (title, description) + up to 10 files
+// under the `images` field. At least one image is required.
+app.post('/api/recaps', uploadRecapImages.array('images', 10), async (req, res) => {
+  try {
+    const { title, description } = req.body;
+
+    if (!title) {
+      (req.files || []).forEach(f => deleteUploadedFile(`/uploads/recaps/${f.filename}`));
+      return res.status(400).json({ error: 'Title is required' });
+    }
+
+    if (!req.files || !req.files.length) {
+      return res.status(400).json({ error: 'At least one image is required' });
+    }
+
+    const images = req.files.map(f => `/uploads/recaps/${f.filename}`);
+
+    const recap = await Recap.create({
+      title:       title.slice(0, 120),
+      description: (description || '').slice(0, 1000),
+      images,
+    });
+
+    res.status(201).json({ success: true, id: recap._id });
+
+  } catch (err) {
+    console.error('POST /api/recaps:', err);
+    (req.files || []).forEach(f => deleteUploadedFile(`/uploads/recaps/${f.filename}`));
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── DELETE /api/recaps/:id ──
+app.delete('/api/recaps/:id', async (req, res) => {
+  try {
+    const recap = await Recap.findByIdAndDelete(req.params.id);
+
+    if (!recap) return res.status(404).json({ error: 'Not found' });
+
+    (recap.images || []).forEach(deleteUploadedFile);
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error('DELETE /api/recaps/:id:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -704,6 +1040,28 @@ app.get('/api/daily-lesson', async (req, res) => {
     console.error('GET /api/daily-lesson:', err.message);
     res.status(502).json({ error: 'Could not reach ssnet.org' });
   }
+});
+
+/* ═══════════════════════════════════════════════
+   ERROR HANDLING — must be registered after all routes.
+   Catches multer upload errors (bad file type, too large, too many
+   files) and returns clean JSON instead of Express's default HTML
+   stack trace, so the dashboard can show a real error message.
+═══════════════════════════════════════════════ */
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    const messages = {
+      LIMIT_FILE_SIZE:       'Image is too large — max 5MB per file.',
+      LIMIT_FILE_COUNT:      'Too many images — max 10 per recap.',
+      LIMIT_UNEXPECTED_FILE: 'Too many images — max 10 per recap.',
+    };
+    return res.status(400).json({ error: messages[err.code] || err.message });
+  }
+  if (err && /Only image files are allowed/.test(err.message || '')) {
+    return res.status(400).json({ error: err.message });
+  }
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Server error' });
 });
 
 /* ═══════════════════════════════════════════════
