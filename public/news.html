@@ -413,186 +413,98 @@
 .recap-gallery-thumb.active { border-color: #755b00; opacity: 1; }
 .recap-gallery-thumb:hover { opacity: 1; }
 
-
 /* ══════════════════════════════════════════════════════
-   NEWS.JS MOBILE + FULLSCREEN ADD-ONS
-   Merge these into your main stylesheet — placeholder values only,
-   swap colors/spacing for your existing design tokens once you send
-   over the real CSS/HTML so this can match exactly.
+   MOBILE UX + FULLSCREEN IMAGE VIEWER ADD-ONS
 ══════════════════════════════════════════════════════ */
 
-/* ── Category pills: horizontal scroll on narrow screens instead
-   of wrapping/overflowing ── */
-#news-cat-pills {
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x proximity;
-  padding-bottom: 0.25rem;
+/* Reactions row — was referenced by news.js but never styled before,
+   so buttons rendered as bare unstyled text. Full styling + a 44px
+   tap target for touch. */
+.news-reactions { display: flex; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+.news-reaction-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  min-height: 40px; padding: 6px 12px; border-radius: 999px;
+  border: 1px solid #e2e2e2; background: #f9f9f9; cursor: pointer;
+  font-family: Inter, sans-serif; font-size: 13px; font-weight: 600; color: #45464e;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
-#news-cat-pills .news-cat-pill {
-  flex: 0 0 auto;
-  scroll-snap-align: start;
-  min-height: 40px; /* comfortable tap target */
-  padding: 0.5rem 1rem;
-}
-#news-cat-pills::-webkit-scrollbar { display: none; }
+.news-reaction-btn:hover { border-color: #755b00; }
+.news-reaction-btn.active { background: #fffbee; border-color: #755b00; color: #584400; }
+.news-reaction-btn.pop { animation: reactionPop 0.22s ease; }
+@keyframes reactionPop { 50% { transform: scale(1.18); } }
+.news-reaction-count { min-width: 12px; text-align: left; }
 
-/* ── Bigger tap targets on touch devices for reaction buttons and
-   read-more toggles — 44px is the usual comfortable minimum ── */
-.news-reaction-btn,
-.news-read-more {
-  min-height: 44px;
-  min-width: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.25rem 0.5rem;
+/* Expiring countdown badge on announcement cards — also referenced
+   by news.js but previously unstyled. */
+.news-expiring-tag {
+  display: inline-block; padding: 4px 10px; border-radius: 999px;
+  background: #ffdad6; color: #93000a; font-family: Inter, sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap;
 }
 
-/* ── Card grids: single column on phones ── */
-@media (max-width: 640px) {
-  #news-announce-grid,
-  #news-events-grid,
-  #news-recaps-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ══════════════════════════════════════════════════════
-   EVENT MODAL — responsive sizing + fullscreen image state
-══════════════════════════════════════════════════════ */
-#event-modal .event-modal-panel {
-  width: min(560px, 92vw);
-  max-height: 90vh;
-  overflow-y: auto;
-}
-#event-modal-image {
-  width: 100%;
-  height: auto;
-  max-height: 50vh;
-  object-fit: cover;
-  cursor: zoom-in;
-}
-
-/* When fullscreen is toggled on, the image takes over the viewport
-   and everything else in the panel steps out of the way. */
-#event-modal.is-fullscreen .event-modal-panel {
-  width: 100vw;
-  height: 100vh;
-  max-height: 100vh;
-  padding: 0;
-  background: #000;
-}
-#event-modal.is-fullscreen #event-modal-image {
-  width: 100%;
-  height: 100%;
-  max-height: 100vh;
-  object-fit: contain;
-  cursor: zoom-out;
-}
-#event-modal.is-fullscreen .event-modal-title,
-#event-modal.is-fullscreen .event-modal-date,
-#event-modal.is-fullscreen .event-modal-info,
-#event-modal.is-fullscreen #event-modal-close {
-  display: none;
-}
-
-@media (max-width: 480px) {
-  #event-modal .event-modal-panel { width: 96vw; }
-}
-
-/* ══════════════════════════════════════════════════════
-   RECAP GALLERY MODAL — responsive sizing + fullscreen image state
-══════════════════════════════════════════════════════ */
-#recap-gallery-modal .recap-gallery-panel {
-  width: min(720px, 94vw);
-  max-height: 90vh;
-}
-#recap-gallery-track {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  touch-action: pan-y; /* let vertical page scroll through while JS reads horizontal swipes */
-}
-.recap-gallery-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-  cursor: zoom-in;
-  background: #111;
-}
-.recap-gallery-img.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-#recap-gallery-thumbs {
-  display: flex;
-  gap: 0.375rem;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 0.5rem 0;
-}
-.recap-gallery-thumb {
-  flex: 0 0 auto;
-  width: 56px;
-  height: 56px;
-  min-width: 44px;
-  min-height: 44px;
-  opacity: 0.5;
-  border: 2px solid transparent;
-}
-.recap-gallery-thumb.active {
-  opacity: 1;
-  border-color: currentColor;
-}
-
-/* Fullscreen: image fills the viewport, thumbnails/title/desc hide,
-   prev/next remain so keyboard/mouse users can still navigate. */
-#recap-gallery-modal.is-fullscreen .recap-gallery-panel {
-  width: 100vw;
-  height: 100vh;
-  max-height: 100vh;
-  padding: 0;
-  background: #000;
-}
-#recap-gallery-modal.is-fullscreen #recap-gallery-track {
-  aspect-ratio: unset;
-  height: 100vh;
-}
-#recap-gallery-modal.is-fullscreen .recap-gallery-img {
-  cursor: zoom-out;
-}
-#recap-gallery-modal.is-fullscreen #recap-gallery-thumbs,
-#recap-gallery-modal.is-fullscreen #recap-gallery-title,
-#recap-gallery-modal.is-fullscreen #recap-gallery-desc,
-#recap-gallery-modal.is-fullscreen #recap-gallery-close {
-  display: none;
-}
-
-@media (max-width: 480px) {
-  #recap-gallery-modal .recap-gallery-panel { width: 100vw; }
-  #recap-gallery-track { aspect-ratio: 1 / 1; }
-}
-
-/* Respect reduced-motion preference for the card entrance animation
-   referenced in news.js (animateCardsIn). */
+/* Card entrance animation — animateCardsIn() in news.js toggles these
+   two classes, but they had no rules, so cards previously just
+   snapped into view with no motion. */
+.news-card-enter { opacity: 0; transform: translateY(16px); transition: opacity 0.4s ease, transform 0.4s ease; }
+.news-card-enter-active { opacity: 1; transform: translateY(0); }
 @media (prefers-reduced-motion: reduce) {
-  .news-card-enter,
-  .news-card-enter-active {
-    transition: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
+  .news-card-enter, .news-card-enter-active { transition: none !important; opacity: 1 !important; transform: none !important; }
 }
+
+/* Bigger, thumb-friendly tap targets across the news page's
+   interactive controls (44px is the standard comfortable minimum). */
+.news-read-more, .news-modal-close, .recap-gallery-thumb { min-height: 40px; }
+@media (max-width: 640px) {
+  .news-cat-pill { min-height: 40px; display: inline-flex; align-items: center; }
+  .recap-gallery-nav { width: 44px; height: 44px; }
+  .recap-gallery-thumb { width: 52px; height: 52px; min-width: 44px; min-height: 44px; }
+  .news-modal-close { width: 40px; height: 40px; }
+}
+
+/* Category pills: scroll horizontally instead of overflowing once
+   they no longer fit a narrow screen in one row. */
+@media (max-width: 480px) {
+  #news-cat-pills { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+  #news-cat-pills::-webkit-scrollbar { display: none; }
+}
+
+/* Modals: on phones, dock to the bottom edge full-width instead of a
+   centered floating card — easier to reach and dismiss one-handed. */
+@media (max-width: 640px) {
+  .news-modal { padding: 0; align-items: flex-end; }
+  .news-modal-box { max-width: 100%; width: 100%; max-height: 92vh; border-radius: 20px 20px 0 0; }
+  .news-modal-body { padding: 22px 20px 28px; }
+  .recap-gallery-stage { aspect-ratio: 1 / 1; }
+}
+
+/* Tap-to-zoom affordance on images that support the fullscreen viewer. */
+#event-modal-image, .recap-gallery-img { cursor: zoom-in; }
+#event-modal.is-fullscreen #event-modal-image,
+#recap-gallery-modal.is-fullscreen .recap-gallery-img { cursor: zoom-out; }
+
+/* Event modal — fullscreen image viewer state (toggled by news.js via
+   the .is-fullscreen class on #event-modal). */
+#event-modal.is-fullscreen { padding: 0; }
+#event-modal.is-fullscreen .news-modal-box {
+  max-width: 100vw; width: 100vw; max-height: 100vh; height: 100vh;
+  border-radius: 0; background: #000; display: flex; align-items: center; justify-content: center;
+}
+#event-modal.is-fullscreen #event-modal-image { width: 100%; height: 100%; max-height: 100vh; object-fit: contain; }
+#event-modal.is-fullscreen .news-modal-body { display: none; }
+#event-modal.is-fullscreen .news-modal-close { background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); }
+
+/* Recap gallery modal — fullscreen image viewer state, and the swipe
+   surface. touch-action: pan-y lets vertical page scroll through
+   untouched while news.js reads horizontal swipes on touchstart/end. */
+.recap-gallery-track { touch-action: pan-y; }
+#recap-gallery-modal.is-fullscreen { padding: 0; }
+#recap-gallery-modal.is-fullscreen .news-modal-box {
+  max-width: 100vw; width: 100vw; max-height: 100vh; height: 100vh; border-radius: 0;
+}
+#recap-gallery-modal.is-fullscreen .recap-gallery-stage { aspect-ratio: unset; height: 100%; }
+#recap-gallery-modal.is-fullscreen .recap-gallery-thumbs,
+#recap-gallery-modal.is-fullscreen .news-modal-body { display: none; }
+#recap-gallery-modal.is-fullscreen .news-modal-close { background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); }
 </style>
 </head>
 
@@ -1041,6 +953,8 @@
 <!-- ══════════════ SCRIPTS ══════════════ -->
 <script src="sda.js" defer></script>
 <script src="func.js" defer></script>
+</body>
+</html>
 
 <script>
 (function () {
