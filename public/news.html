@@ -412,6 +412,187 @@
 .recap-gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .recap-gallery-thumb.active { border-color: #755b00; opacity: 1; }
 .recap-gallery-thumb:hover { opacity: 1; }
+
+
+/* ══════════════════════════════════════════════════════
+   NEWS.JS MOBILE + FULLSCREEN ADD-ONS
+   Merge these into your main stylesheet — placeholder values only,
+   swap colors/spacing for your existing design tokens once you send
+   over the real CSS/HTML so this can match exactly.
+══════════════════════════════════════════════════════ */
+
+/* ── Category pills: horizontal scroll on narrow screens instead
+   of wrapping/overflowing ── */
+#news-cat-pills {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  padding-bottom: 0.25rem;
+}
+#news-cat-pills .news-cat-pill {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  min-height: 40px; /* comfortable tap target */
+  padding: 0.5rem 1rem;
+}
+#news-cat-pills::-webkit-scrollbar { display: none; }
+
+/* ── Bigger tap targets on touch devices for reaction buttons and
+   read-more toggles — 44px is the usual comfortable minimum ── */
+.news-reaction-btn,
+.news-read-more {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+}
+
+/* ── Card grids: single column on phones ── */
+@media (max-width: 640px) {
+  #news-announce-grid,
+  #news-events-grid,
+  #news-recaps-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   EVENT MODAL — responsive sizing + fullscreen image state
+══════════════════════════════════════════════════════ */
+#event-modal .event-modal-panel {
+  width: min(560px, 92vw);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+#event-modal-image {
+  width: 100%;
+  height: auto;
+  max-height: 50vh;
+  object-fit: cover;
+  cursor: zoom-in;
+}
+
+/* When fullscreen is toggled on, the image takes over the viewport
+   and everything else in the panel steps out of the way. */
+#event-modal.is-fullscreen .event-modal-panel {
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  padding: 0;
+  background: #000;
+}
+#event-modal.is-fullscreen #event-modal-image {
+  width: 100%;
+  height: 100%;
+  max-height: 100vh;
+  object-fit: contain;
+  cursor: zoom-out;
+}
+#event-modal.is-fullscreen .event-modal-title,
+#event-modal.is-fullscreen .event-modal-date,
+#event-modal.is-fullscreen .event-modal-info,
+#event-modal.is-fullscreen #event-modal-close {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  #event-modal .event-modal-panel { width: 96vw; }
+}
+
+/* ══════════════════════════════════════════════════════
+   RECAP GALLERY MODAL — responsive sizing + fullscreen image state
+══════════════════════════════════════════════════════ */
+#recap-gallery-modal .recap-gallery-panel {
+  width: min(720px, 94vw);
+  max-height: 90vh;
+}
+#recap-gallery-track {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  touch-action: pan-y; /* let vertical page scroll through while JS reads horizontal swipes */
+}
+.recap-gallery-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  cursor: zoom-in;
+  background: #111;
+}
+.recap-gallery-img.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#recap-gallery-thumbs {
+  display: flex;
+  gap: 0.375rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.5rem 0;
+}
+.recap-gallery-thumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  min-width: 44px;
+  min-height: 44px;
+  opacity: 0.5;
+  border: 2px solid transparent;
+}
+.recap-gallery-thumb.active {
+  opacity: 1;
+  border-color: currentColor;
+}
+
+/* Fullscreen: image fills the viewport, thumbnails/title/desc hide,
+   prev/next remain so keyboard/mouse users can still navigate. */
+#recap-gallery-modal.is-fullscreen .recap-gallery-panel {
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  padding: 0;
+  background: #000;
+}
+#recap-gallery-modal.is-fullscreen #recap-gallery-track {
+  aspect-ratio: unset;
+  height: 100vh;
+}
+#recap-gallery-modal.is-fullscreen .recap-gallery-img {
+  cursor: zoom-out;
+}
+#recap-gallery-modal.is-fullscreen #recap-gallery-thumbs,
+#recap-gallery-modal.is-fullscreen #recap-gallery-title,
+#recap-gallery-modal.is-fullscreen #recap-gallery-desc,
+#recap-gallery-modal.is-fullscreen #recap-gallery-close {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  #recap-gallery-modal .recap-gallery-panel { width: 100vw; }
+  #recap-gallery-track { aspect-ratio: 1 / 1; }
+}
+
+/* Respect reduced-motion preference for the card entrance animation
+   referenced in news.js (animateCardsIn). */
+@media (prefers-reduced-motion: reduce) {
+  .news-card-enter,
+  .news-card-enter-active {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
 </style>
 </head>
 
@@ -1169,6 +1350,11 @@
         pill.classList.add('active');
         activeCategory = pill.dataset.cat;
         renderAnnouncements();
+        // On mobile the pill row scrolls horizontally — keep the tapped
+        // pill in view instead of leaving it clipped at the edge.
+        if (pill.scrollIntoView) {
+          pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
       });
     });
   }
@@ -1267,6 +1453,10 @@
     const infoEl  = document.getElementById('event-modal-info');
     if (!modal) return;
 
+    // Always start collapsed — a stale fullscreen state from a
+    // previously viewed event should never carry over.
+    modal.classList.remove('is-fullscreen');
+
     if (imgEl) {
       if (ev.posterUrl) {
         imgEl.src = ev.posterUrl;
@@ -1288,20 +1478,45 @@
     const modal = document.getElementById('event-modal');
     if (!modal) return;
     modal.classList.remove('active');
+    modal.classList.remove('is-fullscreen');
     document.body.style.overflow = '';
+  }
+
+  // Tapping the poster inside the event modal fills the screen with
+  // it (class-toggle only — CSS decides how "fullscreen" actually
+  // looks). Tapping again, or the backdrop, or Escape steps back out
+  // one level before the modal itself closes.
+  function toggleEventModalFullscreen(forceState) {
+    const modal = document.getElementById('event-modal');
+    if (!modal) return;
+    const next = typeof forceState === 'boolean' ? forceState : !modal.classList.contains('is-fullscreen');
+    modal.classList.toggle('is-fullscreen', next);
   }
 
   function initEventModal() {
     const modal    = document.getElementById('event-modal');
     const closeBtn = document.getElementById('event-modal-close');
+    const imgEl    = document.getElementById('event-modal-image');
     if (!modal) return;
 
     if (closeBtn) closeBtn.addEventListener('click', closeEventModal);
+    if (imgEl) imgEl.addEventListener('click', function () { toggleEventModalFullscreen(); });
+
     modal.addEventListener('click', function (e) {
-      if (e.target === modal) closeEventModal();
+      if (e.target !== modal) return;
+      if (modal.classList.contains('is-fullscreen')) {
+        toggleEventModalFullscreen(false);
+      } else {
+        closeEventModal();
+      }
     });
     document.addEventListener('keydown', function (e) {
-      if (modal.classList.contains('active') && e.key === 'Escape') closeEventModal();
+      if (!modal.classList.contains('active') || e.key !== 'Escape') return;
+      if (modal.classList.contains('is-fullscreen')) {
+        toggleEventModalFullscreen(false);
+      } else {
+        closeEventModal();
+      }
     });
   }
 
@@ -1449,6 +1664,14 @@
         showSlide(Number(btn.dataset.slideIndex));
       });
     });
+
+    // Tapping the main image toggles fullscreen — rewired here because
+    // track.innerHTML is rebuilt fresh every time a recap opens.
+    track.querySelectorAll('.recap-gallery-img').forEach(function (img) {
+      img.addEventListener('click', function () {
+        toggleGalleryFullscreen();
+      });
+    });
   }
 
   function showSlide(index) {
@@ -1469,6 +1692,18 @@
     if (counter) counter.textContent = (activeSlideIndex + 1) + ' / ' + images.length;
   }
 
+  // Tap-to-fullscreen for the gallery: class-toggle only, CSS decides
+  // the look (e.g. hide thumbnails/description, image fills viewport
+  // with object-fit: contain). Kept as its own function so both the
+  // image click handler and the modal/backdrop/Escape handlers share
+  // one source of truth for the current state.
+  function toggleGalleryFullscreen(forceState) {
+    const modal = document.getElementById('recap-gallery-modal');
+    if (!modal) return;
+    const next = typeof forceState === 'boolean' ? forceState : !modal.classList.contains('is-fullscreen');
+    modal.classList.toggle('is-fullscreen', next);
+  }
+
   function openRecapGallery(recap) {
     if (!recap) return;
     const modal   = document.getElementById('recap-gallery-modal');
@@ -1485,6 +1720,7 @@
     buildGalleryMarkup(images);
     showSlide(0);
 
+    modal.classList.remove('is-fullscreen'); // never inherit fullscreen from a previous recap
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
@@ -1493,8 +1729,46 @@
     const modal = document.getElementById('recap-gallery-modal');
     if (!modal) return;
     modal.classList.remove('active');
+    modal.classList.remove('is-fullscreen');
     document.body.style.overflow = '';
     activeRecap = null;
+  }
+
+  // Swipe left → next slide, swipe right → previous slide. Attached
+  // once to the static #recap-gallery-track element (it persists
+  // across recaps — only its innerHTML is rebuilt), so this only
+  // needs to run once at init, not every time a recap opens.
+  function initGallerySwipe() {
+    const track = document.getElementById('recap-gallery-track');
+    if (!track) return;
+
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+    const SWIPE_THRESHOLD_PX = 40;
+
+    track.addEventListener('touchstart', function (e) {
+      if (!e.touches || e.touches.length !== 1) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      tracking = true;
+    }, { passive: true });
+
+    track.addEventListener('touchend', function (e) {
+      if (!tracking) return;
+      tracking = false;
+      const touch = e.changedTouches && e.changedTouches[0];
+      if (!touch) return;
+
+      const dx = touch.clientX - startX;
+      const dy = touch.clientY - startY;
+
+      // Require a mostly-horizontal drag past the threshold so a
+      // vertical scroll/pinch attempt doesn't accidentally flip slides.
+      if (Math.abs(dx) > SWIPE_THRESHOLD_PX && Math.abs(dx) > Math.abs(dy)) {
+        showSlide(activeSlideIndex + (dx < 0 ? 1 : -1));
+      }
+    }, { passive: true });
   }
 
   function initRecapGallery() {
@@ -1506,7 +1780,12 @@
 
     if (closeBtn) closeBtn.addEventListener('click', closeRecapGallery);
     modal.addEventListener('click', function (e) {
-      if (e.target === modal) closeRecapGallery();
+      if (e.target !== modal) return;
+      if (modal.classList.contains('is-fullscreen')) {
+        toggleGalleryFullscreen(false);
+      } else {
+        closeRecapGallery();
+      }
     });
 
     if (prevBtn) prevBtn.addEventListener('click', function () { showSlide(activeSlideIndex - 1); });
@@ -1514,10 +1793,15 @@
 
     document.addEventListener('keydown', function (e) {
       if (!modal.classList.contains('active')) return;
-      if (e.key === 'Escape')     closeRecapGallery();
+      if (e.key === 'Escape') {
+        if (modal.classList.contains('is-fullscreen')) toggleGalleryFullscreen(false);
+        else closeRecapGallery();
+      }
       if (e.key === 'ArrowLeft')  showSlide(activeSlideIndex - 1);
       if (e.key === 'ArrowRight') showSlide(activeSlideIndex + 1);
     });
+
+    initGallerySwipe();
   }
 
   /* ══════════════════════════════════════════════════════
