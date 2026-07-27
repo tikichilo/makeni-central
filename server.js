@@ -16,6 +16,7 @@
  *  GET  /api/events                    — Upcoming events
  *  GET  /api/events/featured           — The single featured event (or null)
  *  GET  /api/recaps                    — Event recap galleries
+ *  GET  /api/hero-slideshow            — Shuffled hero slideshow images
  *
  *  — Admin endpoints —
  *  GET    /api/donations             — List all donations
@@ -75,6 +76,12 @@ const UPLOAD_ROOT       = path.join(__dirname, 'public', 'uploads');
 const EVENT_UPLOAD_DIR  = path.join(UPLOAD_ROOT, 'events');
 const RECAP_UPLOAD_DIR  = path.join(UPLOAD_ROOT, 'recaps');
 [EVENT_UPLOAD_DIR, RECAP_UPLOAD_DIR].forEach(dir => fs.mkdirSync(dir, { recursive: true }));
+
+// Hero slideshow images — dropped in manually (not via multer upload),
+// but the folder still needs to exist or GET /api/hero-slideshow below
+// throws ENOENT on the very first request.
+const SLIDESHOW_DIR = path.join(__dirname, 'public', 'slideshow');
+fs.mkdirSync(SLIDESHOW_DIR, { recursive: true });
 
 const IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -567,6 +574,43 @@ app.get('/api/recaps', async (req, res) => {
 });
 
 
+// ── GET /api/hero-slideshow ──
+// Reads public/slideshow/ and returns a freshly shuffled array of
+// image URLs for whatever standard-format photos are sitting in that
+// folder — a new random order on every request. Drop photos in as
+// .jpg/.jpeg/.png/.webp/.gif and they show up automatically, no code
+// changes needed.
+const HERO_SLIDESHOW_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
+
+function shuffleHeroImages(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+app.get('/api/hero-slideshow', async (req, res) => {
+  try {
+    const entries = await fs.promises.readdir(SLIDESHOW_DIR, { withFileTypes: true });
+
+    const urls = entries
+      .filter(e => e.isFile() && HERO_SLIDESHOW_EXTENSIONS.has(path.extname(e.name).toLowerCase()))
+      .map(e => '/slideshow/' + encodeURIComponent(e.name));
+
+    // Never cache this response — a fresh shuffle every page load is
+    // the whole point.
+    res.set('Cache-Control', 'no-store');
+    res.json({ images: shuffleHeroImages(urls) });
+
+  } catch (err) {
+    console.error('GET /api/hero-slideshow:', err);
+    res.status(500).json({ images: [] });
+  }
+});
+
+
 /* ═══════════════════════════════════════════════
    ROUTES — ADMIN
 ═══════════════════════════════════════════════ */
@@ -1041,6 +1085,7 @@ app.get('/api/daily-lesson', async (req, res) => {
     res.status(502).json({ error: 'Could not reach ssnet.org' });
   }
 });
+
 
 /* ═══════════════════════════════════════════════
    ERROR HANDLING — must be registered after all routes.

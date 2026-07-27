@@ -149,15 +149,54 @@ function funcInit() {
 
 /* ═══════════════════════════════════════════════
    HERO SLIDESHOW — index.html
+   Slides are no longer hardcoded in the HTML. On load this fetches
+   GET /api/hero-slideshow, which returns every image currently in
+   public/slideshow/ (HEIC/HEIF included — the server converts those
+   to JPEG) in a freshly randomized order. Drop photos into that
+   folder and they show up here automatically, no HTML edits needed.
 ═══════════════════════════════════════════════ */
-function initHeroSlideshow() {
-  const slides = document.querySelectorAll('.hero-slide');
-  const dots   = document.querySelectorAll('.hero-dots .hero-dot');
+async function initHeroSlideshow() {
+  const track    = document.getElementById('hero-slideshow');
+  const dotsWrap = document.getElementById('hero-dots');
+  const section  = document.querySelector('[aria-label="Welcome hero"]');
+  if (!track) return;
 
+  const FALLBACK_IMAGE = 'images/church.jpg'; // shown if the API is empty or fails
+  const INTERVAL        = 6000;
+  const RESUME_DELAY    = 8000;
+
+  let images = [];
+  try {
+    const res  = await fetch('/api/hero-slideshow', { cache: 'no-store' });
+    const data = res.ok ? await res.json() : null;
+    images = Array.isArray(data && data.images) ? data.images : [];
+  } catch (e) {
+    console.warn('[hero] could not load slideshow images:', e);
+  }
+  if (!images.length) images = [FALLBACK_IMAGE];
+
+  // Build one .hero-slide per image, and a matching dot, however
+  // many came back.
+  track.innerHTML = images.map(function (src, i) {
+    return '<div class="hero-slide' + (i === 0 ? ' active' : '') + '" style="background-image:url(\'' + src + '\');"></div>';
+  }).join('');
+
+  if (dotsWrap) {
+    dotsWrap.innerHTML = images.map(function (_, i) {
+      return '<button class="hero-dot' + (i === 0 ? ' active' : '') + '" role="tab" aria-selected="' + (i === 0) + '" aria-label="Slide ' + (i + 1) + '"></button>';
+    }).join('');
+  }
+
+  const slides = track.querySelectorAll('.hero-slide');
+  const dots   = dotsWrap ? dotsWrap.querySelectorAll('.hero-dot') : [];
   if (!slides.length) return;
 
-  const INTERVAL     = 6000;
-  const RESUME_DELAY = 8000;
+  // Preload every slide up front so rotating to it later never shows
+  // a blank flash while the browser fetches it for the first time.
+  images.forEach(function (src) {
+    const img = new Image();
+    img.src = src;
+  });
 
   let current     = 0;
   let timer       = null;
@@ -189,7 +228,9 @@ function initHeroSlideshow() {
 
   function next() { goTo(current + 1); }
 
-  function startAuto() { stopAuto(); timer = setInterval(next, INTERVAL); }
+  // No point auto-rotating a single slide (or hammering setInterval
+  // if the folder ever ends up with just one photo in it).
+  function startAuto() { stopAuto(); if (slides.length > 1) timer = setInterval(next, INTERVAL); }
   function stopAuto()  { if (timer) { clearInterval(timer); timer = null; } }
 
   dots.forEach((dot, i) => {
@@ -202,7 +243,6 @@ function initHeroSlideshow() {
     });
   });
 
-  const section = document.querySelector('[aria-label="Welcome hero"]');
   if (section) {
     section.addEventListener('mouseenter', stopAuto);
     section.addEventListener('mouseleave', startAuto);
@@ -217,7 +257,6 @@ function initHeroSlideshow() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   startAuto();
 }
-
 
 /* ═══════════════════════════════════════════════
    FUND TRACKER — building.html
