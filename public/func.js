@@ -1,5 +1,5 @@
 /**
- * func.js — Makeni Central SDA Church  v4.2
+ * func.js — Makeni Central SDA Church  v4.4
  * API-driven features: fund tracker, stories, youth board,
  * discussion modal, leaders grid, toast system, and shared
  * API utilities.
@@ -22,26 +22,28 @@
  * Give modal, scroll-reveal, back-to-top, image shimmer, active nav,
  * dropdown nav, mobile accordion).
  *
- * CHANGES v4.1 → v4.2:
- *  § initLeadersGrid — NEW §17. Fetches /api/leaders on leaders.html,
- *    renders leader cards (photo w/ placeholder fallback, name,
- *    department, short description, phone, department link), and wires
- *    the .dept-filter pills. Falls back gracefully to the static HTML
- *    cards already in the page if the fetch fails or the endpoint isn't
- *    built yet. Supersedes the inline filter script that used to live
- *    at the bottom of leaders.html — remove that inline block now that
- *    this owns it (see notes after the file).
- *
- * CHANGES v4.2 → v4.3:
- *  § Comments — NEW. Each discussion card's comment count is now a
- *    clickable button that opens #comments-modal, listing that
- *    discussion's replies (GET /api/discussions/:id/comments) and
- *    letting anyone post a new one (POST /api/discussions/:id/comments).
- *    Wired in three places a card can come from: the static demo cards
- *    already in youth.html, loadDiscussions() (API-fetched cards), and
- *    submitDiscussion() (the freshly-posted card). Static demo cards
- *    have no real discussion _id, so their comment button opens the
- *    modal in a read-only "preview" state instead of hitting the API.
+ * CHANGES v4.3 → v4.4 (bugfix pass):
+ *  § Filter pills — FIXED. The "FILTER BY" buttons in youth.html now
+ *    carry the `.filter-btn` class the click handler was already
+ *    looking for (it previously matched nothing, so the pills did not
+ *    do anything). The handler now also swaps the active/inactive
+ *    Tailwind classes itself, instead of only flipping aria-pressed
+ *    with no matching CSS — so the selected pill visibly highlights.
+ *    The currently-active filter is now re-applied after
+ *    loadDiscussions() swaps in the API-fetched cards, so a filter
+ *    chosen while the board was still loading doesn't get lost.
+ *  § submitDiscussion — FIXED. Previously always showed the "Discussion
+ *    Posted!" success view even if the POST to /api/discussions failed
+ *    (apiPost returning null), silently losing the post. Now checks
+ *    result.success, disables the submit button while the request is
+ *    in flight (via new #disc-submit-btn id in youth.html) to stop
+ *    double-submits, shows a toast + re-enables the form on failure,
+ *    and only shows success once the server actually confirms it.
+ *    The freshly-posted card now also gets a working "Read more" link
+ *    like every other card, instead of being permanently truncated.
+ *  § footer-year — youth.html now has the #footer-year span the code
+ *    was already trying to update, so the copyright year keeps itself
+ *    current instead of silently no-op'ing.
  */
 
 'use strict';
@@ -191,7 +193,7 @@ function funcInit() {
   initYouthBoard();    // §16 — youth.html only
 
   console.log(
-    '%c✦ Makeni Central SDA — func.js v4.3 loaded',
+    '%c✦ Makeni Central SDA — func.js v4.4 loaded',
     'color:#e6c364;background:#041534;padding:6px 14px;border-radius:4px;font-weight:600;'
   );
 }
@@ -520,8 +522,12 @@ function initYouthBoard() {
       const id = btn.dataset.id;
       if (id) {
         try {
-          await fetch(`/api/discussions/${id}/like`, { method: 'POST' });
-        } catch (e) { /* silent fail — UI already updated */ }
+          const res = await fetch(`/api/discussions/${id}/like`, { method: 'POST' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        } catch (e) {
+          console.warn('[func.js] like failed to save:', e);
+          window.SDAToast?.('Your like didn\u2019t save — check your connection.', 'error');
+        }
       }
     });
   }
@@ -704,6 +710,49 @@ function initYouthBoard() {
     };
   }
 
+  /* ═══════════════════════════════════════════
+     FILTER PILLS — "FILTER BY" row above the board.
+     Re-queries cards on every click so it works against whichever
+     set (static demo cards or API-fetched cards) is currently in
+     the DOM, and keeps both aria-pressed *and* the visible
+     active/inactive Tailwind classes in sync.
+  ═══════════════════════════════════════════ */
+  const FILTER_ACTIVE_CLASSES   = ['bg-primary', 'text-on-primary'];
+  const FILTER_INACTIVE_CLASSES = ['bg-surface-container-low', 'text-on-surface-variant'];
+
+  function applyFilter(filter) {
+    const cards = document.querySelectorAll('#discussions-list article[data-category]');
+    let anyVisible = false;
+    cards.forEach(card => {
+      const match = filter === 'all' || card.dataset.category === filter;
+      card.style.display = match ? '' : 'none';
+      if (match) anyVisible = true;
+    });
+
+    const emptyState = document.getElementById('empty-state');
+    if (emptyState) emptyState.classList.toggle('hidden', anyVisible);
+  }
+
+  function wireFilterBtn(btn) {
+    if (btn.dataset.filterWired) return;
+    btn.dataset.filterWired = '1';
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.setAttribute('aria-pressed', 'false');
+        b.classList.remove(...FILTER_ACTIVE_CLASSES);
+        b.classList.add(...FILTER_INACTIVE_CLASSES);
+      });
+      btn.setAttribute('aria-pressed', 'true');
+      btn.classList.remove(...FILTER_INACTIVE_CLASSES);
+      btn.classList.add(...FILTER_ACTIVE_CLASSES);
+
+      applyFilter(filter);
+    });
+  }
+  document.querySelectorAll('.filter-btn').forEach(wireFilterBtn);
+
   async function loadDiscussions() {
     const list = document.getElementById('discussions-list');
     if (!list) return;
@@ -774,6 +823,12 @@ function initYouthBoard() {
       const emptyState = document.getElementById('empty-state');
       if (emptyState) emptyState.classList.add('hidden');
 
+      // Re-apply whatever filter the visitor already had selected
+      // (defaults to "All Topics"), so a choice made while these
+      // cards were still loading isn't lost when they land.
+      const activeFilterBtn = document.querySelector('.filter-btn[aria-pressed="true"]');
+      if (activeFilterBtn) applyFilter(activeFilterBtn.dataset.filter);
+
     } catch (err) {
       console.warn('[func.js] loadDiscussions failed:', err);
     }
@@ -794,26 +849,6 @@ function initYouthBoard() {
     });
   }
   document.querySelectorAll('.read-more-btn').forEach(wireReadMore);
-
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const filter = btn.dataset.filter;
-
-      document.querySelectorAll('.filter-btn').forEach(b => b.setAttribute('aria-pressed', 'false'));
-      btn.setAttribute('aria-pressed', 'true');
-
-      const cards = document.querySelectorAll('#discussions-list article[data-category]');
-      let anyVisible = false;
-      cards.forEach(card => {
-        const match = filter === 'all' || card.dataset.category === filter;
-        card.style.display = match ? '' : 'none';
-        if (match) anyVisible = true;
-      });
-
-      const emptyState = document.getElementById('empty-state');
-      if (emptyState) emptyState.classList.toggle('hidden', anyVisible);
-    });
-  });
 
   window.toggleExpand = function(id, btn) {
     const el = document.getElementById(id);
@@ -917,13 +952,23 @@ function initYouthBoard() {
     });
     if (!valid) return;
 
+    const submitBtn = document.getElementById('disc-submit-btn');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '0.7'; }
+
     const result = await apiPost('/api/discussions', { name, category, title, body });
+
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = ''; }
+
+    if (!result || !result.success) {
+      window.SDAToast?.('Could not post your discussion — please try again.', 'error');
+      return; // keep the form open with what they typed so they can retry
+    }
 
     const initials = initialsOf(name);
     const newCard  = document.createElement('article');
     newCard.className        = 'discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow';
     newCard.dataset.category = category;
-    if (result?.id) newCard.dataset.id = result.id;
+    newCard.dataset.id       = result.id;
     newCard.style.cssText    = 'opacity:0;transform:translateY(-12px);transition:opacity 0.35s ease,transform 0.35s ease;';
 
     newCard.innerHTML = `
@@ -932,22 +977,24 @@ function initYouthBoard() {
              aria-label="${escHtml(name)}">${escHtml(initials)}</div>
         <div>
           <h4 class="font-label-md text-label-md text-primary">${escHtml(name)}</h4>
-          <p class="text-[12px] text-on-surface-variant uppercase tracking-tighter">Just now</p>
+          <p class="text-[12px] text-on-surface-variant uppercase tracking-tighter">Just now in ${escHtml(category)}</p>
         </div>
       </div>
       <span class="card-category">${escHtml(category)}</span>
       <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${escHtml(title)}</h3>
-      <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-6">${escHtml(body)}</p>
-      <div class="flex items-center gap-6">
-        ${commentButtonHtml(result?.id, title, 0)}
+      <p class="card-body font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-2">${escHtml(body)}</p>
+      <button class="read-more-btn">Read more</button>
+      <div class="flex items-center gap-6 mt-4">
+        ${commentButtonHtml(result.id, title, 0)}
         <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors"
-                aria-label="Like this post" data-count="0" ${result?.id ? `data-id="${result.id}"` : ''}>
+                aria-label="Like this post" data-count="0" data-id="${escHtml(result.id)}">
           <span class="material-symbols-outlined text-[20px]">favorite</span>
           <span class="font-label-md like-count">0 Likes</span>
         </button>
       </div>`;
 
     wireLikeBtn(newCard.querySelector('.like-btn'));
+    wireReadMore(newCard.querySelector('.read-more-btn'));
     wireCommentBtn(newCard.querySelector('.comment-count-btn'));
 
     const list = document.getElementById('discussions-list');
@@ -957,6 +1004,14 @@ function initYouthBoard() {
       newCard.style.opacity   = '1';
       newCard.style.transform = 'translateY(0)';
     }));
+
+    // Respect whichever filter is currently active — if the visitor
+    // is viewing a specific category and just posted in a different
+    // one, don't leave their own new card invisible without explanation.
+    const activeFilterBtn = document.querySelector('.filter-btn[aria-pressed="true"]');
+    if (activeFilterBtn && activeFilterBtn.dataset.filter !== 'all' && activeFilterBtn.dataset.filter !== category) {
+      newCard.style.display = 'none';
+    }
 
     document.getElementById('modal-form-view').style.display = 'none';
     document.getElementById('modal-success-view').classList.add('show');

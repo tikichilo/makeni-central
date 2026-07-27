@@ -83,6 +83,9 @@
     padding: 3px 10px; border-radius: 100px; margin-bottom: 12px;
   }
 
+  /* Filter pills — active/inactive state (JS toggles the classes below) */
+  .filter-btn { transition: background-color 0.2s ease, color 0.2s ease; cursor: pointer; }
+
   /* ── MOBILE NAV ── */
   @media (max-width: 767px) {
     .logo-text { display: none !important; }
@@ -632,11 +635,11 @@
   <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mb-12">
     <div class="flex flex-wrap gap-3 items-center">
       <span class="font-label-md text-label-md text-primary mr-2">FILTER BY</span>
-      <button class="px-6 py-2 rounded-full bg-primary text-on-primary font-label-md" data-filter="all">All Topics</button>
-      <button class="px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-label-md hover:bg-secondary-container transition-colors" data-filter="Faith &amp; Doubt">Faith &amp; Doubt</button>
-      <button class="px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-label-md hover:bg-secondary-container transition-colors" data-filter="Prayer">Prayer</button>
-      <button class="px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-label-md hover:bg-secondary-container transition-colors" data-filter="Bible Study">Bible Study</button>
-      <button class="px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-label-md hover:bg-secondary-container transition-colors" data-filter="Christian Living">Christian Living</button>
+      <button class="filter-btn px-6 py-2 rounded-full bg-primary text-on-primary font-label-md" data-filter="all" aria-pressed="true">All Topics</button>
+      <button class="filter-btn px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-label-md hover:bg-secondary-container transition-colors" data-filter="Faith &amp; Doubt" aria-pressed="false">Faith &amp; Doubt</button>
+      <button class="filter-btn px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-label-md hover:bg-secondary-container transition-colors" data-filter="Prayer" aria-pressed="false">Prayer</button>
+      <button class="filter-btn px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-label-md hover:bg-secondary-container transition-colors" data-filter="Bible Study" aria-pressed="false">Bible Study</button>
+      <button class="filter-btn px-6 py-2 rounded-full bg-surface-container-low text-on-surface-variant font-label-md hover:bg-secondary-container transition-colors" data-filter="Christian Living" aria-pressed="false">Christian Living</button>
     </div>
   </section>
 
@@ -750,11 +753,11 @@
             </div>
             <span class="card-category">Christian Living</span>
             <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">Community Service Project: Next Steps</h3>
-            
+
             <p class="card-body font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-2">
-  ...text...
-</p>
-<button class="read-more-btn">Read more</button>
+              Following up from last Sabbath's announcement — we need a few more hands for the outreach visit to the elderly home on Saturday. If you can help with transport, food packs, or just showing up to spend time with the residents, drop a comment below so we can plan numbers.
+            </p>
+            <button class="read-more-btn">Read more</button>
             <div class="flex items-center gap-6">
               <button class="comment-count-btn flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors"
                       data-id="" data-title="Community Service Project: Next Steps" aria-label="View comments">
@@ -861,7 +864,7 @@
         </div>
 
         <!-- Submit -->
-        <button class="modal-submit-btn" onclick="submitDiscussion()">
+        <button class="modal-submit-btn" id="disc-submit-btn" onclick="submitDiscussion()">
           <span class="material-symbols-outlined">send</span>
           Post Discussion
         </button>
@@ -997,7 +1000,7 @@
     </div>
   </div>
   <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-12 pt-8 border-t border-on-primary/10 flex flex-col md:flex-row items-center justify-center md:justify-between gap-3 text-center">
-    <p class="font-body-md text-body-md text-on-primary/60">© 2026 Makeni Central SDA Church. All rights reserved.</p>
+    <p class="font-body-md text-body-md text-on-primary/60">© <span id="footer-year">2026</span> Makeni Central SDA Church. All rights reserved.</p>
     <a href="developer.html" class="font-label-md text-label-md text-on-primary/50 hover:text-secondary-container transition-colors">Developer</a>
   </div>
 </footer>
