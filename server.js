@@ -8,6 +8,8 @@
  *  GET  /api/discussions               — Youth board list
  *  POST /api/discussions               — Submit new discussion
  *  POST /api/discussions/:id/like      — Like a discussion
+ *  GET  /api/discussions/:id/comments  — List comments on a discussion
+ *  POST /api/discussions/:id/comments  — Add a comment to a discussion
  *  GET  /api/lesson                    — Lesson of the week
  *  GET  /api/theme                     — Theme of the month
  *  GET  /api/announcements             — Active announcements
@@ -26,6 +28,7 @@
  *  POST   /api/theme                 — Save theme of the month
  *  POST   /api/announcements         — Add announcement (text, title, category, expiresAt)
  *  DELETE /api/announcements/:id     — Remove announcement
+ *  DELETE /api/comments/:id          — Remove a comment
  *  GET    /api/visits                — List planned visits
  *  POST   /api/events                — Add event (multipart: poster + fields)
  *  PATCH  /api/events/:id/feature    — Mark an event as the featured one
@@ -184,6 +187,16 @@ const discussionSchema = new mongoose.Schema({
   createdAt: { type: Date,   default: Date.now },
 });
 const Discussion = mongoose.model('Discussion', discussionSchema);
+
+
+// ── Comment — replies on a Discussion ──
+const commentSchema = new mongoose.Schema({
+  discussionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Discussion', required: true, index: true },
+  name:         { type: String, required: true, maxlength: 100 },
+  body:         { type: String, required: true, maxlength: 500 },
+  createdAt:    { type: Date,   default: Date.now },
+});
+const Comment = mongoose.model('Comment', commentSchema);
 
 
 // ── Lesson — single active document ──
@@ -384,6 +397,57 @@ app.post('/api/discussions/:id/like', async (req, res) => {
 
   } catch (err) {
     console.error('POST /api/discussions/:id/like:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── GET /api/discussions/:id/comments ──
+// Oldest first, so a reply thread reads top-to-bottom naturally.
+app.get('/api/discussions/:id/comments', async (req, res) => {
+  try {
+    const comments = await Comment
+      .find({ discussionId: req.params.id })
+      .sort({ createdAt: 1 })
+      .lean();
+
+    res.json(comments);
+
+  } catch (err) {
+    console.error('GET /api/discussions/:id/comments:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── POST /api/discussions/:id/comments ──
+app.post('/api/discussions/:id/comments', async (req, res) => {
+  try {
+    const { name, body } = req.body;
+
+    if (!name || !body) {
+      return res.status(400).json({ error: 'Name and comment are required' });
+    }
+
+    const discussionExists = await Discussion.exists({ _id: req.params.id });
+    if (!discussionExists) return res.status(404).json({ error: 'Discussion not found' });
+
+    const comment = await Comment.create({
+      discussionId: req.params.id,
+      name:         name.slice(0, 100),
+      body:         body.slice(0, 500),
+    });
+
+    const discussion = await Discussion.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { comments: 1 } },
+      { new: true }
+    );
+
+    res.status(201).json({ success: true, comment, commentCount: discussion.comments });
+
+  } catch (err) {
+    console.error('POST /api/discussions/:id/comments:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -655,10 +719,31 @@ app.delete('/api/discussions/:id', async (req, res) => {
 
     if (!discussion) return res.status(404).json({ error: 'Not found' });
 
+    // Clean up any comments left orphaned by this discussion
+    await Comment.deleteMany({ discussionId: req.params.id });
+
     res.json({ success: true });
 
   } catch (err) {
     console.error('DELETE /api/discussions/:id:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── DELETE /api/comments/:id ──
+app.delete('/api/comments/:id', async (req, res) => {
+  try {
+    const comment = await Comment.findByIdAndDelete(req.params.id);
+
+    if (!comment) return res.status(404).json({ error: 'Not found' });
+
+    await Discussion.findByIdAndUpdate(comment.discussionId, { $inc: { comments: -1 } });
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error('DELETE /api/comments/:id:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });

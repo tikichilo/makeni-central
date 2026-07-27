@@ -15,7 +15,8 @@
  *                        department filter pills
  *  • Youth board       — §16: filters, likes, read-more toggle,
  *                        "Start a Discussion" modal (open/close/submit/inject),
- *                        char counters, FAB wiring, dynamic footer year
+ *                        char counters, FAB wiring, dynamic footer year,
+ *                        comment threads (view/add) per discussion
  *
  * sda.js owns everything else (UI motion, navbar, hero, counters,
  * Give modal, scroll-reveal, back-to-top, image shimmer, active nav,
@@ -30,6 +31,17 @@
  *    built yet. Supersedes the inline filter script that used to live
  *    at the bottom of leaders.html — remove that inline block now that
  *    this owns it (see notes after the file).
+ *
+ * CHANGES v4.2 → v4.3:
+ *  § Comments — NEW. Each discussion card's comment count is now a
+ *    clickable button that opens #comments-modal, listing that
+ *    discussion's replies (GET /api/discussions/:id/comments) and
+ *    letting anyone post a new one (POST /api/discussions/:id/comments).
+ *    Wired in three places a card can come from: the static demo cards
+ *    already in youth.html, loadDiscussions() (API-fetched cards), and
+ *    submitDiscussion() (the freshly-posted card). Static demo cards
+ *    have no real discussion _id, so their comment button opens the
+ *    modal in a read-only "preview" state instead of hitting the API.
  */
 
 'use strict';
@@ -127,6 +139,44 @@ function slugify(str) {
     .replace(/^-+|-+$/g, '');
 }
 
+/* Shared "time ago" formatter — used by the discussion board and by
+   the comments modal so both read the same relative time style. */
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1)  return 'Just now';
+  if (m < 60) return `${m} minute${m > 1 ? 's' : ''} ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} hour${h > 1 ? 's' : ''} ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7)  return `${d} day${d > 1 ? 's' : ''} ago`;
+  return new Date(dateStr).toLocaleDateString();
+}
+
+/* Shared initials helper — "Chanda Mwale" -> "CM" */
+function initialsOf(name) {
+  return String(name || '')
+    .split(' ')
+    .filter(Boolean)
+    .map(w => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+/* Comment-count button markup — used by the static cards in youth.html,
+   loadDiscussions() (API-fetched cards), and submitDiscussion() (the
+   freshly-posted card), so all three stay visually and behaviorally
+   identical. `id` is '' for demo cards without a real discussion _id. */
+function commentButtonHtml(id, title, count) {
+  return `
+    <button class="comment-count-btn flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors"
+            data-id="${escHtml(id || '')}" data-title="${escHtml(title || '')}" aria-label="View comments">
+      <span class="material-symbols-outlined text-[20px]">forum</span>
+      <span class="font-label-md comment-count">${count || 0} Comments</span>
+    </button>`;
+}
+
 
 /* ═══════════════════════════════════════════════
    DOM-READY INIT
@@ -141,7 +191,7 @@ function funcInit() {
   initYouthBoard();    // §16 — youth.html only
 
   console.log(
-    '%c✦ Makeni Central SDA — func.js v4.2 loaded',
+    '%c✦ Makeni Central SDA — func.js v4.3 loaded',
     'color:#e6c364;background:#041534;padding:6px 14px;border-radius:4px;font-weight:600;'
   );
 }
@@ -477,6 +527,183 @@ function initYouthBoard() {
   }
   document.querySelectorAll('.like-btn').forEach(wireLikeBtn);
 
+  /* ═══════════════════════════════════════════
+     COMMENTS — #comments-modal wiring
+     Opens on any .comment-count-btn click, whether that button
+     lives on a static demo card, an API-fetched card, or a
+     freshly-posted card. `data-id` is the discussion's Mongo _id
+     (empty string for demo cards, which get a read-only preview).
+  ═══════════════════════════════════════════ */
+  const commentsModal = document.getElementById('comments-modal');
+
+  function wireCommentBtn(btn) {
+    if (!btn || btn.dataset.commentWired) return;
+    btn.dataset.commentWired = '1';
+    btn.addEventListener('click', () => {
+      const id    = btn.dataset.id || '';
+      const title = btn.dataset.title || 'Discussion';
+      window.openCommentsModal(id, title, btn);
+    });
+  }
+  document.querySelectorAll('.comment-count-btn').forEach(wireCommentBtn);
+  window.wireCommentBtn = wireCommentBtn; // exposed so newly-injected cards can wire themselves
+
+  if (commentsModal) {
+    const commentsList     = document.getElementById('comments-list');
+    const commentsEmpty    = document.getElementById('comments-empty');
+    const commentsSubtitle = document.getElementById('comments-modal-subtitle');
+    const commentNameField = document.getElementById('comment-name');
+    const commentBodyField = document.getElementById('comment-body');
+    const commentBodyCount = document.getElementById('comment-body-count');
+    const commentSubmitBtn = document.getElementById('comment-submit-btn');
+
+    let activeDiscussionId    = '';
+    let activeCommentCountBtn = null;
+
+    function renderComment(c) {
+      const wrap = document.createElement('div');
+      wrap.className = 'comment-item';
+      wrap.style.cssText = 'padding:14px 0;border-bottom:1px solid #e2e2e2;';
+      wrap.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <div style="width:30px;height:30px;border-radius:50%;background:#fed977;display:flex;align-items:center;justify-content:center;
+                      font-family:Inter,sans-serif;font-size:12px;font-weight:700;color:#785d00;flex-shrink:0;">${escHtml(initialsOf(c.name))}</div>
+          <span style="font-family:Inter,sans-serif;font-size:13px;font-weight:600;color:#041534;">${escHtml(c.name)}</span>
+          <span style="font-family:Inter,sans-serif;font-size:11px;color:#75777f;">${timeAgo(c.createdAt)}</span>
+        </div>
+        <p style="font-family:Inter,sans-serif;font-size:14px;color:#45464e;line-height:1.5;margin-left:40px;">${escHtml(c.body)}</p>`;
+      return wrap;
+    }
+
+    async function loadComments(id) {
+      if (!commentsList) return;
+      commentsList.innerHTML = `<p style="text-align:center;color:#75777f;font-size:13px;padding:16px 0;">Loading comments…</p>`;
+      if (commentsEmpty) commentsEmpty.classList.add('hidden');
+
+      if (!id) {
+        commentsList.innerHTML = '';
+        if (commentsEmpty) {
+          commentsEmpty.classList.remove('hidden');
+          commentsEmpty.querySelector('p').textContent = 'This is a preview post — comments aren\u2019t available yet.';
+        }
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/discussions/${id}/comments`);
+        const data = res.ok ? await res.json() : [];
+
+        commentsList.innerHTML = '';
+        if (!Array.isArray(data) || !data.length) {
+          if (commentsEmpty) {
+            commentsEmpty.classList.remove('hidden');
+            commentsEmpty.querySelector('p').textContent = 'No comments yet — be the first to reply.';
+          }
+          return;
+        }
+
+        data.forEach(c => commentsList.appendChild(renderComment(c)));
+      } catch (err) {
+        console.warn('[func.js] loadComments failed:', err);
+        commentsList.innerHTML = `<p style="text-align:center;color:#ba1a1a;font-size:13px;padding:16px 0;">Couldn\u2019t load comments — try again shortly.</p>`;
+      }
+    }
+
+    window.openCommentsModal = function(id, title, sourceBtn) {
+      activeDiscussionId    = id;
+      activeCommentCountBtn = sourceBtn || null;
+
+      if (commentsSubtitle) commentsSubtitle.textContent = title;
+      if (commentNameField) commentNameField.value = '';
+      if (commentBodyField) commentBodyField.value = '';
+      if (commentBodyCount) commentBodyCount.textContent = '0 / 500';
+      if (commentSubmitBtn) commentSubmitBtn.style.display = id ? '' : 'none';
+
+      commentsModal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      loadComments(id);
+
+      setTimeout(() => { if (id && commentNameField) commentNameField.focus(); }, 300);
+    };
+
+    window.closeCommentsModal = function() {
+      commentsModal.classList.remove('open');
+      document.body.style.overflow = '';
+    };
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && commentsModal.classList.contains('open')) window.closeCommentsModal();
+    });
+    const commentsBackdrop = commentsModal.querySelector('.modal-backdrop');
+    if (commentsBackdrop) commentsBackdrop.addEventListener('click', window.closeCommentsModal);
+
+    if (commentBodyField) {
+      commentBodyField.addEventListener('input', function() {
+        const len = this.value.length;
+        if (commentBodyCount) {
+          commentBodyCount.textContent = len + ' / 500';
+          commentBodyCount.classList.toggle('near-limit', len > 425);
+        }
+      });
+    }
+
+    window.submitComment = async function() {
+      if (!activeDiscussionId) return; // preview post — nothing to submit against
+
+      const name = (commentNameField?.value || '').trim();
+      const body = (commentBodyField?.value || '').trim();
+
+      const fields = [
+        { el: commentNameField, val: name },
+        { el: commentBodyField, val: body },
+      ];
+      let valid = true;
+      fields.forEach(f => {
+        if (!f.el) return;
+        if (!f.val) {
+          valid = false;
+          f.el.style.borderColor = '#ba1a1a';
+          f.el.style.boxShadow   = '0 0 0 3px rgba(186,26,26,0.12)';
+          f.el.addEventListener('input', () => {
+            f.el.style.borderColor = '';
+            f.el.style.boxShadow   = '';
+          }, { once: true });
+        }
+      });
+      if (!valid) return;
+
+      if (commentSubmitBtn) { commentSubmitBtn.disabled = true; commentSubmitBtn.style.opacity = '0.7'; }
+
+      const result = await apiPost(`/api/discussions/${activeDiscussionId}/comments`, { name, body });
+
+      if (commentSubmitBtn) { commentSubmitBtn.disabled = false; commentSubmitBtn.style.opacity = ''; }
+
+      if (!result || !result.success) {
+        window.SDAToast?.('Could not post your comment — please try again.', 'error');
+        return;
+      }
+
+      if (commentsEmpty) commentsEmpty.classList.add('hidden');
+      if (commentsList) commentsList.appendChild(renderComment(result.comment));
+      if (commentsList) commentsList.scrollTop = commentsList.scrollHeight;
+
+      if (commentNameField) commentNameField.value = '';
+      if (commentBodyField) commentBodyField.value = '';
+      if (commentBodyCount) commentBodyCount.textContent = '0 / 500';
+
+      const newCount = typeof result.commentCount === 'number' ? result.commentCount : null;
+      if (activeCommentCountBtn) {
+        const countEl = activeCommentCountBtn.querySelector('.comment-count');
+        if (countEl) {
+          const current = newCount !== null ? newCount : (parseInt(countEl.textContent, 10) || 0) + 1;
+          countEl.textContent = current + ' Comments';
+        }
+      }
+
+      window.SDAToast?.('Reply posted!', 'success');
+    };
+  }
+
   async function loadDiscussions() {
     const list = document.getElementById('discussions-list');
     if (!list) return;
@@ -489,18 +716,6 @@ function initYouthBoard() {
       if (!Array.isArray(data) || !data.length) return;
 
       list.querySelectorAll('article').forEach(a => a.remove());
-
-      function timeAgo(dateStr) {
-        const diff = Date.now() - new Date(dateStr).getTime();
-        const m = Math.floor(diff / 60000);
-        if (m < 1)  return 'Just now';
-        if (m < 60) return `${m} minute${m > 1 ? 's' : ''} ago`;
-        const h = Math.floor(m / 60);
-        if (h < 24) return `${h} hour${h > 1 ? 's' : ''} ago`;
-        const d = Math.floor(h / 24);
-        if (d < 7)  return `${d} day${d > 1 ? 's' : ''} ago`;
-        return new Date(dateStr).toLocaleDateString();
-      }
 
       function wireReadMore(btn) {
         if (btn.dataset.wired) return;
@@ -515,7 +730,7 @@ function initYouthBoard() {
       }
 
       data.forEach(d => {
-        const initials = d.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        const initials = initialsOf(d.name);
 
         const card = document.createElement('article');
         card.className        = 'discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow';
@@ -536,10 +751,7 @@ function initYouthBoard() {
           <p class="card-body font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-2">${escHtml(d.body)}</p>
           <button class="read-more-btn">Read more</button>
           <div class="flex items-center gap-6 mt-4">
-            <div class="flex items-center gap-2 text-on-surface-variant">
-              <span class="material-symbols-outlined text-[20px]">forum</span>
-              <span class="font-label-md">${d.comments || 0} Comments</span>
-            </div>
+            ${commentButtonHtml(d._id, d.title, d.comments || 0)}
             <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors"
                     aria-label="Like this post" data-count="${d.likes || 0}" data-id="${escHtml(d._id)}">
               <span class="material-symbols-outlined text-[20px]">favorite</span>
@@ -556,6 +768,7 @@ function initYouthBoard() {
 
         wireLikeBtn(card.querySelector('.like-btn'));
         wireReadMore(card.querySelector('.read-more-btn'));
+        wireCommentBtn(card.querySelector('.comment-count-btn'));
       });
 
       const emptyState = document.getElementById('empty-state');
@@ -706,7 +919,7 @@ function initYouthBoard() {
 
     const result = await apiPost('/api/discussions', { name, category, title, body });
 
-    const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const initials = initialsOf(name);
     const newCard  = document.createElement('article');
     newCard.className        = 'discussion-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow';
     newCard.dataset.category = category;
@@ -726,10 +939,7 @@ function initYouthBoard() {
       <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${escHtml(title)}</h3>
       <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-6">${escHtml(body)}</p>
       <div class="flex items-center gap-6">
-        <div class="flex items-center gap-2 text-on-surface-variant">
-          <span class="material-symbols-outlined text-[20px]">forum</span>
-          <span class="font-label-md">0 Comments</span>
-        </div>
+        ${commentButtonHtml(result?.id, title, 0)}
         <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors"
                 aria-label="Like this post" data-count="0" ${result?.id ? `data-id="${result.id}"` : ''}>
           <span class="material-symbols-outlined text-[20px]">favorite</span>
@@ -738,6 +948,7 @@ function initYouthBoard() {
       </div>`;
 
     wireLikeBtn(newCard.querySelector('.like-btn'));
+    wireCommentBtn(newCard.querySelector('.comment-count-btn'));
 
     const list = document.getElementById('discussions-list');
     if (list) list.insertBefore(newCard, list.firstChild);

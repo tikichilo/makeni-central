@@ -325,6 +325,7 @@
   }
   .modal-submit-btn:hover { background: #755b00; }
   .modal-submit-btn:active { transform: scale(0.97); }
+  .modal-submit-btn:disabled { opacity: 0.7; cursor: default; }
 
   /* Success view */
   .modal-success-view {
@@ -353,6 +354,20 @@
 }
 .read-more-btn:hover { text-decoration: underline; }
 .discussion-card .card-body.expanded { display: block; }
+
+  /* ══════════════════════════════════════════
+     COMMENT COUNT BUTTON — opens the comments modal
+  ══════════════════════════════════════════ */
+  .comment-count-btn {
+    background: none; border: none; cursor: pointer; padding: 0;
+    font: inherit;
+  }
+
+  /* ══════════════════════════════════════════
+     COMMENTS MODAL / COMMENT ITEMS
+  ══════════════════════════════════════════ */
+  #comments-list { max-height: 320px; overflow-y: auto; }
+  .comment-item:last-child { border-bottom: none !important; }
 
   /* ═══════════════════════════════════════════
      MOBILE USABILITY IMPROVEMENTS
@@ -685,10 +700,11 @@
               How do we balance the drive to excel in our professional lives while ensuring our walk with Christ remains the priority? I've been struggling lately with...
             </p>
             <div class="flex items-center gap-6">
-              <div class="flex items-center gap-2 text-on-surface-variant">
+              <button class="comment-count-btn flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors"
+                      data-id="" data-title="Navigating Career Ambition and Spiritual Growth" aria-label="View comments">
                 <span class="material-symbols-outlined text-[20px]">forum</span>
-                <span class="font-label-md">24 Comments</span>
-              </div>
+                <span class="font-label-md comment-count">24 Comments</span>
+              </button>
               <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors" aria-label="Like this post" data-count="15">
                 <span class="material-symbols-outlined text-[20px]">favorite</span>
                 <span class="font-label-md like-count">15 Likes</span>
@@ -711,10 +727,11 @@
               Final exams are coming up and the stress is real. What are your go-to scriptures when you need to feel the peace that surpasses understanding?
             </p>
             <div class="flex items-center gap-6">
-              <div class="flex items-center gap-2 text-on-surface-variant">
+              <button class="comment-count-btn flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors"
+                      data-id="" data-title="Favourite verses for times of anxiety?" aria-label="View comments">
                 <span class="material-symbols-outlined text-[20px]">forum</span>
-                <span class="font-label-md">48 Comments</span>
-              </div>
+                <span class="font-label-md comment-count">48 Comments</span>
+              </button>
               <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors" aria-label="Like this post" data-count="32">
                 <span class="material-symbols-outlined text-[20px]">favorite</span>
                 <span class="font-label-md like-count">32 Likes</span>
@@ -739,10 +756,11 @@
 </p>
 <button class="read-more-btn">Read more</button>
             <div class="flex items-center gap-6">
-              <div class="flex items-center gap-2 text-on-surface-variant">
+              <button class="comment-count-btn flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors"
+                      data-id="" data-title="Community Service Project: Next Steps" aria-label="View comments">
                 <span class="material-symbols-outlined text-[20px]">forum</span>
-                <span class="font-label-md">12 Comments</span>
-              </div>
+                <span class="font-label-md comment-count">12 Comments</span>
+              </button>
               <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors" aria-label="Like this post" data-count="8">
                 <span class="material-symbols-outlined text-[20px]">favorite</span>
                 <span class="font-label-md like-count">8 Likes</span>
@@ -868,6 +886,60 @@
 
   </div><!-- /.modal-panel -->
 </div><!-- /#discussion-modal -->
+
+<!-- ══════════════════════════════════════════
+     COMMENTS MODAL
+     func.js wires: openCommentsModal, closeCommentsModal,
+     loadComments, submitComment, backdrop click, Escape key.
+     Opened by any .comment-count-btn on a discussion card.
+══════════════════════════════════════════ -->
+<div id="comments-modal" class="discussion-modal" role="dialog" aria-modal="true" aria-labelledby="comments-modal-title">
+
+  <div class="modal-backdrop"></div>
+
+  <div class="modal-panel">
+
+    <div class="modal-header">
+      <div>
+        <h2 id="comments-modal-title" class="font-headline-md text-headline-md text-primary">Comments</h2>
+        <p id="comments-modal-subtitle" class="font-body-md text-body-md text-on-surface-variant mt-1">Discussion</p>
+      </div>
+      <button class="modal-close-btn" onclick="closeCommentsModal()" aria-label="Close modal">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Existing comments — populated by func.js -->
+      <div id="comments-list"></div>
+
+      <!-- Shown when there are no comments (or the post has no real id) -->
+      <div id="comments-empty" class="hidden text-center py-6 text-on-surface-variant">
+        <span class="material-symbols-outlined text-4xl mb-2 block" style="color:#c5c6cf;">chat_bubble</span>
+        <p class="font-body-md text-body-md">No comments yet — be the first to reply.</p>
+      </div>
+
+      <!-- Add a comment -->
+      <div class="modal-field">
+        <label for="comment-name">Your Name</label>
+        <input id="comment-name" type="text" placeholder="e.g. Chanda Mwale" maxlength="80" autocomplete="name"/>
+      </div>
+
+      <div class="modal-field">
+        <label for="comment-body">Your Reply</label>
+        <textarea id="comment-body" rows="3" placeholder="Add to the discussion…" maxlength="500"></textarea>
+        <div class="modal-char-count" id="comment-body-count">0 / 500</div>
+      </div>
+
+      <button class="modal-submit-btn" id="comment-submit-btn" onclick="submitComment()">
+        <span class="material-symbols-outlined">send</span>
+        Post Reply
+      </button>
+
+    </div><!-- /.modal-body -->
+  </div><!-- /.modal-panel -->
+</div><!-- /#comments-modal -->
 
 <!-- ══════════════ FOOTER ══════════════ -->
 <footer class="bg-primary text-on-primary w-full py-12 border-t-4 border-secondary">
