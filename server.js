@@ -248,10 +248,11 @@ const visitSchema = new mongoose.Schema({
   service:   { type: String, required: true, maxlength: 60  }, // e.g. "Divine Service"
   time:      { type: String, default: '',    maxlength: 60  }, // e.g. "11:00 AM"
   name:      { type: String, default: '',    maxlength: 100 },
-  needs:     { type: [String], default: [] },                  // e.g. ["prayer","welcome"]
+  phone:     { type: String, default: '',    maxlength: 20  }, // e.g. "0977 123 456"
   createdAt: { type: Date,   default: Date.now },
 });
 const Visit = mongoose.model('Visit', visitSchema);
+
 
 // Allowed values, kept in sync with the service buttons in index.html
 const VISIT_SERVICES = ['Sabbath School', 'Divine Service', 'Bible Study', 'Full Day'];
@@ -544,10 +545,10 @@ app.post('/api/announcements/:id/react', async (req, res) => {
 
 
 // ── POST /api/visits ──
-// Saves a "Plan Your Visit" submission: date, service, name, needs.
+// Saves a "Plan Your Visit" submission: date, service, name, phone.
 app.post('/api/visits', async (req, res) => {
   try {
-    const { date, service, time, name, needs } = req.body;
+    const { date, service, time, name, phone } = req.body;
 
     if (!date || !service) {
       return res.status(400).json({ error: 'Date and service are required' });
@@ -562,17 +563,12 @@ app.post('/api/visits', async (req, res) => {
       return res.status(400).json({ error: 'Invalid service' });
     }
 
-    // Drop any need values that aren't in our known list, just in case
-    const cleanNeeds = Array.isArray(needs)
-      ? needs.filter(n => VISIT_NEEDS.includes(n))
-      : [];
-
     const visit = await Visit.create({
       date:    parsedDate,
       service,
       time:    (time || '').slice(0, 60),
       name:    (name || '').slice(0, 100),
-      needs:   cleanNeeds,
+      phone:   (phone || '').slice(0, 20),
     });
 
     res.status(201).json({ success: true, id: visit._id });

@@ -2199,7 +2199,7 @@
         </button>
       </div>
 
-      <!-- ── STEP 2: Personal details + needs ── -->
+      <!-- ── STEP 2: Personal details ── -->
       <div class="visit-step" id="visit-step-2">
         <div class="visit-section-label">Your name <span style="color:#75777f;font-weight:400;letter-spacing:0;text-transform:none;font-size:12px;">(optional)</span></div>
         <input
@@ -2211,28 +2211,16 @@
           maxlength="80"
         />
 
-        <div class="visit-section-label" style="margin-bottom:12px;">Anything we can help with?</div>
-
-        <label class="visit-need-check" data-need="prayer">
-          <input type="checkbox" value="prayer" />
-          <div class="visit-need-check-box"></div>
-          🙏 I'd like someone to pray with me
-        </label>
-        <label class="visit-need-check" data-need="welcome">
-          <input type="checkbox" value="welcome" />
-          <div class="visit-need-check-box"></div>
-          👋 First time — please welcome me!
-        </label>
-        <label class="visit-need-check" data-need="kids">
-          <input type="checkbox" value="kids" />
-          <div class="visit-need-check-box"></div>
-          👧 I'm bringing children
-        </label>
-        <label class="visit-need-check" data-need="transport">
-          <input type="checkbox" value="transport" />
-          <div class="visit-need-check-box"></div>
-          🚗 I need help with directions
-        </label>
+        <div class="visit-section-label" style="margin-top:20px;">Phone number <span style="color:#75777f;font-weight:400;letter-spacing:0;text-transform:none;font-size:12px;">(optional — so we can follow up)</span></div>
+        <input
+          type="tel"
+          id="visit-phone"
+          class="visit-name-input"
+          placeholder="e.g. 0977 123 456"
+          aria-label="Your phone number (optional)"
+          maxlength="20"
+          inputmode="tel"
+        />
 
         <div style="display:flex;gap:10px;margin-top:20px;">
           <button class="visit-btn-back" id="step2-back">← Back</button>
@@ -2267,11 +2255,11 @@
               <div class="visit-confirm-value" id="confirm-name">—</div>
             </div>
           </div>
-          <div class="visit-confirm-row" id="confirm-needs-row" style="display:none;">
-            <span class="material-symbols-outlined visit-confirm-icon">check_circle</span>
+          <div class="visit-confirm-row" id="confirm-phone-row" style="display:none;">
+            <span class="material-symbols-outlined visit-confirm-icon">call</span>
             <div>
-              <div class="visit-confirm-label">Requests</div>
-              <div class="visit-confirm-value" id="confirm-needs">—</div>
+              <div class="visit-confirm-label">Phone</div>
+              <div class="visit-confirm-value" id="confirm-phone">—</div>
             </div>
           </div>
         </div>
@@ -2747,11 +2735,8 @@
         b.classList.remove('selected');
         b.setAttribute('aria-pressed', 'false');
       });
-      document.querySelectorAll('.visit-need-check').forEach(l => {
-        l.classList.remove('checked');
-        l.querySelector('input').checked = false;
-      });
-      document.getElementById('visit-name').value = '';
+      document.getElementById('visit-name').value  = '';
+      document.getElementById('visit-phone').value = '';
       step1Next.disabled = true;
 
       modal.classList.add('active');
@@ -2832,29 +2817,19 @@
 
     step1Next.addEventListener('click', function() { goToStep(2); });
 
-    /* ── Step 2: name + needs ── */
-    // Checkbox-style labels
-    document.querySelectorAll('.visit-need-check').forEach(function(label) {
-      label.addEventListener('click', function() {
-        const cb = label.querySelector('input[type="checkbox"]');
-        cb.checked = !cb.checked;
-        label.classList.toggle('checked', cb.checked);
-      });
-    });
-
+    /* ── Step 2: name + phone ── */
     step2Back.addEventListener('click', function() { goToStep(1); });
 
     step2Next.addEventListener('click', function() {
       // Populate review card
       const name  = document.getElementById('visit-name').value.trim();
-      const needs = [...document.querySelectorAll('.visit-need-check.checked')]
-        .map(function(l) { return l.textContent.trim(); });
+      const phone = document.getElementById('visit-phone').value.trim();
 
       document.getElementById('confirm-date').textContent    = formatDate(dateInput.value);
       document.getElementById('confirm-service').textContent = selectedService + ' · ' + selectedTime;
 
       const nameRow  = document.getElementById('confirm-name-row');
-      const needsRow = document.getElementById('confirm-needs-row');
+      const phoneRow = document.getElementById('confirm-phone-row');
 
       if (name) {
         document.getElementById('confirm-name').textContent = name;
@@ -2863,11 +2838,11 @@
         nameRow.style.display = 'none';
       }
 
-      if (needs.length) {
-        document.getElementById('confirm-needs').textContent = needs.join(', ');
-        needsRow.style.display = '';
+      if (phone) {
+        document.getElementById('confirm-phone').textContent = phone;
+        phoneRow.style.display = '';
       } else {
-        needsRow.style.display = 'none';
+        phoneRow.style.display = 'none';
       }
 
       // Wire up the calendar buttons now that we know the event details
@@ -2880,12 +2855,11 @@
     function buildCurrentEvent() {
       const { start, end } = buildEventTimes(dateInput.value, selectedStart, selectedEnd);
       const name  = document.getElementById('visit-name').value.trim();
-      const needs = [...document.querySelectorAll('.visit-need-check.checked')]
-        .map(function(l) { return l.textContent.trim(); });
+      const phone = document.getElementById('visit-phone').value.trim();
 
       let description = `Visiting Makeni Central SDA Church for ${selectedService}.`;
-      if (name)        description += `\\nName: ${name}`;
-      if (needs.length) description += `\\nRequests: ${needs.join(', ')}`;
+      if (name)  description += `\\nName: ${name}`;
+      if (phone) description += `\\nPhone: ${phone}`;
 
       return {
         title:       `${selectedService} — ${CHURCH_NAME}`,
@@ -2916,10 +2890,8 @@
     // for the admin side, so a failed save should never block the visitor
     // or show them a scary error for something they don't control.
     async function saveVisitToServer() {
-      const { start } = buildCurrentEvent();
       const name  = document.getElementById('visit-name').value.trim();
-      const needs = [...document.querySelectorAll('.visit-need-check.checked')]
-        .map(function(l) { return l.dataset.need; });
+      const phone = document.getElementById('visit-phone').value.trim();
 
       try {
         await fetch('/api/visits', {
@@ -2930,7 +2902,7 @@
             service: selectedService,
             time:    selectedTime,
             name,
-            needs
+            phone
           })
         });
       } catch (e) {
