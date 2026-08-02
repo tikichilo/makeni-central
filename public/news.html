@@ -505,6 +505,25 @@
 #recap-gallery-modal.is-fullscreen .recap-gallery-thumbs,
 #recap-gallery-modal.is-fullscreen .news-modal-body { display: none; }
 #recap-gallery-modal.is-fullscreen .news-modal-close { background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); }
+
+/* ═══════════════════════════════════════════
+   MOBILE SCALE FIX — headline sizes
+   (same fix as index.html: text-headline-lg /
+   text-headline-md have no mobile variant here,
+   so headings render at full desktop size on
+   phones — page title, nav logo, modal titles,
+   section headings, featured event title.)
+═══════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .text-headline-lg { font-size: 30px !important; line-height: 1.25 !important; }
+  .text-headline-md { font-size: 24px !important; line-height: 1.3 !important; }
+}
+
+@media (max-width: 480px) {
+  .text-headline-lg { font-size: 26px !important; }
+  .text-headline-md { font-size: 22px !important; }
+}
+
 </style>
 </head>
 
@@ -678,7 +697,7 @@
 </section>
 
 <!-- ══════════════ CATEGORY FILTER PILLS ══════════════ -->
-<nav class="flex-wrap gap-3 mb-10 justify-center" id="news-cat-pills" style="display:none;" aria-label="Filter announcements by category">
+<nav class="flex flex-wrap gap-3 mb-10 justify-center" id="news-cat-pills" style="display:none;" aria-label="Filter announcements by category">
   <button class="news-cat-pill active" data-cat="all">All</button>
   <button class="news-cat-pill" data-cat="general">General</button>
   <button class="news-cat-pill" data-cat="youth">Youth</button>
