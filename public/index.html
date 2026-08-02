@@ -553,8 +553,7 @@
     z-index: 10;
     cursor: pointer;
   }
-
-  /* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════
    ANNOUNCEMENTS — CARD CAROUSEL
 ═══════════════════════════════════════════ */
 .announce-wrap {
@@ -571,22 +570,18 @@
 
 .announce-viewport {
   flex: 1;
-  overflow: hidden;
   position: relative;
-  min-height: 88px;
   display: flex;
   align-items: center;
 }
 
 .announce-track {
-  position: relative;
+  display: grid;
   width: 100%;
-  min-height: 88px;
 }
 
 .announce-card {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -596,6 +591,7 @@
   transform: translateY(10px);
   pointer-events: none;
   transition: opacity 0.5s ease, transform 0.5s ease;
+  padding: 6px 2px;
 }
 .announce-card.active {
   opacity: 1;
@@ -663,11 +659,16 @@
 
 /* Mobile sizing */
 @media (max-width: 640px) {
-  .announce-text { font-size: 16.5px; max-width: 260px; }
-  .announce-icon { font-size: 24px; }
-  .announce-nav  { width: 34px; height: 34px; }
-  .announce-viewport { min-height: 96px; }
-  .announce-track { min-height: 96px; }
+  .announce-shell { gap: 10px; }
+  .announce-card  { flex-direction: column; gap: 6px; }
+  .announce-text  { font-size: 15.5px; max-width: 100%; line-height: 1.4; }
+  .announce-icon  { font-size: 22px; }
+  .announce-nav   { width: 32px; height: 32px; flex-shrink: 0; }
+}
+
+@media (max-width: 360px) {
+  .announce-nav  { width: 28px; height: 28px; }
+  .announce-text { font-size: 14.5px; }
 }
 
 /* Respect users who've asked for reduced motion */
@@ -1455,6 +1456,45 @@
   .footer-contact-call-number {
     font-family: Inter, sans-serif; font-size: 15px; font-weight: 700; color: #ffffff;
   }
+
+  /* ═══════════════════════════════════════════
+   MOBILE SCALE FIX
+   Headings, section spacing, hero sizing, and
+   card padding were fixed at desktop sizes with
+   no responsive variant — this is what made the
+   page feel shrunk-desktop rather than mobile.
+   Also caps the FB embed's hardcoded 500px width
+   so it can't force horizontal scroll on phones.
+═══════════════════════════════════════════ */
+
+.fb-page, .fb-page iframe, .fb-page span {
+  max-width: 100% !important;
+}
+
+@media (max-width: 767px) {
+  .text-headline-lg { font-size: 30px !important; line-height: 1.25 !important; }
+  .text-headline-md { font-size: 24px !important; line-height: 1.3 !important; }
+  .py-section-gap    { padding-top: 64px !important; padding-bottom: 64px !important; }
+  .pt-section-gap    { padding-top: 64px !important; }
+  .gap-gutter         { gap: 20px !important; }
+  .h-\[85vh\]         { height: 78vh !important; }
+}
+
+@media (min-width: 481px) and (max-width: 767px) {
+  .hero-h1 { font-size: 44px !important; }
+}
+
+@media (max-width: 480px) {
+  .text-headline-lg { font-size: 26px !important; }
+  .text-headline-md { font-size: 22px !important; }
+  .py-section-gap    { padding-top: 48px !important; padding-bottom: 48px !important; }
+  .pt-section-gap    { padding-top: 48px !important; }
+  .h-\[85vh\]         { height: 72vh !important; min-height: 480px !important; }
+  .p-10               { padding: 24px !important; }
+  .gap-10             { gap: 24px !important; }
+  .hero-cta           { flex-direction: column !important; width: 100% !important; }
+  .hero-cta > *       { width: 100% !important; text-align: center !important; }
+}
 </style>
 </head>
 
