@@ -286,6 +286,40 @@
   .contact-call-number {
     font-family: Inter, sans-serif; font-size: 15px; font-weight: 700; color: #ffffff;
   }
+
+  /* ═══════════════════════════════════════════
+   MOBILE SCALE FIX
+   Same root cause as index.html/news.html:
+   text-headline-lg/md have no mobile variant.
+   This page adds two more unscaled spots: the
+   hero (h-[70vh] + text-display-lg, no wrapper
+   class to hook a mobile size onto), and the
+   fixed-padding CTA/banner sections.
+═══════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .text-headline-lg { font-size: 30px !important; line-height: 1.25 !important; }
+  .text-headline-md { font-size: 24px !important; line-height: 1.3 !important; }
+  .py-section-gap    { padding-top: 64px !important; padding-bottom: 64px !important; }
+  .pb-section-gap     { padding-bottom: 64px !important; }
+  .gap-gutter          { gap: 20px !important; }
+  .h-\[70vh\]          { height: 62vh !important; }
+}
+
+@media (min-width: 481px) and (max-width: 767px) {
+  .text-display-lg { font-size: 42px !important; }
+}
+
+@media (max-width: 480px) {
+  .text-headline-lg { font-size: 26px !important; }
+  .text-headline-md { font-size: 22px !important; }
+  .py-section-gap    { padding-top: 48px !important; padding-bottom: 48px !important; }
+  .pb-section-gap     { padding-bottom: 48px !important; }
+  .h-\[70vh\]          { height: 56vh !important; min-height: 420px !important; }
+  .text-display-lg    { font-size: 34px !important; }
+  .p-12               { padding: 32px !important; }
+  .py-24              { padding-top: 56px !important; padding-bottom: 56px !important; }
+}
+
 </style>
 </head>
 
