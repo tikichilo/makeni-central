@@ -681,7 +681,7 @@
   // Leave as null to show "Contact Church Office" disabled state instead.
   var CHURCH_OFFICE_PHONE = null; // e.g. '+260971234567'
 
-  // ── Fixed role categories, in the order the filter pills should show.
+// ── Fixed role categories, in the order the filter pills should show.
   // A leader's `role` must exactly match one of these strings, or their
   // card will only ever appear under "All" and never get its own filter pill.
   var LEADER_ROLES = [
@@ -702,7 +702,18 @@
   // phone: international format e.g. '+260971234567', or null if not yet available.
   // photo: filename in your images folder, or null to show the placeholder icon.
   // bio: a short general line about their service — keep it department-free.
+  //
+  // Order below follows church structure: Pastor → Admin → Elders →
+  // Deacons/Deaconesses → Clerk → Treasurer → Ministry/Department leaders.
   var CHURCH_LEADERS = [
+  {
+    id: 'leader-Pastor',
+    name: 'Nicholas Mtetesha',
+    role: 'Pastor',
+    phone: '+260979992444',
+    photo: 'images/pastor.jpeg',
+    bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation, and oversees the overall ministry of the church.'
+  },
   {
     id: 'leader-admin',
     name: 'Joseph Chilimina',
@@ -711,6 +722,8 @@
     photo: 'images/chilimina.jpg',
     bio: 'Handles administrative coordination for the church office, supporting leadership with records and planning.'
   },
+
+  // ── Elders ──
   {
     id: 'leader-chilomo-champion',
     name: 'Champion Chilomo',
@@ -725,14 +738,6 @@
     role: 'Elder',
     phone: '+260772041304',
     photo: 'images/aori.jpg',
-    bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.'
-  },
-  {
-    id: 'leader-moyo-chilende',
-    name: 'Chilende Moyo',
-    role: 'Elder & Building Committee Chair',
-    phone: '+260966220333',
-    photo: 'images/moyo.jpg',
     bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.'
   },
   {
@@ -753,66 +758,94 @@
   },
   {
     id: 'leader-tembo',
-    name: 'Elder Tembo',
+    name: 'Mackson Tembo',
     role: 'Elder',
     phone: '+260978088776',
     photo: 'images/tembo.jpg',
     bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.'
   },
   // 5 provisional Elder slots — fill in as more Elders are confirmed
-  { id: 'leader-elder-nsinde', name: 'Olens Nsinde', role: 'Elder', phone: null, photo: 'images/nsinde.jpg', bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
   //{ id: 'leader-elder-provision-2', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
   //{ id: 'leader-elder-provision-3', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
   //{ id: 'leader-elder-provision-4', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
   //{ id: 'leader-elder-provision-5', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
-  {
+
+    {
     id: 'leader-zimindo',
-    name: 'Mrs Zimindo',
+    name: 'Dr Norreen Machila Zimindo',
     role: 'Church Clerk',
     phone: '+260977729232',
     photo: 'images/mrs zimindo.jpg',
     bio: 'Maintains official church records, membership rolls, and minutes of business meetings.'
   },
   //{
-   // id: 'leader-clerk-provision-1',
-    //name: 'TBA',
-   // role: 'Church Clerk',
+    //id: 'leader-clerk',
+    //name: 'Sr Mwiinga',
+    //role: 'Assistant Church Clerk',
     //phone: null,
     //photo: null,
     //bio: 'Maintains official church records, membership rolls, and minutes of business meetings.'
   //},
+
+  {
+    id: 'leader-deacon-hamatimba',
+    name: 'Hamatimba Mweene',
+    role: 'Head Deacon',
+    phone: '+260977800947',
+    photo: 'images/hamatimba.jpg',
+    bio: 'Assists with ushering, church upkeep, and practical support for members in need.'
+  },
+ // {
+    //id: 'leader-deaconess-mutanga',
+    //name: 'Sr Mutanga',
+    //role: 'Head Deaconess',
+    //phone: '+2609',
+    //photo: '',
+    //bio: 'Assists with ushering, church upkeep, and practical support for members in need.'
+  //},
+
+   {
+    id: 'leader-nsinde',
+    name: 'Olens Nsinde',
+    role: 'Sterwardship Leader & Music Director',
+    phone: null,
+    photo: 'images/nsinde.jpg',
+    bio: 'Teaches biblical stewardship of time, talents, and resources, and directs the church choir and music ministry.'
+  },
+  
+  {
+    id: 'leader-Treasurer',
+    name: 'Charity Nyasulu',
+    role: 'Treasurer',
+    phone: null,
+    photo: 'images/nyasulu.jpg',
+    bio: 'Oversees church finances and faithful handling of tithes and offerings.'
+  },
   {
     id: 'leader-treasurer',
     name: 'Cider Moyo',
-    role: 'Treasurer, Chorister & Adventurer Leader',
+    role: 'Assistant Treasurer, Chorister & Adventurer Leader',
     phone: '+260971234567',
     photo: 'images/sterwardship.jpg',
     bio: 'Oversees church finances and faithful handling of tithes and offerings, leads the choir in worship, and directs the Adventurer Club for younger children.'
   },
-  {
-    id: 'leader-musowe',
-    name: 'Mrs Musowe',
-    role: 'Youth Leader',
-    phone: '+260977803376',
-    photo: 'images/youth leader.jpg',
-    bio: 'Coordinates youth programs and activities, nurturing young people in faith and service.'
-  },
+
   {
     id: 'leader-chilomo-personal-ministries',
-    name: 'Charity Chilomo',
+    name: 'Charity Muzandu Chilomo',
     role: 'Personal Ministries Leader',
     phone: '+260977845634',
     photo: 'images/mrs chilomo.jpg',
     bio: 'Leads outreach, soul-winning, and evangelism efforts, equipping members for personal ministry.'
   },
-  {
-    id: 'leader-deacon-hamatimba',
-    name: 'Hamatimba Mweene',
-    role: 'Deacon',
-    phone: '+260977800947',
-    photo: 'images/hamatimba.jpg',
-    bio: 'Assists with ushering, church upkeep, and practical support for members in need.'
-  },
+    //{
+    //id: 'leader-Monde',
+    //name: 'Richard Monde',
+    //role: 'Family Life',
+    //phone: '+260',
+    //photo: 'images/monde.jpg',
+    //bio: 'Promotes healthy marriages, parenting, and family relationships through family life ministry programs.'
+  //},
   {
     id: 'leader-zandonda',
     name: 'Bester Zandonda',
@@ -822,20 +855,36 @@
     bio: 'Promotes health education and wellness programs within the congregation.'
   },
   {
-    id: 'leader-munsanje',
-    name: 'Chimuka Munsanje',
-    role: 'Adventist Men Leader, Deacon & Chorister',
-    phone: null,
-    photo: 'images/chimuka.jpg',
-    bio: 'Coordinates men\'s ministry activities, assists with practical church duties as deacon, and serves in the choir.'
-  },
-  {
     id: 'leader-Enock',
     name: 'Enock Chilimina',
     role: 'Communications',
     phone: '+260765699759',
     photo: 'images/enock.jpg',
     bio: 'Manages church announcements, media, and communication with the congregation and wider community.'
+  },
+  {
+    id: 'leader-moyo-chilende',
+    name: 'Chilende Moyo',
+    role: 'Building Committee Chair',
+    phone: '+260966220333',
+    photo: 'images/moyo.jpg',
+    bio: 'Leads the committee overseeing church building and construction projects.'
+  },
+  {
+    id: 'leader-musowe',
+    name: 'Christine Musowe',
+    role: 'Youth Leader',
+    phone: '+260977803376',
+    photo: 'images/youth leader.jpg',
+    bio: 'Coordinates youth programs and activities, nurturing young people in faith and service.'
+  },
+  {
+    id: 'leader-munsanje',
+    name: 'Chimuka Munsanje',
+    role: 'Adventist Men Leader, Deacon & Chorister',
+    phone: null,
+    photo: 'images/chimuka.jpg',
+    bio: 'Coordinates men\'s ministry activities, assists with practical church duties as deacon, and serves in the choir.'
   },
   //{
     //id: 'leader-dorcas-1',
@@ -846,16 +895,6 @@
     //bio: 'Serves through the Dorcas Society, providing welfare support and care for those in need.'
   //}
 
-  
-    // ── Add more leaders here as they're confirmed. Example:
-    // {
-    //   id: 'leader-unique-id',
-    //   name: 'Full Name',
-    //   role: 'Brother',            // must match one of LEADER_ROLES
-    //   phone: '+260XXXXXXXXX',
-    //   photo: 'images/filename.jpg',
-    //   bio: 'Short general line about their service.'
-    // },
   ];
 
   // ── DOM refs ──
