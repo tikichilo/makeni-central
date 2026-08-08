@@ -1740,18 +1740,24 @@
 
 <main class="pt-20">
 
-  <!-- ══════════════ HERO ══════════════ -->
+<!-- ══════════════ HERO ══════════════ -->
   <section class="relative h-[85vh] w-full overflow-hidden flex items-center justify-center" aria-label="Welcome hero">
     <!-- Hero Slideshow backgrounds -->
     <div id="hero-slideshow" aria-hidden="true">
       <div class="hero-slide active" style="background-image: url('images/church.jpg');"></div>
-      <div class="hero-slide" style="background-image: url('images/gate 2.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('images/gate%202.jpg');"></div>
       <div class="hero-slide" style="background-image: url('images/church3.jpg');"></div>
-      <div class="hero-slide" style="background-image: url('images/church\ bld.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('images/church%20bld.jpg');"></div>
     </div>
+
     <!-- Overlay -->
     <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(4,21,52,0.55) 0%, rgba(4,21,52,0.35) 60%, rgba(4,21,52,0.65) 100%);"></div>
-<!-- Content -->
+
+    <!-- Invisible left/right click zones (desktop) — swipe handles mobile -->
+    <button type="button" class="hero-zone hero-zone-prev" aria-label="Previous slide"></button>
+    <button type="button" class="hero-zone hero-zone-next" aria-label="Next slide"></button>
+
+    <!-- Content -->
     <div class="hero-content relative z-10 text-center px-margin-mobile">
       <img
         src="indexlogo.png"
@@ -1771,21 +1777,15 @@
       <div class="hero-cta flex flex-wrap gap-4 justify-center mt-10">
         <!-- Now opens the visit planner modal -->
         <button
+          type="button"
           id="hero-visit-btn"
           class="bg-secondary-container text-on-secondary-container px-7 py-3 rounded-xl font-label-md text-label-md hover:bg-secondary-fixed transition-all active:scale-95">
           Join Us This Sabbath
         </button>
       </div>
     </div>
-
-    <!-- Slideshow dot indicators -->
-    <div class="hero-dots" id="hero-dots" role="tablist" aria-label="Hero slideshow navigation">
-      <button class="hero-dot active" role="tab" aria-selected="true"  aria-label="Slide 1"></button>
-      <button class="hero-dot"        role="tab" aria-selected="false" aria-label="Slide 2"></button>
-      <button class="hero-dot"        role="tab" aria-selected="false" aria-label="Slide 3"></button>
-      <button class="hero-dot"        role="tab" aria-selected="false" aria-label="Slide 4"></button>
-    </div>
-
+  </section>
+  
     <!-- Scroll indicator -->
     <a href="#announcements" class="scroll-indicator text-on-primary/70 hover:text-on-primary transition-colors" aria-label="Scroll down">
       <span class="material-symbols-outlined" style="font-size:32px;">keyboard_arrow_down</span>
@@ -3048,6 +3048,42 @@
   }
 
 })();
+
+/* ── Hero slideshow: swipe left/right, no buttons ── */
+function initHeroSwipe(containerEl, { onPrev, onNext }) {
+  if (!containerEl) return;
+
+  let startX = 0;
+  let startY = 0;
+  let tracking = false;
+  const SWIPE_THRESHOLD = 40;   // min px horizontal distance to count as a swipe
+  const DIRECTION_LOCK  = 1.2;  // horizontal must beat vertical by this ratio (avoids hijacking page-scroll)
+
+  containerEl.addEventListener('touchstart', function (e) {
+    const t = e.touches[0];
+    startX = t.clientX;
+    startY = t.clientY;
+    tracking = true;
+  }, { passive: true });
+
+  containerEl.addEventListener('touchend', function (e) {
+    if (!tracking) return;
+    tracking = false;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+
+    if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+    if (Math.abs(dx) < Math.abs(dy) * DIRECTION_LOCK) return; // mostly vertical → ignore, let page scroll
+
+    if (dx < 0) onNext(); else onPrev();
+  }, { passive: true });
+}
+
+initHeroSwipe(document.querySelector('.hero-slideshow'), {
+  onPrev: prevSlide,   // your existing "go back one slide" function
+  onNext: nextSlide    // your existing "go forward one slide" function
+});
 </script>
 </body>
 </html>
