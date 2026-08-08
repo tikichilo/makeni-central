@@ -66,19 +66,6 @@ header.scrolled { box-shadow: 0 4px 24px -4px rgba(4,21,52,0.14) !important; }
 
 .nav-inner { transition: height 0.3s ease; }
 
-
-/* ═══════════════════════════════════════════
-   LOGO BADGE — hover lift (all pages)
-═══════════════════════════════════════════ */
-.logo-badge {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.logo-badge:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 0 4px rgba(117,91,0,0.15);
-}
-
-
 /* ═══════════════════════════════════════════
    SCROLL-REVEAL  (.reveal)
    Add class="reveal" to any element you want

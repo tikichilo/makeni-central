@@ -54,14 +54,39 @@
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
   .sacred-shadow { box-shadow: 0 10px 30px -10px rgba(4, 21, 52, 0.08); }
   .gold-divider { height: 2px; background: #755b00; width: 60px; }
-  .logo-badge {
-    display: flex; align-items: center; justify-content: center;
-    width: 52px; height: 52px; border-radius: 50%;
-    background-color: #041534; border: 2px solid #755b00; flex-shrink: 0;
-  }
-  .logo-badge img { width: 38px; height: 38px; object-fit: contain; }
-  .logo-badge-sm { width: 44px; height: 44px; }
-  .logo-badge-sm img { width: 30px; height: 30px; }
+ 
+    /* ── Logo ── */
+.logo-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 104px;
+  height: 104px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+.logo-badge:hover {
+  transform: scale(1.06);
+}
+.logo-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.logo-badge-sm {
+  width: 80px;
+  height: 80px;
+}
+.logo-badge-sm img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Logo-only nav brand — wordmark text retired everywhere, not just mobile */
+.logo-text {
+  display: none !important;
+}
 
   /* ── MOBILE NAV ── */
   @media (max-width: 767px) {
@@ -252,6 +277,9 @@
   .leader-card:hover { transform: translateY(-4px); }
   .leader-card:hover .leader-card-body { box-shadow: 0 20px 40px -15px rgba(4,21,52,0.14); }
   .leader-card-body { cursor: pointer; }
+  .leader-card-bio {
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
 
   /* ── Leader card "View" button — matches site primary navy ── */
   .leader-view-btn {
@@ -262,13 +290,13 @@
     width: 100%;
     background: #041534;
     color: #ffffff;
-    padding: 10px 20px;
+    padding: 12px 20px;
     border-radius: 9999px;
     border: none;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.15s ease;
+    transition: background 0.2s ease, transform 0.15s ease, gap 0.2s ease;
   }
-  .leader-view-btn:hover { background: #755b00; }
+  .leader-view-btn:hover { background: #755b00; gap: 10px; }
   .leader-view-btn:active { transform: scale(0.96); }
 
   /* ── Filter pills ── */
@@ -296,7 +324,7 @@
 
   .leader-modal {
     position: relative;
-    background: #ffffff; border-radius: 20px; max-width: 520px; width: 100%;
+    background: #ffffff; border-radius: 20px; max-width: 480px; width: 100%;
     max-height: 88vh; overflow-y: auto;
     box-shadow: 0 30px 60px -15px rgba(4,21,52,0.35);
     transform: translateY(16px) scale(0.98); opacity: 0;
@@ -328,6 +356,14 @@
     background: linear-gradient(to bottom, rgba(4,21,52,0.5), rgba(4,21,52,0));
     pointer-events: none;
   }
+  /* gold name plate straddling the photo/body seam — the modal's signature touch */
+  .leader-modal-plate {
+    position: relative; margin: -28px 24px 0; z-index: 2;
+    background: #ffffff; border-radius: 14px;
+    padding: 18px 22px;
+    box-shadow: 0 14px 34px -12px rgba(4,21,52,0.28);
+    border-top: 3px solid #755b00;
+  }
 
   .leader-modal-close {
     position: absolute; top: 16px; right: 16px; z-index: 3;
@@ -343,20 +379,7 @@
   .leader-modal-close:active { transform: scale(0.92); }
   .leader-modal-close .material-symbols-outlined { font-size: 22px; }
 
-  .leader-modal-body { padding: 32px; }
-  .leader-modal-call {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    width: 100%; background: #041534; color: #fff; padding: 14px 24px; border-radius: 12px;
-    font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.06em; font-weight: 600;
-    text-decoration: none; border: none; cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-  }
-  .leader-modal-call:hover { background: #755b00; }
-  .leader-modal-call:active { transform: scale(0.97); }
-  .leader-modal-call.unavailable {
-    background: #f3f3f4; color: #75777f; cursor: not-allowed;
-  }
-  .leader-modal-call.unavailable:hover { background: #f3f3f4; }
+  .leader-modal-body { padding: 28px 32px 32px; }
 
   /* ── Mobile: bottom-sheet style modal ── */
   @media (max-width: 640px) {
@@ -373,17 +396,14 @@
     .leader-modal-overlay.open .leader-modal { transform: translateY(0); }
     .leader-modal-photo {
       aspect-ratio: 1 / 1; /* tighter crop, mostly face/shoulders on narrow screens */
-      max-height: 40vh;
+      max-height: 38vh;
     }
     .leader-modal-close {
       top: 14px; right: 14px; width: 44px; height: 44px;
     }
+    .leader-modal-plate { margin: -24px 16px 0; padding: 16px 18px; }
     .leader-modal-body {
-      padding: 24px 20px;
-      padding-bottom: max(28px, env(safe-area-inset-bottom));
-    }
-    .leader-modal-call {
-      padding: 16px 24px; /* bigger tap target */
+      padding: 20px 20px max(28px, env(safe-area-inset-bottom));
     }
   }
   /* ── Footer: collapsible Resources ── */
@@ -588,7 +608,10 @@
 
 </main>
 
-<!-- ══════════════ LEADER PROFILE MODAL ══════════════ -->
+<!-- ══════════════ LEADER PROFILE MODAL ══════════════
+     View-only: no phone numbers or call actions live here.
+     A gold-topped name plate straddles the photo/body seam as
+     the page's signature detail. ══════════════ -->
 <div class="leader-modal-overlay" id="leader-modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="leader-modal" id="leader-modal">
     <div class="relative">
@@ -597,19 +620,15 @@
       </button>
       <div class="leader-modal-photo" id="leader-modal-photo"></div>
     </div>
+
+    <div class="leader-modal-plate">
+      <span class="font-label-md text-label-md text-secondary uppercase tracking-[0.08em] block mb-1" id="leader-modal-role-tag"></span>
+      <h3 class="font-headline-md text-headline-md text-primary" id="leader-modal-name"></h3>
+    </div>
+
     <div class="leader-modal-body">
-      <span class="font-label-md text-label-md text-secondary uppercase tracking-[0.08em] block mb-2" id="leader-modal-role-tag"></span>
-      <h3 class="font-headline-md text-headline-md text-primary mb-6" id="leader-modal-name"></h3>
-
-      <div class="mb-8">
-        <h4 class="font-title-lg text-title-lg text-primary mb-2">About</h4>
-        <p class="font-body-md text-body-md text-on-surface-variant" id="leader-modal-bio"></p>
-      </div>
-
-      <a href="#" id="leader-modal-call" class="leader-modal-call">
-        <span class="material-symbols-outlined text-[18px]">call</span>
-        <span id="leader-modal-call-label">Call Leader</span>
-      </a>
+      <h4 class="font-title-lg text-title-lg text-primary mb-2">About</h4>
+      <p class="font-body-md text-body-md text-on-surface-variant" id="leader-modal-bio"></p>
     </div>
   </div>
 </div>
@@ -618,12 +637,7 @@
 <footer class="bg-primary text-on-primary w-full py-12 border-t-4 border-secondary">
   <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
     <div>
-      <div class="flex items-center gap-3 mb-6">
-        <div class="logo-badge logo-badge-sm" style="background-color:#0a1a3a; border-color:#e6c364;">
-          <img alt="Makeni Central SDA Logo" src="sda.png"/>
-        </div>
-        <span class="font-headline-md text-headline-md text-on-primary">Makeni Central</span>
-      </div>
+    
       <p class="font-body-md text-body-md text-on-primary/80">Proclaiming the everlasting gospel to every nation, kindred, tongue, and people.</p>
     </div>
 
@@ -671,17 +685,15 @@
      LEADERS PAGE — STATIC DATA + RENDER LOGIC
      No database / API call. Leaders are shown by ROLE only —
      departments are intentionally NOT shown anywhere on this page.
-     To add or update a leader, edit CHURCH_LEADERS directly.
+     Phone numbers and call actions have been removed site-wide on
+     this page — leaders are shown "View only". To add or update a
+     leader, edit CHURCH_LEADERS directly.
 ════════════════════════════════════════════════════════════════ -->
 <script>
 (function () {
   'use strict';
 
-  // ── Fallback number for leaders without a confirmed phone yet.
-  // Leave as null to show "Contact Church Office" disabled state instead.
-  var CHURCH_OFFICE_PHONE = null; // e.g. '+260971234567'
-
-// ── Fixed role categories, in the order the filter pills should show.
+  // ── Fixed role categories, in the order the filter pills should show.
   // A leader's `role` must exactly match one of these strings, or their
   // card will only ever appear under "All" and never get its own filter pill.
   var LEADER_ROLES = [
@@ -697,9 +709,8 @@
     'Sister'
   ];
 
-  // ── Leaders. One entry per person — no department shown here.
+  // ── Leaders. One entry per person — no department, no phone number.
   // role: must be one of LEADER_ROLES above.
-  // phone: international format e.g. '+260971234567', or null if not yet available.
   // photo: filename in your images folder, or null to show the placeholder icon.
   // bio: a short general line about their service — keep it department-free.
   //
@@ -710,7 +721,6 @@
     id: 'leader-Pastor',
     name: 'Nicholas Mtetesha',
     role: 'Pastor',
-    phone: '+260979992444',
     photo: 'images/pastor.jpeg',
     bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation, and oversees the overall ministry of the church.'
   },
@@ -718,7 +728,6 @@
     id: 'leader-1st-elder',
     name: 'Joseph Chilimina',
     role: '1st Elder',
-    phone: '+260977695623',
     photo: 'images/chilimina.jpg',
     bio: 'Handles administrative coordination for the church office, supporting leadership with records and planning.'
   },
@@ -728,7 +737,6 @@
     id: 'leader-chilomo-champion',
     name: 'Champion Chilomo',
     role: 'Elder',
-    phone: '+260963733142',
     photo: 'images/chilomo.jpg',
     bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.'
   },
@@ -736,7 +744,6 @@
     id: 'leader-aori',
     name: 'Geoffrey Aori',
     role: 'Elder',
-    phone: '+260772041304',
     photo: 'images/aori.jpg',
     bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.'
   },
@@ -744,7 +751,6 @@
     id: 'leader-Hantumbu',
     name: 'James Hantumbu',
     role: 'Elder',
-    phone: null,
     photo: 'images/hantumbu.jpg',
     bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.'
   },
@@ -752,7 +758,6 @@
     id: 'leader-kalonga',
     name: 'Kalonga Chambawa',
     role: 'Elder',
-    phone: '+260977408058',
     photo: 'images/kalonga.jpg',
     bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.'
   },
@@ -760,21 +765,19 @@
     id: 'leader-tembo',
     name: 'Waxson Tembo',
     role: 'Elder',
-    phone: '+260978088776',
     photo: 'images/tembo.jpg',
     bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.'
   },
   // 5 provisional Elder slots — fill in as more Elders are confirmed
-  //{ id: 'leader-elder-provision-2', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
-  //{ id: 'leader-elder-provision-3', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
-  //{ id: 'leader-elder-provision-4', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
-  //{ id: 'leader-elder-provision-5', name: 'TBA', role: 'Elder', phone: null, photo: null, bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
+  //{ id: 'leader-elder-provision-2', name: 'TBA', role: 'Elder', photo: null, bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
+  //{ id: 'leader-elder-provision-3', name: 'TBA', role: 'Elder', photo: null, bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
+  //{ id: 'leader-elder-provision-4', name: 'TBA', role: 'Elder', photo: null, bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
+  //{ id: 'leader-elder-provision-5', name: 'TBA', role: 'Elder', photo: null, bio: 'Provides spiritual leadership, preaching, and pastoral care to the congregation.' },
 
     {
     id: 'leader-zimindo',
     name: 'Dr Norreen Machila Zimindo',
     role: 'Church Clerk',
-    phone: '+260977729232',
     photo: 'images/mrs zimindo.jpg',
     bio: 'Maintains official church records, membership rolls, and minutes of business meetings.'
   },
@@ -782,7 +785,6 @@
     //id: 'leader-clerk',
     //name: 'Sr Mwiinga',
     //role: 'Assistant Church Clerk',
-    //phone: null,
     //photo: null,
     //bio: 'Maintains official church records, membership rolls, and minutes of business meetings.'
   //},
@@ -791,7 +793,6 @@
     id: 'leader-deacon-hamatimba',
     name: 'Hamatimba Mweene',
     role: 'Head Deacon',
-    phone: '+260977800947',
     photo: 'images/hamatimba.jpg',
     bio: 'Assists with ushering, church upkeep, and practical support for members in need.'
   },
@@ -799,7 +800,6 @@
     //id: 'leader-deaconess-mutanga',
     //name: 'Sr Mutanga',
     //role: 'Head Deaconess',
-    //phone: '+2609',
     //photo: '',
     //bio: 'Assists with ushering, church upkeep, and practical support for members in need.'
   //},
@@ -808,16 +808,14 @@
     id: 'leader-nsinde',
     name: 'Olens Nsinde',
     role: 'Sterwardship Leader & Music Director',
-    phone: null,
     photo: 'images/nsinde.jpg',
     bio: 'Teaches biblical stewardship of time, talents, and resources, and directs the church choir and music ministry.'
   },
-  
+
   {
     id: 'leader-Treasurer',
     name: 'Charity Nyasulu',
     role: 'Treasurer',
-    phone: null,
     photo: 'images/nyasulu.jpg',
     bio: 'Oversees church finances and faithful handling of tithes and offerings.'
   },
@@ -825,7 +823,6 @@
     id: 'leader-treasurer',
     name: 'Cider Moyo',
     role: 'Assistant Treasurer, Chorister & Adventurer Leader',
-    phone: '+260971234567',
     photo: 'images/sterwardship.jpg',
     bio: 'Oversees church finances and faithful handling of tithes and offerings, leads the choir in worship, and directs the Adventurer Club for younger children.'
   },
@@ -834,7 +831,6 @@
     id: 'leader-chilomo-personal-ministries',
     name: 'Charity Muzandu Chilomo',
     role: 'Personal Ministries Leader',
-    phone: '+260977845634',
     photo: 'images/mrs chilomo.jpg',
     bio: 'Leads outreach, soul-winning, and evangelism efforts, equipping members for personal ministry.'
   },
@@ -842,7 +838,6 @@
     //id: 'leader-Monde',
     //name: 'Richard Monde',
     //role: 'Family Life',
-    //phone: '+260',
     //photo: 'images/monde.jpg',
     //bio: 'Promotes healthy marriages, parenting, and family relationships through family life ministry programs.'
   //},
@@ -850,7 +845,6 @@
     id: 'leader-zandonda',
     name: 'Bester Zandonda',
     role: 'Health Ministries Leader',
-    phone: null,
     photo: 'images/bester.jpg',
     bio: 'Promotes health education and wellness programs within the congregation.'
   },
@@ -858,7 +852,6 @@
     id: 'leader-Enock',
     name: 'Enock Chilimina',
     role: 'Communications',
-    phone: '+260765699759',
     photo: 'images/enock.jpg',
     bio: 'Manages church announcements, media, and communication with the congregation and wider community.'
   },
@@ -866,7 +859,6 @@
     id: 'leader-moyo-chilende',
     name: 'Chilende Moyo',
     role: 'Building Committee Chair',
-    phone: '+260966220333',
     photo: 'images/moyo.jpg',
     bio: 'Leads the committee overseeing church building and construction projects.'
   },
@@ -874,7 +866,6 @@
     id: 'leader-musowe',
     name: 'Christine Musowe',
     role: 'Youth Leader',
-    phone: '+260977803376',
     photo: 'images/youth leader.jpg',
     bio: 'Coordinates youth programs and activities, nurturing young people in faith and service.'
   },
@@ -882,7 +873,6 @@
     id: 'leader-munsanje',
     name: 'Chimuka Munsanje',
     role: 'Adventist Men Leader, Deacon & Chorister',
-    phone: null,
     photo: 'images/chimuka.jpg',
     bio: 'Coordinates men\'s ministry activities, assists with practical church duties as deacon, and serves in the choir.'
   },
@@ -890,7 +880,6 @@
     //id: 'leader-dorcas-1',
     //name: 'Sister Name',
     //role: 'Sister',
-    //phone: '+260000000000',
     //photo: 'images/dorcas.jpg',
     //bio: 'Serves through the Dorcas Society, providing welfare support and care for those in need.'
   //}
@@ -905,8 +894,6 @@
   var modalRoleTagEl = document.getElementById('leader-modal-role-tag');
   var modalNameEl = document.getElementById('leader-modal-name');
   var modalBioEl = document.getElementById('leader-modal-bio');
-  var modalCallEl = document.getElementById('leader-modal-call');
-  var modalCallLabelEl = document.getElementById('leader-modal-call-label');
   var closeBtn = document.getElementById('leader-modal-close');
 
   function escapeHtml(str) {
@@ -986,14 +973,12 @@
   }
 
   // ── Render leader cards ──
+  // Card body: photo, role tag, name, a two-line bio teaser, then a single
+  // full-width View button — no phone row, no call action anywhere.
   function renderLeaders() {
     var html = '';
     CHURCH_LEADERS.forEach(function (leader) {
       var cardPhoto = photoMarkup(leader, 'rounded-xl sacred-shadow border border-outline-variant/30');
-
-      var phoneRow = leader.phone
-        ? '<span class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md"><span class="material-symbols-outlined text-[18px]">phone</span><span>Tap "View" to call</span></span>'
-        : '<span class="flex items-center gap-2 text-outline font-label-md text-label-md"><span class="material-symbols-outlined text-[18px]">phone</span><span>Available Soon</span></span>';
 
       html += '' +
         '<article class="leader-card flex flex-col h-full" data-role="' + roleToSlug(leader.role) + '">' +
@@ -1001,10 +986,10 @@
           '<div class="leader-card-body bg-surface-container-lowest p-8 pt-16 rounded-xl sacred-shadow flex flex-col h-full" data-leader-id="' + leader.id + '">' +
             '<span class="font-label-md text-label-md text-secondary uppercase tracking-[0.08em] block mb-2">' + escapeHtml(leader.role) + '</span>' +
             '<h3 class="font-title-lg text-title-lg text-primary mb-3">' + escapeHtml(leader.name) + '</h3>' +
-            '<div class="mt-auto space-y-4">' +
-              phoneRow +
+            '<p class="leader-card-bio font-body-md text-body-md text-on-surface-variant mb-6">' + escapeHtml(leader.bio) + '</p>' +
+            '<div class="mt-auto">' +
               '<button type="button" class="leader-view-btn font-label-md text-label-md" data-leader-id="' + leader.id + '" aria-label="View profile for ' + escapeHtml(leader.name) + '">' +
-                'View <span aria-hidden="true">→</span>' +
+                'View Profile <span aria-hidden="true">→</span>' +
               '</button>' +
             '</div>' +
           '</div>' +
@@ -1043,19 +1028,6 @@
     modalNameEl.textContent = leader.name;
     modalBioEl.textContent = leader.bio;
 
-    // Call button — the actual number is only ever assembled here at click-time,
-    // never printed as plain text elsewhere on the page.
-    var callNumber = leader.phone || CHURCH_OFFICE_PHONE;
-    if (callNumber) {
-      modalCallEl.href = 'tel:' + callNumber;
-      modalCallEl.classList.remove('unavailable');
-      modalCallLabelEl.textContent = leader.phone ? ('Call ' + leader.name) : 'Call Church Office';
-    } else {
-      modalCallEl.href = '#';
-      modalCallEl.classList.add('unavailable');
-      modalCallLabelEl.textContent = 'Number Not Yet Available';
-    }
-
     overlayEl.classList.add('open');
     overlayEl.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -1073,9 +1045,6 @@
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && overlayEl.classList.contains('open')) closeModal();
-  });
-  modalCallEl.addEventListener('click', function (e) {
-    if (modalCallEl.classList.contains('unavailable')) e.preventDefault();
   });
 
   renderFilters();

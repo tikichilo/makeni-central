@@ -128,36 +128,38 @@
     width: 60px;
   }
 
-  /* ── Logo badge ── */
-  .logo-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background-color: #041534;
-    border: 2px solid #755b00;
-    flex-shrink: 0;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  .logo-badge:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 4px rgba(117, 91, 0, 0.15);
-  }
-  .logo-badge img {
-    width: 38px;
-    height: 38px;
-    object-fit: contain;
-  }
-  .logo-badge-sm {
-    width: 44px;
-    height: 44px;
-  }
-  .logo-badge-sm img {
-    width: 30px;
-    height: 30px;
-  }
+  /* ── Logo ── */
+.logo-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 104px;
+  height: 104px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+.logo-badge:hover {
+  transform: scale(1.06);
+}
+.logo-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.logo-badge-sm {
+  width: 80px;
+  height: 80px;
+}
+.logo-badge-sm img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Logo-only nav brand — wordmark text retired everywhere, not just mobile */
+.logo-text {
+  display: none !important;
+}
 
   /* ── Nav scroll-shrink ── */
   header {
@@ -176,7 +178,6 @@
 
   /* ── MOBILE NAV ── */
   @media (max-width: 767px) {
-    .logo-text { display: none !important; }
     .nav-brand  { position: absolute; left: 50%; transform: translateX(-50%); z-index: 1; }
     .hamburger-btn { position: relative; z-index: 2; }
     .mobile-give { position: relative; z-index: 2; }
@@ -481,7 +482,7 @@
   .mobile-drawer .accordion-panel a:last-child { border-bottom: none; }
   .mobile-drawer .accordion-panel a:hover { padding-left: 62px; }
 
-  /* ── Hero Slideshow ── */
+/* ── Hero Slideshow ── */
   .hero-slide {
     position: absolute;
     inset: 0;
@@ -504,10 +505,16 @@
     100% { transform: scale(1.08); }
   }
 
+  /* Reserves clearance below the button row so a big logo doesn't
+     push content low enough to collide with the dots/chevron */
+  .hero-content {
+    padding-bottom: 64px;
+  }
+
   /* Slideshow dot indicators */
   .hero-dots {
     position: absolute;
-    bottom: 72px;
+    bottom: 56px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -529,6 +536,18 @@
     transform: scale(1.25);
   }
 
+  /* ── Hero logo lockup ── */
+  .hero-logo {
+    width: 152px;
+    height: 152px;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 18px rgba(4,21,52,0.35));
+    animation: fadeUp 0.8s 0s ease both;
+  }
+  .hero-eyebrow {
+    animation: fadeUp 0.8s 0.35s ease both;
+  }
+
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(28px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -545,7 +564,7 @@
   }
   .scroll-indicator {
     position: absolute;
-    bottom: 32px;
+    bottom: 22px;
     left: 50%;
     transform: translateX(-50%);
     animation: bounce 2s ease-in-out infinite;
@@ -553,6 +572,17 @@
     z-index: 10;
     cursor: pointer;
   }
+
+  /* ── Short-viewport safeguard ──
+       Taller content stack (logo + h1 + eyebrow) can crowd the dots
+       on short/landscape screens where 85vh comes out small. */
+  @media (max-height: 560px) {
+    .hero-logo   { width: 96px; height: 96px; }
+    .hero-content { padding-bottom: 44px; }
+    .hero-dots   { bottom: 40px; }
+    .scroll-indicator { bottom: 14px; }
+  }
+
 /* ═══════════════════════════════════════════
    ANNOUNCEMENTS — CARD CAROUSEL
 ═══════════════════════════════════════════ */
@@ -1678,12 +1708,19 @@
     </div>
     <!-- Overlay -->
     <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(4,21,52,0.55) 0%, rgba(4,21,52,0.35) 60%, rgba(4,21,52,0.65) 100%);"></div>
-
-    <!-- Content -->
-    <div class="relative z-10 text-center px-margin-mobile">
-      <h1 class="hero-h1 font-display-lg text-display-lg text-on-primary mb-6 max-w-4xl mx-auto">
-        Makeni Central SDA Church
+<!-- Content -->
+    <div class="hero-content relative z-10 text-center px-margin-mobile">
+      <img
+        src="indexlogo.png"
+        alt="Seventh-day Adventist Church symbol"
+        class="hero-logo mx-auto mb-6"
+      />
+      <h1 class="hero-h1 font-display-lg text-display-lg text-on-primary mb-3 max-w-4xl mx-auto">
+        Makeni Central
       </h1>
+      <span class="hero-eyebrow block font-label-md text-label-md text-secondary-container uppercase tracking-[0.2em] mb-8">
+        Seventh-day Adventist Church
+      </span>
       <div class="hero-div gold-divider mx-auto mb-8"></div>
       <p class="hero-p text-on-primary/90 font-body-lg text-body-lg max-w-2xl mx-auto italic">
         "A Sanctuary of Hope, A Community of Grace."
@@ -2041,18 +2078,11 @@
 </section>
   
 </main>
-
 <!-- ══════════════ FOOTER ══════════════ -->
 <footer class="bg-primary text-on-primary w-full py-12 border-t-4 border-secondary" role="contentinfo">
   <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
 
     <div class="md:col-span-1">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="logo-badge logo-badge-sm" style="background-color:#0a1a3a; border-color:#e6c364;">
-          <img alt="Makeni Central SDA Logo" src="sda.png"/>
-        </div>
-        <span class="font-headline-md text-headline-md text-on-primary">Makeni Central</span>
-      </div>
       <p class="font-body-md text-body-md text-on-primary/80">
         Proclaiming the everlasting gospel to every nation, kindred, tongue, and people.
       </p>
@@ -2103,7 +2133,6 @@
     <a href="developer.html" class="font-label-md text-label-md text-on-primary/50 hover:text-secondary-container transition-colors">Developer</a>
   </div>
 </footer>
-
 <!-- ══════════════ PLAN YOUR VISIT MODAL ══════════════ -->
 <div id="visit-modal" role="dialog" aria-modal="true" aria-labelledby="visit-modal-title">
 
