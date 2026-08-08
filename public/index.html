@@ -128,6 +128,16 @@
     width: 60px;
   }
 
+  /* ── Header height as a variable ──
+       Used by .mobile-drawer so it stays glued to the header even
+       after header.scrolled shrinks .nav-inner from 80px to 64px.
+       JS should set --header-h to 64px when it adds .scrolled to
+       <header>, and back to 80px when it removes it. Falls back to
+       80px if JS never touches it, so nothing breaks without the JS change. */
+  :root {
+    --header-h: 80px;
+  }
+
   /* ── Logo ── */
 .logo-badge {
   display: flex;
@@ -179,7 +189,7 @@
   /* ── MOBILE NAV ── */
   @media (max-width: 767px) {
     .nav-brand  { position: absolute; left: 50%; transform: translateX(-50%); z-index: 1; }
-    .hamburger-btn { position: relative; z-index: 2; }
+    .hamburger-btn { position: relative; }
     .mobile-give { position: relative; z-index: 2; }
     .mobile-hamburger { display: flex; }
     .desktop-give { display: none !important; }
@@ -230,7 +240,7 @@
   /* Mobile drawer */
   .mobile-drawer {
     position: fixed;
-    top: 80px;
+    top: var(--header-h);
     left: 0; right: 0;
     z-index: 49;
     background: rgba(249,249,249,0.98);
@@ -240,9 +250,9 @@
     box-shadow: 0 20px 40px -10px rgba(4,21,52,0.12);
     transform: translateY(-110%);
     opacity: 0;
-    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease, top 0.3s ease;
     pointer-events: none;
-    max-height: calc(100vh - 80px);
+    max-height: calc(100vh - var(--header-h));
     overflow-y: auto;
   }
   .mobile-drawer.open {
@@ -494,10 +504,16 @@
   }
   .hero-slide.active {
     opacity: 1;
+    z-index: 2;
     animation: kenBurns 14s ease-out forwards;
   }
+  /* .prev keeps the outgoing slide visible (and above the base layer,
+     below .active) for the duration of the crossfade instead of
+     snapping straight to opacity:0 with everything else. If your JS
+     never actually reads this class, it's safe to remove from the JS. */
   .hero-slide.prev {
-    opacity: 0;
+    opacity: 1;
+    z-index: 1;
   }
 
   @keyframes kenBurns {
@@ -1031,7 +1047,27 @@
     color: #45464e;
     user-select: none;
   }
-  .visit-need-check input[type="checkbox"] { display: none; }
+  /* FIX: was display:none, which pulls the checkbox out of the tab
+     order entirely — keyboard users could never toggle it unless the
+     JS independently manages focus/keydown on the wrapper. This
+     "visually hidden" pattern keeps it focusable and announced by
+     screen readers while the custom .visit-need-check-box still
+     drives the visuals. */
+  .visit-need-check input[type="checkbox"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .visit-need-check input[type="checkbox"]:focus-visible ~ .visit-need-check-box {
+    outline: 2px solid #755b00;
+    outline-offset: 2px;
+  }
   .visit-need-check-box {
     width: 20px;
     height: 20px;
@@ -1233,7 +1269,7 @@
 
   /* Anchor scroll offset so sections aren't hidden under fixed header */
   #mission, #announcements, #find-us {
-    scroll-margin-top: 80px;
+    scroll-margin-top: var(--header-h);
   }
 
   /* Hero text scaling for small screens */
@@ -1288,12 +1324,19 @@
     }
   }
 
-  /* Find Us section: prevent oversized map card on mobile */
+  /* Find Us section: prevent oversized map card on mobile
+     NOTE: kept the original Tailwind-chain selectors so nothing
+     breaks if the markup hasn't changed, but added a stable hook
+     class (.find-us-map-card / .find-us-map-inner) as an alternative
+     target — add these classes in the HTML when convenient so future
+     edits don't silently stop matching if the utility classes shift. */
   @media (max-width: 640px) {
-    #find-us .rounded-xl.overflow-hidden.sacred-shadow {
+    #find-us .rounded-xl.overflow-hidden.sacred-shadow,
+    #find-us .find-us-map-card {
       min-height: auto;
     }
-    #find-us .relative.flex-1 {
+    #find-us .relative.flex-1,
+    #find-us .find-us-map-inner {
       min-height: 280px;
     }
     #church-map {
