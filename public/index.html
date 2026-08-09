@@ -2438,15 +2438,41 @@
    sda.js does NOT already handle: the API data loaders,
    footer year, and the visit planner modal.
 
-   FIX (this version): the DOMContentLoaded handler used to
-   call loadTheme(), a function that no longer exists after
+   FIX (previous version): the DOMContentLoaded handler used
+   to call loadTheme(), a function that no longer exists after
    the Theme of the Month section was removed. Calling an
-   undefined function throws a ReferenceError, which silently
+   undefined function threw a ReferenceError, which silently
    killed the rest of that callback — so loadAnnouncements()
    and initVisitPlanner() never ran, and the Plan Your Visit
    modal appeared "broken" even though its own code was fine.
-   loadTheme() has been removed, and each init call below is
-   now wrapped so a single failure can't take down the others.
+   loadTheme() was removed, and each init call is wrapped so a
+   single failure can't take down the others.
+
+   FIX (this version):
+   1. buildCurrentEvent() was inserting "\\n" (a literal
+      backslash + "n") instead of a real newline into the
+      calendar description. escIcsText() only converts actual
+      newline characters into the ICS "\n" escape sequence, so
+      the stray literal backslash was getting double-escaped
+      instead — visitors who downloaded the .ics file saw a
+      raw "\n" (or "\\n") printed in their event description
+      rather than a line break. Now uses real newlines.
+   2. initHeroSwipe(...) used to be called at the very bottom
+      of the file, outside DOMContentLoaded — it ran the
+      instant the script was parsed. If this script tag isn't
+      literally the last thing before </body>, .hero-slideshow
+      doesn't exist yet, querySelector returns null, and swipe
+      silently never gets wired up (same class of bug as the
+      loadTheme() issue above). It's now started inside
+      DOMContentLoaded like everything else.
+   3. Added a document.readyState check so the init sequence
+      still runs if this script ever loads after
+      DOMContentLoaded has already fired (e.g. injected
+      dynamically or moved later in the page) — previously it
+      would just never fire in that case.
+   4. Guarded the swipe handlers against prevSlide/nextSlide
+      not being defined yet, so a missing/renamed global can't
+      throw and silently break swipe.
 ══════════════════════════════════════════════════════ */
 (function () {
 
@@ -2648,17 +2674,79 @@
     restartAnnounceTimer();
   }
 
-  /* Run all inits on load.
+  /* ──────────────────────────────────────────────
+     HERO SLIDESHOW SWIPE
+  ────────────────────────────────────────────── */
+
+  // Swipe left/right, no buttons.
+  function initHeroSwipe(containerEl, { onPrev, onNext }) {
+    if (!containerEl) return;
+
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+    const SWIPE_THRESHOLD = 40;   // min px horizontal distance to count as a swipe
+    const DIRECTION_LOCK  = 1.2;  // horizontal must beat vertical by this ratio (avoids hijacking page-scroll)
+
+    containerEl.addEventListener('touchstart', function (e) {
+      const t = e.touches[0];
+      startX = t.clientX;
+      startY = t.clientY;
+      tracking = true;
+    }, { passive: true });
+
+    containerEl.addEventListener('touchend', function (e) {
+      if (!tracking) return;
+      tracking = false;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+
+      if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+      if (Math.abs(dx) < Math.abs(dy) * DIRECTION_LOCK) return; // mostly vertical → ignore, let page scroll
+
+      if (dx < 0) { if (typeof onNext === 'function') onNext(); }
+      else        { if (typeof onPrev === 'function') onPrev(); }
+    }, { passive: true });
+  }
+
+  function wireHeroSwipe() {
+    // prevSlide/nextSlide are expected to be defined globally elsewhere
+    // (e.g. sda.js). Guard so a missing/renamed function can't throw.
+    initHeroSwipe(document.querySelector('.hero-slideshow'), {
+      onPrev: function () {
+        if (typeof window.prevSlide === 'function') window.prevSlide();
+        else console.warn('[index] prevSlide() is not defined — hero swipe-right had nothing to call.');
+      },
+      onNext: function () {
+        if (typeof window.nextSlide === 'function') window.nextSlide();
+        else console.warn('[index] nextSlide() is not defined — hero swipe-left had nothing to call.');
+      }
+    });
+  }
+
+  /* Run all inits once the DOM is ready.
      Each call is wrapped in its own try/catch so that if any single
      loader throws (missing element, bad API response, future typo,
      etc.) it logs a warning instead of silently aborting every loader
      that comes after it — this is exactly what let a stray loadTheme()
      call take down the Visit Planner before. */
-  document.addEventListener('DOMContentLoaded', function () {
+  function runInits() {
     try { loadLesson(); }        catch (e) { console.warn('[index] loadLesson failed:', e); }
     try { loadAnnouncements(); } catch (e) { console.warn('[index] loadAnnouncements failed:', e); }
     try { initVisitPlanner(); }  catch (e) { console.warn('[index] initVisitPlanner failed:', e); }
-  });
+    try { wireHeroSwipe(); }     catch (e) { console.warn('[index] wireHeroSwipe failed:', e); }
+  }
+
+  // If DOMContentLoaded already fired (e.g. this script was injected or
+  // moved to load after the DOM finished parsing), the event below would
+  // never fire and none of the inits would ever run — so check readyState
+  // and run immediately in that case instead of only listening for the event.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runInits);
+  } else {
+    runInits();
+  }
 
 
   /* ──────────────────────────────────────────────
@@ -2966,9 +3054,15 @@
       const name  = document.getElementById('visit-name').value.trim();
       const phone = document.getElementById('visit-phone').value.trim();
 
+      // FIX: these used to be "\\n" (a literal backslash + "n", not a real
+      // newline). escIcsText() only converts actual newline characters into
+      // the ICS "\n" escape — with the old literal-backslash string it just
+      // double-escaped the stray backslash instead, so downloaded .ics files
+      // showed a raw "\n" printed in the description. Real newlines here let
+      // escIcsText() produce a correct ICS line break.
       let description = `Visiting Makeni Central SDA Church for ${selectedService}.`;
-      if (name)  description += `\\nName: ${name}`;
-      if (phone) description += `\\nPhone: ${phone}`;
+      if (name)  description += `\nName: ${name}`;
+      if (phone) description += `\nPhone: ${phone}`;
 
       return {
         title:       `${selectedService} — ${CHURCH_NAME}`,
@@ -3048,42 +3142,6 @@
   }
 
 })();
-
-/* ── Hero slideshow: swipe left/right, no buttons ── */
-function initHeroSwipe(containerEl, { onPrev, onNext }) {
-  if (!containerEl) return;
-
-  let startX = 0;
-  let startY = 0;
-  let tracking = false;
-  const SWIPE_THRESHOLD = 40;   // min px horizontal distance to count as a swipe
-  const DIRECTION_LOCK  = 1.2;  // horizontal must beat vertical by this ratio (avoids hijacking page-scroll)
-
-  containerEl.addEventListener('touchstart', function (e) {
-    const t = e.touches[0];
-    startX = t.clientX;
-    startY = t.clientY;
-    tracking = true;
-  }, { passive: true });
-
-  containerEl.addEventListener('touchend', function (e) {
-    if (!tracking) return;
-    tracking = false;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - startX;
-    const dy = t.clientY - startY;
-
-    if (Math.abs(dx) < SWIPE_THRESHOLD) return;
-    if (Math.abs(dx) < Math.abs(dy) * DIRECTION_LOCK) return; // mostly vertical → ignore, let page scroll
-
-    if (dx < 0) onNext(); else onPrev();
-  }, { passive: true });
-}
-
-initHeroSwipe(document.querySelector('.hero-slideshow'), {
-  onPrev: prevSlide,   // your existing "go back one slide" function
-  onNext: nextSlide    // your existing "go forward one slide" function
-});
 </script>
 </body>
 </html>
