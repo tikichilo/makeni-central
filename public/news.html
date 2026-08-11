@@ -171,6 +171,19 @@
     .desktop-give     { display: flex !important; }
   }
 
+  /* ── Tablet safety net ──
+     The full desktop nav (5 items, some with dropdowns) plus the Give
+     button needs more like 1024px of breathing room. Between 768-1023px
+     it can crowd or wrap, so fall back to the mobile hamburger pattern
+     until there's real desktop width to work with. */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .nav-inner nav[aria-label="Main navigation"] { display: none !important; }
+    .mobile-hamburger { display: flex !important; }
+    .mobile-give      { display: flex !important; }
+    .desktop-give     { display: none !important; }
+    .nav-brand        { position: absolute !important; left: 50%; transform: translateX(-50%) !important; }
+  }
+
   .hamburger-btn {
     display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
     width: 40px; height: 40px; gap: 5px; cursor: pointer; background: none; border: none;
@@ -196,6 +209,9 @@
     pointer-events: none; max-height: calc(100vh - 80px); overflow-y: auto;
   }
   .mobile-drawer.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  /* Header shrinks to 64px after scroll — keep the drawer's top edge flush with it,
+     otherwise a gap of page content shows through above the open drawer. */
+  header.scrolled + .mobile-drawer { top: 64px; }
   .mobile-drawer nav a {
     display: flex; align-items: center; gap: 12px; padding: 18px 24px;
     font-family: Inter, sans-serif; font-size: 14px; letter-spacing: 0.08em; font-weight: 600;
