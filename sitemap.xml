@@ -4,67 +4,67 @@
   <!-- ══════════════ MAIN SITE ══════════════ -->
 
   <url>
-    <loc>https://makenicentralsda.com/</loc>
+    <loc>https://mccadventist.org/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/news.html</loc>
+    <loc>https://mccadventist.org/news.html</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/leaders.html</loc>
+    <loc>https://mccadventist.org/leaders.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/beliefs.html</loc>
+    <loc>https://mccadventist.org/beliefs.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/adventurers.html</loc>
+    <loc>https://mccadventist.org/adventurers.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/ay.html</loc>
+    <loc>https://mccadventist.org/ay.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/building.html</loc>
+    <loc>https://mccadventist.org/building.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/dorcus.html</loc>
+    <loc>https://mccadventist.org/dorcus.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/kids.html</loc>
+    <loc>https://mccadventist.org/kids.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/pathfinders.html</loc>
+    <loc>https://mccadventist.org/pathfinders.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/youth.html</loc>
+    <loc>https://mccadventist.org/youth.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -72,7 +72,7 @@
   <!-- ══════════════ DEPARTMENTS HUB ══════════════ -->
 
   <url>
-    <loc>https://makenicentralsda.com/departments.html</loc>
+    <loc>https://mccadventist.org/departments.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -80,85 +80,85 @@
   <!-- ══════════════ DEPARTMENT PAGES ══════════════ -->
 
   <url>
-    <loc>https://makenicentralsda.com/clerk.html</loc>
+    <loc>https://mccadventist.org/clerk.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/communication.html</loc>
+    <loc>https://mccadventist.org/communication.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/community-services.html</loc>
+    <loc>https://mccadventist.org/community-services.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/family-life.html</loc>
+    <loc>https://mccadventist.org/family-life.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/health-ministries.html</loc>
+    <loc>https://mccadventist.org/health-ministries.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/mens-ministries.html</loc>
+    <loc>https://mccadventist.org/mens-ministries.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/music-ministries.html</loc>
+    <loc>https://mccadventist.org/music-ministries.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/personal-ministries.html</loc>
+    <loc>https://mccadventist.org/personal-ministries.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/prayer-ministries.html</loc>
+    <loc>https://mccadventist.org/prayer-ministries.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/publishing-ministries.html</loc>
+    <loc>https://mccadventist.org/publishing-ministries.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/sabbath-school.html</loc>
+    <loc>https://mccadventist.org/sabbath-school.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/stewardship.html</loc>
+    <loc>https://mccadventist.org/stewardship.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/womens-ministries.html</loc>
+    <loc>https://mccadventist.org/womens-ministries.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://makenicentralsda.com/youth-ministries.html</loc>
+    <loc>https://mccadventist.org/youth-ministries.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -166,7 +166,7 @@
   <!-- ══════════════ SITE CREDITS ══════════════ -->
 
   <url>
-    <loc>https://makenicentralsda.com/developer.html</loc>
+    <loc>https://mccadventist.org/developer.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
