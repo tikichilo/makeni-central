@@ -19,6 +19,7 @@
  *  GET  /api/events/featured           — The single featured event (or null)
  *  GET  /api/recaps                    — Event recap galleries
  *  GET  /api/hero-slideshow            — Shuffled hero slideshow images
+ *  GET  /api/gallery                   — Home page Gallery photos (optional ?category=)
  *
  *  — Admin endpoints —
  *  GET    /api/donations             — List all donations
@@ -35,6 +36,8 @@
  *  DELETE /api/events/:id            — Remove an event
  *  POST   /api/recaps                — Add event recap (multipart: up to 10 images + fields)
  *  DELETE /api/recaps/:id            — Remove a recap
+ *  POST   /api/gallery               — Add Gallery photo (multipart: photo + title + category)
+ *  DELETE /api/gallery/:id           — Remove a Gallery photo
  */
 
 'use strict';
@@ -69,16 +72,17 @@ app.get('/', (req, res) => {
 
 
 /* ═══════════════════════════════════════════════
-   UPLOADS (event posters + recap gallery images)
+   UPLOADS (event posters + recap gallery images + gallery photos)
    Stored under public/uploads/... so express.static above serves them
-   directly at /uploads/events/<file> and /uploads/recaps/<file> —
-   no extra route needed. Non-image files and anything over 5MB are
-   rejected before they touch disk.
+   directly at /uploads/events/<file>, /uploads/recaps/<file>, and
+   /uploads/gallery/<file> — no extra route needed. Non-image files
+   and anything over 5MB are rejected before they touch disk.
 ═══════════════════════════════════════════════ */
 const UPLOAD_ROOT       = path.join(__dirname, 'public', 'uploads');
-const EVENT_UPLOAD_DIR  = path.join(UPLOAD_ROOT, 'events');
-const RECAP_UPLOAD_DIR  = path.join(UPLOAD_ROOT, 'recaps');
-[EVENT_UPLOAD_DIR, RECAP_UPLOAD_DIR].forEach(dir => fs.mkdirSync(dir, { recursive: true }));
+const EVENT_UPLOAD_DIR   = path.join(UPLOAD_ROOT, 'events');
+const RECAP_UPLOAD_DIR   = path.join(UPLOAD_ROOT, 'recaps');
+const GALLERY_UPLOAD_DIR = path.join(UPLOAD_ROOT, 'gallery');
+[EVENT_UPLOAD_DIR, RECAP_UPLOAD_DIR, GALLERY_UPLOAD_DIR].forEach(dir => fs.mkdirSync(dir, { recursive: true }));
 
 // Hero slideshow images — dropped in manually (not via multer upload),
 // but the folder still needs to exist or GET /api/hero-slideshow below
@@ -118,8 +122,14 @@ const uploadRecapImages = multer({
   limits: { fileSize: 5 * 1024 * 1024, files: 10 }, // 5MB each, 10 max
 });
 
+const uploadGalleryPhoto = multer({
+  storage: makeStorage(GALLERY_UPLOAD_DIR),
+  fileFilter: imageFileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+});
+
 // Best-effort file deletion — never throws, just logs if it fails
-// (e.g. file already gone). Used when deleting events/recaps.
+// (e.g. file already gone). Used when deleting events/recaps/gallery photos.
 function deleteUploadedFile(publicUrl) {
   if (!publicUrl) return;
   const filePath = path.join(__dirname, 'public', publicUrl);
@@ -288,6 +298,20 @@ const recapSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 const Recap = mongoose.model('Recap', recapSchema);
+
+
+// ── GalleryPhoto — home page "Moments of Grace" gallery ──
+// One document per photo (not grouped into albums like Recap) so each
+// tile on the home page can be filtered independently by category.
+const GALLERY_CATEGORIES = ['worship', 'youth', 'community', 'baptism', 'events'];
+
+const galleryPhotoSchema = new mongoose.Schema({
+  title:     { type: String, required: true, maxlength: 120 },
+  category:  { type: String, required: true, enum: GALLERY_CATEGORIES },
+  imageUrl:  { type: String, required: true }, // /uploads/gallery/<file>
+  createdAt: { type: Date,   default: Date.now },
+});
+const GalleryPhoto = mongoose.model('GalleryPhoto', galleryPhotoSchema);
 
 
 /* ═══════════════════════════════════════════════
@@ -671,6 +695,25 @@ app.get('/api/hero-slideshow', async (req, res) => {
 });
 
 
+// ── GET /api/gallery ──
+// Home page "Moments of Grace" gallery photos, newest first.
+// Optional ?category=worship|youth|community|baptism|events filters;
+// omit (or pass "all") to get everything.
+app.get('/api/gallery', async (req, res) => {
+  try {
+    const { category } = req.query;
+    const filter = category && category !== 'all' ? { category } : {};
+
+    const photos = await GalleryPhoto.find(filter).sort({ createdAt: -1 }).lean();
+    res.json(photos);
+
+  } catch (err) {
+    console.error('GET /api/gallery:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
 /* ═══════════════════════════════════════════════
    ROUTES — ADMIN
 ═══════════════════════════════════════════════ */
@@ -985,6 +1028,63 @@ app.delete('/api/recaps/:id', async (req, res) => {
 
   } catch (err) {
     console.error('DELETE /api/recaps/:id:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── POST /api/gallery ──
+// multipart/form-data: fields (title, category) + a single `photo` file.
+// Both title and category are required; category must be one of
+// GALLERY_CATEGORIES so it always lines up with a filter pill on the
+// home page.
+app.post('/api/gallery', uploadGalleryPhoto.single('photo'), async (req, res) => {
+  try {
+    const { title, category } = req.body;
+
+    if (!title || !category) {
+      if (req.file) deleteUploadedFile(`/uploads/gallery/${req.file.filename}`);
+      return res.status(400).json({ error: 'Title and category are required' });
+    }
+
+    if (!GALLERY_CATEGORIES.includes(category)) {
+      if (req.file) deleteUploadedFile(`/uploads/gallery/${req.file.filename}`);
+      return res.status(400).json({ error: 'Invalid category' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'A photo is required' });
+    }
+
+    const photo = await GalleryPhoto.create({
+      title:    title.slice(0, 120),
+      category,
+      imageUrl: `/uploads/gallery/${req.file.filename}`,
+    });
+
+    res.status(201).json({ success: true, id: photo._id });
+
+  } catch (err) {
+    console.error('POST /api/gallery:', err);
+    if (req.file) deleteUploadedFile(`/uploads/gallery/${req.file.filename}`);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// ── DELETE /api/gallery/:id ──
+app.delete('/api/gallery/:id', async (req, res) => {
+  try {
+    const photo = await GalleryPhoto.findByIdAndDelete(req.params.id);
+
+    if (!photo) return res.status(404).json({ error: 'Not found' });
+
+    deleteUploadedFile(photo.imageUrl);
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error('DELETE /api/gallery/:id:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });

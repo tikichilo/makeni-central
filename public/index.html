@@ -11,7 +11,7 @@
 <meta property="og:description" content="A Sanctuary of Hope, A Community of Grace — join us this Sabbath in Lusaka, Zambia.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/">
-<meta property="og:image" content="https://mccadventist.org/images/big2.jpg">
+<meta property="og:image" content="https://mccadventist.org/images/church.jpg">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -1568,6 +1568,228 @@
   .hero-cta           { flex-direction: column !important; width: 100% !important; }
   .hero-cta > *       { width: 100% !important; text-align: center !important; }
 }
+
+/* ═══════════════════════════════════════════
+   GALLERY
+═══════════════════════════════════════════ */
+.gallery-filter-btn {
+  padding: 9px 20px;
+  border-radius: 9999px;
+  border: 1.5px solid #c5c6cf;
+  background: transparent;
+  color: #45464e;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+.gallery-filter-btn:hover {
+  border-color: #755b00;
+  color: #755b00;
+}
+.gallery-filter-btn.active {
+  background: #041534;
+  border-color: #041534;
+  color: #ffffff;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 190px;
+  gap: 16px;
+}
+@media (max-width: 1023px) {
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 767px) {
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 150px; gap: 10px; }
+  .gallery-grid .gallery-item.wide { grid-column: span 2; }
+  .gallery-grid .gallery-item.tall { grid-row: span 2; }
+}
+@media (max-width: 480px) {
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 130px; }
+}
+
+.gallery-status {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  color: #75777f;
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 10px 30px -10px rgba(4, 21, 52, 0.12);
+}
+.gallery-item.gallery-hide { display: none; }
+.gallery-item.tall { grid-row: span 2; }
+.gallery-item.wide { grid-column: span 2; }
+
+.gallery-item img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+.gallery-item:hover img { transform: scale(1.08); }
+
+/* Placeholder tiles — swap in a real "src" in gallery.js once photos are uploaded */
+.gallery-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #041534 0%, #1c2c40 55%, #38485d 100%);
+  transition: transform 0.6s ease;
+}
+.gallery-item:hover .gallery-placeholder { transform: scale(1.06); }
+.gallery-placeholder .material-symbols-outlined {
+  font-size: 34px;
+  color: #e6c364;
+  opacity: 0.85;
+}
+.gallery-placeholder .ph-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+
+.gallery-caption {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 14px 16px 12px;
+  background: linear-gradient(to top, rgba(4,21,52,0.85) 0%, rgba(4,21,52,0) 100%);
+  color: #fff;
+}
+.gallery-caption .cap-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.gallery-caption .cap-tag {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e6c364;
+}
+
+/* ══ Lightbox ══ */
+#gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(4, 21, 52, 0.94);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+#gallery-lightbox.active { opacity: 1; visibility: visible; }
+.gallery-lightbox-inner {
+  position: relative;
+  width: 100%;
+  max-width: 880px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.gallery-lightbox-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 70vh;
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #041534 0%, #1c2c40 55%, #38485d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gallery-lightbox-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+.gallery-lightbox-frame .material-symbols-outlined {
+  font-size: 56px;
+  color: #e6c364;
+  opacity: 0.85;
+}
+.gallery-lightbox-caption {
+  margin-top: 18px;
+  text-align: center;
+}
+.gallery-lightbox-caption .cap-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+.gallery-lightbox-caption .cap-tag {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #e6c364;
+}
+.gallery-lightbox-close,
+.gallery-lightbox-prev,
+.gallery-lightbox-next {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.gallery-lightbox-close:hover,
+.gallery-lightbox-prev:hover,
+.gallery-lightbox-next:hover {
+  background: rgba(255,255,255,0.2);
+}
+.gallery-lightbox-close { top: -56px; right: 0; }
+.gallery-lightbox-prev { left: -4px; top: 50%; transform: translateY(-50%); }
+.gallery-lightbox-next { right: -4px; top: 50%; transform: translateY(-50%); }
+@media (max-width: 640px) {
+  .gallery-lightbox-close { top: -50px; right: 0; width: 38px; height: 38px; }
+  .gallery-lightbox-prev { left: 4px; }
+  .gallery-lightbox-next { right: 4px; }
+  .gallery-lightbox-prev, .gallery-lightbox-next { width: 38px; height: 38px; background: rgba(4,21,52,0.5); }
+}
 </style>
 </head>
 
@@ -1613,6 +1835,10 @@
 
       <div class="nav-item">
         <a class="font-label-md text-label-md" href="news.html">News</a>
+      </div>
+
+      <div class="nav-item">
+        <a class="font-label-md text-label-md" href="#gallery">Gallery</a>
       </div>
 
       <div class="nav-item">
@@ -1690,6 +1916,8 @@
 
       <a href="news.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">newspaper</span>News</a>
 
+      <a href="#gallery"><span class="material-symbols-outlined nav-icon" aria-hidden="true">photo_library</span>Gallery</a>
+
       <div class="accordion-item">
         <button class="accordion-trigger" aria-expanded="false">
           <span class="trigger-left"><span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span>Youth</span>
@@ -1744,10 +1972,10 @@
   <section class="relative h-[85vh] w-full overflow-hidden flex items-center justify-center" aria-label="Welcome hero">
     <!-- Hero Slideshow backgrounds -->
     <div id="hero-slideshow" aria-hidden="true">
-      <div class="hero-slide active" style="background-image: url('slideshow/ch1.jpg');"></div>
-      <div class="hero-slide" style="background-image: url('slideshow/ch2.jpg');"></div>
-      <div class="hero-slide" style="background-image: url('slideshow/ch3.jpg');"></div>
-      <div class="hero-slide" style="background-image: url('slideshow/ch4.jpg');"></div>
+      <div class="hero-slide active" style="background-image: url('images/church.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('images/gate%202.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('images/church3.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('images/church%20bld.jpg');"></div>
     </div>
 
     <!-- Overlay -->
@@ -1919,7 +2147,53 @@
       </div>
     </div>
   </section>
-  
+
+<!-- ══════════════ GALLERY ══════════════ -->
+<section id="gallery" class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap" aria-labelledby="gallery-heading">
+
+  <div class="text-center mb-10">
+    <h2 id="gallery-heading" class="font-headline-lg text-headline-lg text-primary mb-4">Moments of Grace</h2>
+    <div class="gold-divider mx-auto mb-5"></div>
+    <p class="font-body-md text-body-md text-on-surface-variant max-w-[560px] mx-auto">
+      A look at worship, fellowship, and service across our church family. Tap any photo for a closer look.
+    </p>
+  </div>
+
+  <!-- Filter pills -->
+  <div class="flex flex-wrap justify-center gap-3 mb-10" role="tablist" aria-label="Filter gallery by category">
+    <button type="button" class="gallery-filter-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
+    <button type="button" class="gallery-filter-btn" data-filter="worship" role="tab" aria-selected="false">Worship</button>
+    <button type="button" class="gallery-filter-btn" data-filter="youth" role="tab" aria-selected="false">Youth</button>
+    <button type="button" class="gallery-filter-btn" data-filter="community" role="tab" aria-selected="false">Community</button>
+    <button type="button" class="gallery-filter-btn" data-filter="baptism" role="tab" aria-selected="false">Baptisms</button>
+    <button type="button" class="gallery-filter-btn" data-filter="events" role="tab" aria-selected="false">Events</button>
+  </div>
+
+  <!-- Grid — populated by gallery.js from the GALLERY_ITEMS array -->
+  <div class="gallery-grid" id="gallery-grid" aria-live="polite"></div>
+
+</section>
+
+<!-- Gallery Lightbox -->
+<div id="gallery-lightbox" role="dialog" aria-modal="true" aria-labelledby="gallery-lightbox-title">
+  <div class="gallery-lightbox-inner">
+    <button type="button" class="gallery-lightbox-close" id="gallery-lightbox-close" aria-label="Close gallery viewer">
+      <span class="material-symbols-outlined" aria-hidden="true">close</span>
+    </button>
+    <button type="button" class="gallery-lightbox-prev" id="gallery-lightbox-prev" aria-label="Previous photo">
+      <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+    </button>
+    <div class="gallery-lightbox-frame" id="gallery-lightbox-frame"></div>
+    <button type="button" class="gallery-lightbox-next" id="gallery-lightbox-next" aria-label="Next photo">
+      <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+    </button>
+    <div class="gallery-lightbox-caption">
+      <div class="cap-title" id="gallery-lightbox-title"></div>
+      <span class="cap-tag" id="gallery-lightbox-tag"></span>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════════ WATCH LIVE ══════════════ -->
 <section id="watch-live" class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pt-section-gap" aria-labelledby="watch-live-heading">
   <div class="bg-primary rounded-xl sacred-shadow overflow-hidden relative">
@@ -2419,6 +2693,7 @@
 <!-- ══════════════ SCRIPTS ══════════════ -->
 <script src="sda.js" defer></script>
 <script src="func.js" defer></script>
+<script src="gallery.js" defer></script>
 
 <script>
 /* ══════════════════════════════════════════════════════
