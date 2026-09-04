@@ -1,9 +1,25 @@
 /**
  * sda-shared.css — Makeni Central SDA
- * Shared responsive fixes + scroll-reveal animations
- * for kids.html, youth.html, building.html (and index.html)
+ * Shared core shell (logo, nav, mobile drawer, dropdown, accordion,
+ * footer) + responsive fixes + scroll-reveal animations.
+ *
+ * Used by: index.html, youth.html, leaders.html, news.html,
+ * beliefs.html, kids.html, building.html (and any future page that
+ * shares the same header/footer markup).
+ *
+ * Does NOT cover: health-ministries.html / family-life.html /
+ * womens-ministries.html — those load assets/department-page.css
+ * instead and are intentionally left alone.
  *
  * Load AFTER tailwind: <link rel="stylesheet" href="../sda-shared.css"/>
+ *
+ * NOT covered here (left page-specific on purpose — see chat notes):
+ *   - .img-placeholder default display (flex vs none conflict)
+ *   - .hero-slide / .hero-dot (index vs kids use same class names
+ *     for two different slideshow implementations)
+ *   - Any page's own cards/carousels/pills/modals (discussion modal,
+ *     leader modal, news/recap modal, belief pills, kids carousel,
+ *     visit planner modal, gallery/lightbox, quick-contact, etc.)
  */
 
 /* ═══════════════════════════════════════════
@@ -20,6 +36,18 @@ html { scroll-behavior: smooth; }
 /* Prevent hero / section overflows on narrow viewports */
 img { max-width: 100%; height: auto; }
 
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.sacred-shadow {
+  box-shadow: 0 10px 30px -10px rgba(4, 21, 52, 0.08);
+}
+.gold-divider {
+  height: 2px;
+  background: #755b00;
+  width: 60px;
+}
+
 
 /* ═══════════════════════════════════════════
    FLUID TYPOGRAPHY
@@ -27,7 +55,6 @@ img { max-width: 100%; height: auto; }
    headline-lg : 40px → 26px
    headline-md : 32px → 22px
 ═══════════════════════════════════════════ */
-/* Fluid clamp — scales between 375 px and 1280 px viewport width */
 .font-display-lg,
 .text-display-lg {
   font-size: clamp(2rem, 4vw + 1rem, 3.5rem) !important;
@@ -48,23 +75,412 @@ img { max-width: 100%; height: auto; }
 
 /* ═══════════════════════════════════════════
    SECTION GAP — halved on mobile
+   (tiered to match the 64px/48px values most pages were already
+   using inline — NOT the old flat 60px this file used to have)
 ═══════════════════════════════════════════ */
 @media (max-width: 767px) {
-  .py-section-gap  { padding-top: 60px !important;    padding-bottom: 60px !important; }
-  .pt-section-gap  { padding-top: 60px !important; }
-  .pb-section-gap  { padding-bottom: 60px !important; }
-  .mb-section-gap  { margin-bottom: 60px !important; }
-  .mt-section-gap  { margin-top: 60px !important; }
+  .py-section-gap { padding-top: 64px !important; padding-bottom: 64px !important; }
+  .pt-section-gap { padding-top: 64px !important; }
+  .pb-section-gap { padding-bottom: 64px !important; }
+  .mb-section-gap { margin-bottom: 64px !important; }
+  .mt-section-gap { margin-top: 64px !important; }
+  .gap-gutter     { gap: 20px !important; }
+}
+
+@media (max-width: 480px) {
+  .py-section-gap { padding-top: 48px !important; padding-bottom: 48px !important; }
+  .pt-section-gap { padding-top: 48px !important; }
+  .pb-section-gap { padding-bottom: 48px !important; }
+  .mb-section-gap { margin-bottom: 48px !important; }
+  .mt-section-gap { margin-top: 48px !important; }
 }
 
 
-/* ═══════════════════════════════════════════
-   NAV — scroll shrink
-═══════════════════════════════════════════ */
-header { transition: box-shadow 0.3s ease; }
-header.scrolled { box-shadow: 0 4px 24px -4px rgba(4,21,52,0.14) !important; }
+/* ═══════════════════════════════════════════════════════════════
+   CORE SHELL — LOGO / HEADER / NAV / DRAWER / DROPDOWN / ACCORDION / FOOTER
+   This block used to be pasted near-verbatim into every page's own
+   <style> tag. It now lives here once — delete it from each page's
+   inline styles once this file is linked.
+═══════════════════════════════════════════════════════════════ */
 
-.nav-inner { transition: height 0.3s ease; }
+/* ── Header height as a variable ──
+     Used by .mobile-drawer so it stays glued to the header even
+     after header.scrolled shrinks .nav-inner from 80px to 64px.
+     sda.js should set --header-h to 64px when it adds .scrolled to
+     <header>, and back to 80px when it removes it. Falls back to
+     80px if a page's JS never touches it, so nothing breaks. */
+:root {
+  --header-h: 80px;
+}
+
+/* ── Logo ── */
+.logo-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 104px;
+  height: 104px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+.logo-badge:hover { transform: scale(1.06); }
+.logo-badge img { width: 100%; height: 100%; object-fit: contain; }
+.logo-badge-sm { width: 80px; height: 80px; }
+.logo-badge-sm img { width: 100%; height: 100%; object-fit: contain; }
+
+/* Logo-only nav brand — wordmark text retired everywhere */
+.logo-text { display: none !important; }
+
+/* ── Header scroll-shrink ── */
+header {
+  transition: height 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease;
+}
+header.scrolled {
+  box-shadow: 0 4px 24px -4px rgba(4, 21, 52, 0.14) !important;
+}
+header.scrolled .nav-inner { height: 64px; }
+.nav-inner {
+  height: 80px;
+  transition: height 0.3s ease;
+}
+
+/* ── MOBILE NAV ── */
+@media (max-width: 767px) {
+  .nav-brand        { position: absolute; left: 50%; transform: translateX(-50%); z-index: 1; }
+  .hamburger-btn    { position: relative; }
+  .mobile-give      { position: relative; z-index: 2; }
+  .mobile-hamburger { display: flex; }
+  .desktop-give     { display: none !important; }
+  .mobile-give      { display: flex; }
+}
+@media (min-width: 768px) {
+  .mobile-hamburger { display: none !important; }
+  .mobile-give      { display: none !important; }
+  .desktop-give     { display: flex !important; }
+}
+
+/* ── Tablet safety net ──
+     Full desktop nav + Give button needs ~1024px of room. Between
+     768–1023px it can crowd/wrap, so fall back to the mobile
+     hamburger pattern until there's real desktop width.
+     NOTE: relies on the desktop nav having aria-label="Main
+     navigation" — confirm that's consistent across every page's
+     markup, or this silently won't engage on pages that differ. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .nav-inner nav[aria-label="Main navigation"] { display: none !important; }
+  .mobile-hamburger { display: flex !important; }
+  .mobile-give      { display: flex !important; }
+  .desktop-give     { display: none !important; }
+  .nav-brand        { position: absolute !important; left: 50%; transform: translateX(-50%) !important; }
+}
+
+/* Hamburger lines */
+.hamburger-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 40px;
+  height: 40px;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 6px 4px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  z-index: 60;
+}
+.hamburger-btn:hover { background: rgba(4,21,52,0.06); }
+.hamburger-btn span {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: #041534;
+  transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.hamburger-btn span:nth-child(1) { width: 24px; }
+.hamburger-btn span:nth-child(2) { width: 18px; }
+.hamburger-btn span:nth-child(3) { width: 22px; }
+.hamburger-btn span:nth-child(4) { width: 14px; }
+.hamburger-btn.open span:nth-child(1) { width: 22px; transform: translateY(10.5px) rotate(45deg); }
+.hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger-btn.open span:nth-child(3) { opacity: 0; transform: scaleX(0); }
+.hamburger-btn.open span:nth-child(4) { width: 22px; transform: translateY(-10.5px) rotate(-45deg); }
+
+/* Mobile drawer */
+.mobile-drawer {
+  position: fixed;
+  top: var(--header-h);
+  left: 0; right: 0;
+  z-index: 49;
+  background: rgba(249,249,249,0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 2px solid #fed977;
+  box-shadow: 0 20px 40px -10px rgba(4,21,52,0.12);
+  transform: translateY(-110%);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease, top 0.3s ease;
+  pointer-events: none;
+  max-height: calc(100vh - var(--header-h));
+  overflow-y: auto;
+}
+.mobile-drawer.open {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Belt-and-suspenders: if a page's JS never sets --header-h, this
+   keeps the drawer glued to the header on scroll anyway — as long as
+   .mobile-drawer is the next sibling of <header> in the markup. */
+header.scrolled + .mobile-drawer { top: 64px; }
+
+.mobile-drawer nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 24px;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: #45464e;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(197,198,207,0.3);
+  transition: background 0.2s, color 0.2s, padding-left 0.2s;
+  position: relative;
+}
+.mobile-drawer nav a:hover { background: rgba(254,217,119,0.18); color: #041534; padding-left: 32px; }
+.mobile-drawer nav a.active { color: #041534; }
+.mobile-drawer nav a.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: #755b00;
+  border-radius: 0 2px 2px 0;
+}
+.mobile-drawer nav a .nav-icon { color: #755b00; font-size: 20px; }
+.mobile-drawer-inner { padding: 8px 0 20px; }
+.mobile-give-row { padding: 16px 24px 4px; }
+.mobile-give-btn {
+  width: 100%;
+  background: #041534;
+  color: #fff;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s, transform 0.15s;
+}
+.mobile-give-btn:active { transform: scale(0.97); }
+.mobile-give-btn:hover { background: #755b00; }
+
+/* ═══════════════════════════════════════════
+   DESKTOP DROPDOWN NAVIGATION
+   (shared behaviour lives in sda.js → initDropdownNav())
+═══════════════════════════════════════════ */
+.nav-item { position: relative; }
+.nav-item > a,
+.nav-item > button.nav-trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  color: #45464e;
+  position: relative;
+  padding-bottom: 4px;
+  transition: color 0.25s ease;
+}
+.nav-item .nav-caret {
+  font-size: 18px;
+  transition: transform 0.25s ease, color 0.25s ease;
+  color: #75777f;
+}
+.nav-item:hover .nav-caret,
+.nav-item.nav-open .nav-caret { transform: rotate(180deg); color: #755b00; }
+.nav-item > a::after,
+.nav-item > button.nav-trigger::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: #755b00;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+.nav-item:hover > a,
+.nav-item:hover > button.nav-trigger,
+.nav-item.nav-open > a,
+.nav-item.nav-open > button.nav-trigger,
+.nav-item > a.active { color: #041534; }
+.nav-item:hover > a::after,
+.nav-item:hover > button.nav-trigger::after,
+.nav-item.nav-open > a::after,
+.nav-item.nav-open > button.nav-trigger::after,
+.nav-item > a.active::after { transform: scaleX(1); }
+
+/* Dropdown panel */
+.nav-dropdown {
+  position: absolute;
+  top: calc(100% + 18px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  min-width: 240px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e2e2;
+  box-shadow: 0 20px 45px -12px rgba(4,21,52,0.22);
+  padding: 10px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+  z-index: 40;
+}
+/* invisible bridge so the pointer can travel from link to panel */
+.nav-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -18px; left: 0; right: 0; height: 18px;
+}
+.nav-item:hover .nav-dropdown,
+.nav-item.nav-open .nav-dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+.nav-dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 9px;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #45464e;
+  text-decoration: none;
+  transition: background 0.18s ease, color 0.18s ease, padding-left 0.18s ease;
+  white-space: nowrap;
+}
+.nav-dropdown a:hover,
+.nav-dropdown a:focus-visible { background: #fffbee; color: #041534; padding-left: 18px; }
+.nav-dropdown a.active { color: #041534; background: #fffbee; }
+.nav-dropdown a .dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #755b00;
+  flex-shrink: 0;
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.nav-dropdown a:hover .dot,
+.nav-dropdown a:focus-visible .dot,
+.nav-dropdown a.active .dot { opacity: 1; transform: scale(1); }
+
+/* ═══════════════════════════════════════════
+   MOBILE ACCORDION SUBMENUS
+   (shared behaviour lives in sda.js → initMobileAccordion())
+═══════════════════════════════════════════ */
+.mobile-drawer .accordion-item { border-bottom: 1px solid rgba(197,198,207,0.3); }
+.mobile-drawer .accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: #45464e;
+  text-transform: uppercase;
+  text-align: left;
+  transition: background 0.2s, color 0.2s;
+}
+.mobile-drawer .accordion-trigger:hover,
+.mobile-drawer .accordion-trigger.open { background: rgba(254,217,119,0.18); color: #041534; }
+.mobile-drawer .accordion-trigger .trigger-left { display: flex; align-items: center; gap: 12px; }
+.mobile-drawer .accordion-trigger .nav-icon { color: #755b00; font-size: 20px; }
+.mobile-drawer .accordion-trigger .accordion-caret {
+  font-size: 20px;
+  color: #75777f;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+.mobile-drawer .accordion-trigger.open .accordion-caret { transform: rotate(180deg); color: #755b00; }
+.mobile-drawer .accordion-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+  background: #f6f6f4;
+}
+.mobile-drawer .accordion-panel a {
+  padding: 14px 24px 14px 56px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(197,198,207,0.25);
+}
+.mobile-drawer .accordion-panel a:last-child { border-bottom: none; }
+.mobile-drawer .accordion-panel a:hover { padding-left: 62px; }
+
+/* ── Footer: collapsible Resources ── */
+.footer-resources summary { list-style: none; cursor: pointer; }
+.footer-resources summary::-webkit-details-marker { display: none; }
+.footer-resources-caret { transition: transform 0.25s ease; font-size: 20px; }
+.footer-resources[open] .footer-resources-caret { transform: rotate(180deg); }
+
+/* ── Footer: call card ──
+   Two class-naming schemes exist across pages for the same element
+   (contact-call-* vs footer-contact-call-*) — both are targeted here
+   so neither breaks. Worth standardizing on one in the HTML later. */
+.contact-call-name,
+.footer-contact-call-name {
+  font-family: Inter, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+}
+.contact-call-number,
+.footer-contact-call-number {
+  font-family: Inter, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* ── Anchor scroll offset so sections aren't hidden under the fixed header ── */
+#mission, #announcements, #find-us {
+  scroll-margin-top: var(--header-h);
+}
+#divisions, #stories, #join {
+  scroll-margin-top: 90px;
+}
+
 
 /* ═══════════════════════════════════════════
    SCROLL-REVEAL  (.reveal)
@@ -125,13 +541,24 @@ header.scrolled { box-shadow: 0 4px 24px -4px rgba(4,21,52,0.14) !important; }
 }
 .hero-bg { animation: kenBurns 14s ease-out forwards; will-change: transform; }
 
+/* Stack hero CTAs full-width on very narrow screens */
+@media (max-width: 360px) {
+  .hero-cta { flex-direction: column; width: 100%; }
+  .hero-cta > * { width: 100%; text-align: center; }
+}
+
+/* Hero text scaling for small screens */
+@media (max-width: 480px) {
+  .hero-h1 { font-size: 36px !important; line-height: 1.15; }
+  .hero-p  { font-size: 15px; }
+}
+
 
 /* ═══════════════════════════════════════════
    BUILDING PAGE — responsive fixes
 ═══════════════════════════════════════════ */
-
-/* Bento gallery: fixed 600px height breaks on mobile */
 @media (max-width: 767px) {
+  /* Bento gallery: fixed 600px height breaks on mobile */
   .gallery-bento {
     height: auto !important;
     grid-template-columns: 1fr !important;
@@ -178,19 +605,12 @@ header.scrolled { box-shadow: 0 4px 24px -4px rgba(4,21,52,0.14) !important; }
    KIDS PAGE — responsive fixes
 ═══════════════════════════════════════════ */
 @media (max-width: 767px) {
-  /* Large bento story card: stack vertically */
-  .story-bento-large {
-    flex-direction: column !important;
-  }
+  .story-bento-large { flex-direction: column !important; }
   .story-bento-large .story-img-wrap {
     width: 100% !important;
     height: 200px !important;
   }
-
-  /* Hero image: shorter on mobile */
   .kids-hero-img { height: 260px !important; }
-
-  /* Quote block padding */
   .kids-quote-block { padding: 40px 24px !important; }
 }
 
@@ -199,7 +619,6 @@ header.scrolled { box-shadow: 0 4px 24px -4px rgba(4,21,52,0.14) !important; }
    YOUTH PAGE — responsive fixes
 ═══════════════════════════════════════════ */
 @media (max-width: 767px) {
-  /* FAB: shrink label on very small screens */
   #fab-new-discussion .fab-label { display: none; }
   #fab-new-discussion {
     width: 56px; height: 56px;
@@ -207,33 +626,23 @@ header.scrolled { box-shadow: 0 4px 24px -4px rgba(4,21,52,0.14) !important; }
     justify-content: center;
     border-radius: 50% !important;
   }
-
-  /* Filter pills: allow wrapping, smaller text */
   [data-filter] {
     font-size: 12px !important;
     padding: 6px 14px !important;
   }
-
-  /* Discussion cards: reduce padding */
   .discussion-card { padding: 20px !important; }
-
-  /* Sidebar scripture card: smaller heading */
   .youth-scripture blockquote {
     font-size: clamp(1.1rem, 3vw, 1.375rem) !important;
     line-height: 1.4 !important;
   }
 }
 
-/* Discussion card hover */
-.discussion-card {
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
-}
+.discussion-card { transition: transform 0.22s ease, box-shadow 0.22s ease; }
 .discussion-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 40px -12px rgba(4,21,52,0.14);
 }
 
-/* FAB pulse ring */
 @keyframes fabPulse {
   0%   { box-shadow: 0 0 0 0 rgba(254,217,119,0.5); }
   70%  { box-shadow: 0 0 0 12px rgba(254,217,119,0); }
@@ -256,13 +665,12 @@ header.scrolled { box-shadow: 0 4px 24px -4px rgba(4,21,52,0.14) !important; }
 
 /* ═══════════════════════════════════════════
    UTILITY — touch targets
-   Ensure all interactive elements meet 44px
+   Ensure interactive elements meet 44px minimum
 ═══════════════════════════════════════════ */
 button, [role="button"], a {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Comfortable tap targets on mobile */
 @media (max-width: 767px) {
   .mobile-give, .hamburger-btn { min-height: 44px; min-width: 44px; }
 }
