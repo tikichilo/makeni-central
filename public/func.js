@@ -533,6 +533,39 @@ function initYouthBoard() {
   }
   document.querySelectorAll('.like-btn').forEach(wireLikeBtn);
 
+  function wireDislikeBtn(btn) {
+    if (!btn || btn.dataset.dislikeWired) return;
+    btn.dataset.dislikeWired = '1';
+    let disliked = false;
+    btn.addEventListener('click', async () => {
+      if (disliked) return;
+      disliked = true;
+
+      let count = parseInt(btn.dataset.count) || 0;
+      count++;
+      btn.dataset.count = count;
+
+      const countEl = btn.querySelector('.dislike-count');
+      if (countEl) countEl.textContent = count + ' Dislikes';
+
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (icon) icon.style.fontVariationSettings = "'FILL' 1";
+      btn.style.color = '#ba1a1a';
+
+      const id = btn.dataset.id;
+      if (id) {
+        try {
+          const res = await fetch(`/api/discussions/${id}/dislike`, { method: 'POST' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        } catch (e) {
+          console.warn('[func.js] dislike failed:', e);
+          window.SDAToast?.('Your dislike didn\u2019t save — check your connection.', 'error');
+        }
+      }
+    });
+  }
+  document.querySelectorAll('.dislike-btn').forEach(wireDislikeBtn);
+
   /* ═══════════════════════════════════════════
      COMMENTS — #comments-modal wiring
      Opens on any .comment-count-btn click, whether that button
@@ -566,10 +599,11 @@ function initYouthBoard() {
     let activeDiscussionId    = '';
     let activeCommentCountBtn = null;
 
-    function renderComment(c) {
+    function renderComment(c, repliesByParent, depth) {
       const wrap = document.createElement('div');
       wrap.className = 'comment-item';
-      wrap.style.cssText = 'padding:14px 0;border-bottom:1px solid #e2e2e2;';
+      const indent = Math.min(depth || 0, 3) * 24;
+      wrap.style.cssText = `padding:14px 0;border-bottom:1px solid #e2e2e2;margin-left:${indent}px;`;
       wrap.innerHTML = `
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
           <div style="width:30px;height:30px;border-radius:50%;background:#fed977;display:flex;align-items:center;justify-content:center;
@@ -578,7 +612,68 @@ function initYouthBoard() {
           <span style="font-family:Inter,sans-serif;font-size:11px;color:#75777f;">${timeAgo(c.createdAt)}</span>
         </div>
         <p style="font-family:Inter,sans-serif;font-size:14px;color:#45464e;line-height:1.5;margin-left:40px;">${escHtml(c.body)}</p>`;
+
+      const actions = document.createElement('div');
+      actions.style.cssText = 'margin:8px 0 0 40px;';
+      actions.innerHTML = '<button type="button" class="reply-comment-btn" style="font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#755b00;background:none;border:0;padding:0;cursor:pointer;">Reply</button>';
+      const replyBtn = actions.querySelector('.reply-comment-btn');
+      const replyForm = document.createElement('form');
+      replyForm.hidden = true;
+      replyForm.style.cssText = 'margin-top:10px;display:grid;gap:8px;max-width:420px;';
+      replyForm.innerHTML = `
+        <input type="text" maxlength="100" placeholder="Your name" aria-label="Your name" style="border:1px solid #d6d7dc;border-radius:8px;padding:8px 10px;font-family:Inter,sans-serif;font-size:13px;">
+        <textarea maxlength="500" rows="2" placeholder="Write a reply..." aria-label="Write a reply" style="border:1px solid #d6d7dc;border-radius:8px;padding:8px 10px;font-family:Inter,sans-serif;font-size:13px;resize:vertical;"></textarea>
+        <div style="display:flex;gap:8px;">
+          <button type="submit" style="background:#041534;color:#fff;border:0;border-radius:8px;padding:7px 12px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;">Post Reply</button>
+          <button type="button" class="cancel-reply-btn" style="background:#eeeeee;color:#45464e;border:0;border-radius:8px;padding:7px 12px;font-family:Inter,sans-serif;font-size:12px;cursor:pointer;">Cancel</button>
+        </div>`;
+
+      replyBtn.addEventListener('click', function () {
+        replyForm.hidden = !replyForm.hidden;
+        if (!replyForm.hidden) replyForm.querySelector('input').focus();
+      });
+      replyForm.querySelector('.cancel-reply-btn').addEventListener('click', function () {
+        replyForm.hidden = true;
+      });
+      replyForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const submitBtn = replyForm.querySelector('button[type="submit"]');
+        const name = replyForm.querySelector('input').value.trim();
+        const body = replyForm.querySelector('textarea').value.trim();
+        if (!name || !body) {
+          window.SDAToast?.('Please enter your name and reply.', 'error');
+          return;
+        }
+        submitBtn.disabled = true;
+        const result = await apiPost(`/api/discussions/${activeDiscussionId}/comments`, {
+          name, body, parentCommentId: c._id,
+        });
+        submitBtn.disabled = false;
+        if (!result || !result.success) {
+          window.SDAToast?.('Could not post your reply — please try again.', 'error');
+          return;
+        }
+        await loadComments(activeDiscussionId);
+        updateCommentCount(result.commentCount);
+        window.SDAToast?.('Reply posted!', 'success');
+      });
+
+      actions.appendChild(replyForm);
+      wrap.appendChild(actions);
+
+      const replies = repliesByParent.get(String(c._id)) || [];
+      replies.forEach(reply => wrap.appendChild(renderComment(reply, repliesByParent, (depth || 0) + 1)));
       return wrap;
+    }
+
+    function updateCommentCount(newCount) {
+      if (!activeCommentCountBtn) return;
+      const countEl = activeCommentCountBtn.querySelector('.comment-count');
+      if (!countEl) return;
+      const current = typeof newCount === 'number'
+        ? newCount
+        : (parseInt(countEl.textContent, 10) || 0) + 1;
+      countEl.textContent = current + ' Comments';
     }
 
     async function loadComments(id) {
@@ -608,7 +703,15 @@ function initYouthBoard() {
           return;
         }
 
-        data.forEach(c => commentsList.appendChild(renderComment(c)));
+        const repliesByParent = new Map();
+        data.forEach(c => {
+          const parentId = c.parentCommentId ? String(c.parentCommentId) : '';
+          if (!repliesByParent.has(parentId)) repliesByParent.set(parentId, []);
+          repliesByParent.get(parentId).push(c);
+        });
+        (repliesByParent.get('') || []).forEach(c => {
+          commentsList.appendChild(renderComment(c, repliesByParent, 0));
+        });
       } catch (err) {
         console.warn('[func.js] loadComments failed:', err);
         commentsList.innerHTML = `<p style="text-align:center;color:#ba1a1a;font-size:13px;padding:16px 0;">Couldn\u2019t load comments — try again shortly.</p>`;
@@ -690,21 +793,14 @@ function initYouthBoard() {
       }
 
       if (commentsEmpty) commentsEmpty.classList.add('hidden');
-      if (commentsList) commentsList.appendChild(renderComment(result.comment));
+      await loadComments(activeDiscussionId);
       if (commentsList) commentsList.scrollTop = commentsList.scrollHeight;
 
       if (commentNameField) commentNameField.value = '';
       if (commentBodyField) commentBodyField.value = '';
       if (commentBodyCount) commentBodyCount.textContent = '0 / 500';
 
-      const newCount = typeof result.commentCount === 'number' ? result.commentCount : null;
-      if (activeCommentCountBtn) {
-        const countEl = activeCommentCountBtn.querySelector('.comment-count');
-        if (countEl) {
-          const current = newCount !== null ? newCount : (parseInt(countEl.textContent, 10) || 0) + 1;
-          countEl.textContent = current + ' Comments';
-        }
-      }
+      updateCommentCount(result.commentCount);
 
       window.SDAToast?.('Reply posted!', 'success');
     };
@@ -799,12 +895,17 @@ function initYouthBoard() {
           <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${escHtml(d.title)}</h3>
           <p class="card-body font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-2">${escHtml(d.body)}</p>
           <button class="read-more-btn">Read more</button>
-          <div class="flex items-center gap-6 mt-4">
+          <div class="flex flex-wrap items-center gap-6 mt-4">
             ${commentButtonHtml(d._id, d.title, d.comments || 0)}
             <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors"
                     aria-label="Like this post" data-count="${d.likes || 0}" data-id="${escHtml(d._id)}">
               <span class="material-symbols-outlined text-[20px]">favorite</span>
               <span class="font-label-md like-count">${d.likes || 0} Likes</span>
+            </button>
+            <button class="dislike-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors"
+                    aria-label="Dislike this post" data-count="${d.dislikes || 0}" data-id="${escHtml(d._id)}">
+              <span class="material-symbols-outlined text-[20px]">thumb_down</span>
+              <span class="font-label-md dislike-count">${d.dislikes || 0} Dislikes</span>
             </button>
           </div>`;
 
@@ -816,6 +917,7 @@ function initYouthBoard() {
         }
 
         wireLikeBtn(card.querySelector('.like-btn'));
+        wireDislikeBtn(card.querySelector('.dislike-btn'));
         wireReadMore(card.querySelector('.read-more-btn'));
         wireCommentBtn(card.querySelector('.comment-count-btn'));
       });
@@ -984,16 +1086,22 @@ function initYouthBoard() {
       <h3 class="font-headline-md text-headline-md text-primary mb-3 leading-tight">${escHtml(title)}</h3>
       <p class="card-body font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-2">${escHtml(body)}</p>
       <button class="read-more-btn">Read more</button>
-      <div class="flex items-center gap-6 mt-4">
+      <div class="flex flex-wrap items-center gap-6 mt-4">
         ${commentButtonHtml(result.id, title, 0)}
         <button class="like-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors"
                 aria-label="Like this post" data-count="0" data-id="${escHtml(result.id)}">
           <span class="material-symbols-outlined text-[20px]">favorite</span>
           <span class="font-label-md like-count">0 Likes</span>
         </button>
+        <button class="dislike-btn flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors"
+                aria-label="Dislike this post" data-count="0" data-id="${escHtml(result.id)}">
+          <span class="material-symbols-outlined text-[20px]">thumb_down</span>
+          <span class="font-label-md dislike-count">0 Dislikes</span>
+        </button>
       </div>`;
 
     wireLikeBtn(newCard.querySelector('.like-btn'));
+    wireDislikeBtn(newCard.querySelector('.dislike-btn'));
     wireReadMore(newCard.querySelector('.read-more-btn'));
     wireCommentBtn(newCard.querySelector('.comment-count-btn'));
 

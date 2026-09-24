@@ -8,6 +8,7 @@
  *  GET  /api/discussions               — Youth board list
  *  POST /api/discussions               — Submit new discussion
  *  POST /api/discussions/:id/like      — Like a discussion
+ *  POST /api/discussions/:id/dislike   — Dislike a discussion
  *  GET  /api/discussions/:id/comments  — List comments on a discussion
  *  POST /api/discussions/:id/comments  — Add a comment to a discussion
  *  GET  /api/lesson                    — Lesson of the week
@@ -193,6 +194,7 @@ const discussionSchema = new mongoose.Schema({
   title:     { type: String, required: true, maxlength: 100 },
   body:      { type: String, required: true, maxlength: 1000 },
   likes:     { type: Number, default: 0 },
+  dislikes:  { type: Number, default: 0 },
   comments:  { type: Number, default: 0 },
   createdAt: { type: Date,   default: Date.now },
 });
@@ -202,6 +204,7 @@ const Discussion = mongoose.model('Discussion', discussionSchema);
 // ── Comment — replies on a Discussion ──
 const commentSchema = new mongoose.Schema({
   discussionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Discussion', required: true, index: true },
+  parentCommentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Comment', default: null, index: true },
   name:         { type: String, required: true, maxlength: 100 },
   body:         { type: String, required: true, maxlength: 500 },
   createdAt:    { type: Date,   default: Date.now },
@@ -448,7 +451,7 @@ app.get('/api/discussions/:id/comments', async (req, res) => {
 // ── POST /api/discussions/:id/comments ──
 app.post('/api/discussions/:id/comments', async (req, res) => {
   try {
-    const { name, body } = req.body;
+    const { name, body, parentCommentId } = req.body;
 
     if (!name || !body) {
       return res.status(400).json({ error: 'Name and comment are required' });
@@ -457,8 +460,19 @@ app.post('/api/discussions/:id/comments', async (req, res) => {
     const discussionExists = await Discussion.exists({ _id: req.params.id });
     if (!discussionExists) return res.status(404).json({ error: 'Discussion not found' });
 
+    let parentId = null;
+    if (parentCommentId) {
+      const parent = await Comment.findOne({
+        _id: parentCommentId,
+        discussionId: req.params.id,
+      });
+      if (!parent) return res.status(400).json({ error: 'Parent comment not found' });
+      parentId = parent._id;
+    }
+
     const comment = await Comment.create({
       discussionId: req.params.id,
+      parentCommentId: parentId,
       name:         name.slice(0, 100),
       body:         body.slice(0, 500),
     });
@@ -1330,4 +1344,24 @@ app.use((err, req, res, next) => {
 ═══════════════════════════════════════════════ */
 app.listen(PORT, () => {
   console.log(`\x1b[33m✦ Makeni Central SDA — server running on port ${PORT}\x1b[0m`);
+});
+
+
+// ── POST /api/discussions/:id/dislike ──
+app.post('/api/discussions/:id/dislike', async (req, res) => {
+  try {
+    const discussion = await Discussion.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { dislikes: 1 } },
+      { new: true }
+    );
+
+    if (!discussion) return res.status(404).json({ error: 'Not found' });
+
+    res.json({ dislikes: discussion.dislikes });
+
+  } catch (err) {
+    console.error('POST /api/discussions/:id/dislike:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
