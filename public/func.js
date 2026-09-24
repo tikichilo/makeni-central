@@ -1025,32 +1025,47 @@ function initYouthBoard() {
 }
 /* ── Watch Live: status badge + button ── */
 function initWatchLive() {
-  const FB_PAGE_URL = 'https://www.facebook.com/profile.php?id=100091185906540'; // TODO: replace
-
   const dot        = document.getElementById('live-dot');
   const statusText = document.getElementById('live-status-text');
   const btnText    = document.getElementById('watch-live-btn-text');
   const watchBtn   = document.getElementById('watch-live-btn');
+  const videoWidget = document.getElementById('facebook-video-widget');
+  const videoPlayer = document.getElementById('facebook-video-player');
   if (!dot) return;
 
-  // Live window: Saturday, 10:30 AM – 1:00 PM (song service through end of sermon)
-  function isLiveNow() {
-    const now = new Date();
-    if (now.getDay() !== 6) return false; // 6 = Saturday
-    const minutes = now.getHours() * 60 + now.getMinutes();
-    const start = 10 * 60 + 30; // 10:30
-    const end   = 13 * 60;      // 13:00
-    return minutes >= start && minutes <= end;
+  const latestVideoSrc = videoPlayer ? videoPlayer.src : '';
+
+  if (watchBtn && videoWidget) {
+    watchBtn.addEventListener('click', function () {
+      videoWidget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      videoWidget.focus({ preventScroll: true });
+    });
   }
 
-  function updateLiveStatus() {
-    const live = isLiveNow();
+  function updateLiveStatus(live, liveVideoUrl) {
     dot.classList.toggle('is-live', live);
-    if (statusText) statusText.textContent = live ? 'LIVE NOW' : 'Streams Every Saturday';
-    if (btnText)    btnText.textContent    = live ? 'Watch Live Now' : 'Watch on Facebook';
-    if (watchBtn)   watchBtn.href = live ? FB_PAGE_URL + '/live_videos' : FB_PAGE_URL;
+    if (statusText) statusText.textContent = live ? 'LIVE NOW' : 'LATEST SERMON';
+    if (btnText)    btnText.textContent    = live ? 'Watch Live Stream' : 'Watch Latest Video';
+    if (watchBtn)   watchBtn.setAttribute('aria-label', live ? 'Watch the live stream below' : 'Watch the latest sermon below');
+    if (videoPlayer && liveVideoUrl) {
+      const embedUrl = 'https://www.facebook.com/plugins/video.php?href=' +
+        encodeURIComponent(liveVideoUrl) + '&show_text=false&width=560';
+      if (videoPlayer.src !== embedUrl) videoPlayer.src = embedUrl;
+    } else if (videoPlayer && latestVideoSrc && videoPlayer.src !== latestVideoSrc) {
+      videoPlayer.src = latestVideoSrc;
+    }
   }
 
-  updateLiveStatus();
-  setInterval(updateLiveStatus, 60000); // re-check every minute, in case a visit spans the start time
+  async function checkFacebookLive() {
+    try {
+      const response = await fetch('/api/facebook-live', { cache: 'no-store' });
+      const data = response.ok ? await response.json() : null;
+      updateLiveStatus(Boolean(data && data.live), data && data.videoUrl);
+    } catch (err) {
+      updateLiveStatus(false, null);
+    }
+  }
+
+  checkFacebookLive();
+  setInterval(checkFacebookLive, 60000);
 }

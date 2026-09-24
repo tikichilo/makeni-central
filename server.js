@@ -1223,8 +1223,8 @@ async function fetchLessonPage(url) {
       key,
       label: DAY_LABELS[key],
       title: title || weekTitle,
-      // Short excerpt only — see copyright note above. Full text stays on ssnet.org.
       excerpt: (bodyParts[0] || '').slice(0, 420),
+      content: bodyParts,
     };
   });
 
@@ -1264,6 +1264,41 @@ app.get('/api/daily-lesson', async (req, res) => {
   } catch (err) {
     console.error('GET /api/daily-lesson:', err.message);
     res.status(502).json({ error: 'Could not reach ssnet.org' });
+  }
+});
+
+
+/* ═══════════════════════════════════════════════
+   FACEBOOK LIVE
+   Requires FACEBOOK_PAGE_ID and FACEBOOK_ACCESS_TOKEN in the server
+   environment. The token stays server-side and is never sent to the browser.
+═══════════════════════════════════════════════ */
+app.get('/api/facebook-live', async (req, res) => {
+  const pageId = process.env.FACEBOOK_PAGE_ID || '100091185906540';
+  const accessToken = process.env.FACEBOOK_ACCESS_TOKEN;
+
+  if (!accessToken) return res.json({ live: false, configured: false });
+
+  try {
+    const endpoint = new URL(`https://graph.facebook.com/v20.0/${pageId}/live_videos`);
+    endpoint.searchParams.set('fields', 'id,permalink_url,status,title,creation_time');
+    endpoint.searchParams.set('status', 'LIVE');
+    endpoint.searchParams.set('access_token', accessToken);
+
+    const response = await fetch(endpoint);
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error?.message || `HTTP ${response.status}`);
+
+    const liveVideo = Array.isArray(payload.data) ? payload.data[0] : null;
+    res.json({
+      live: Boolean(liveVideo?.permalink_url),
+      configured: true,
+      videoUrl: liveVideo?.permalink_url || null,
+      title: liveVideo?.title || '',
+    });
+  } catch (err) {
+    console.error('GET /api/facebook-live:', err.message);
+    res.json({ live: false, configured: true });
   }
 });
 

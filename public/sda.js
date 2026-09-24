@@ -42,6 +42,7 @@ const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').mat
 document.addEventListener('DOMContentLoaded', init);
 
 function init() {
+  loadSharedFooter();
   initResponsive();      // §17 — fluid type + mobile spacing
   initNavbar();          // §1  — hamburger/drawer + scroll shrink
   initDropdownNav();     // §1b — desktop dropdown nav
@@ -64,6 +65,14 @@ function init() {
     '%c✦ Makeni Central SDA — sda.js v5 loaded',
     'color:#e6c364;background:#041534;padding:6px 14px;border-radius:4px;font-weight:600;'
   );
+}
+
+function loadSharedFooter() {
+  if (document.querySelector('script[data-shared-footer]')) return;
+  const script = document.createElement('script');
+  script.src = 'footer.js';
+  script.dataset.sharedFooter = 'true';
+  document.body.appendChild(script);
 }
 
 

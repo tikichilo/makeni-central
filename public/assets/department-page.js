@@ -18,6 +18,11 @@
      data-p1="+260978" data-p2="918" data-p3="196"
 */
 
+const sharedFooterScript = document.createElement('script');
+sharedFooterScript.src = 'footer.js';
+sharedFooterScript.dataset.sharedFooter = 'true';
+document.body.appendChild(sharedFooterScript);
+
 document.querySelectorAll('.call-btn').forEach((btn) => {
   btn.addEventListener('click', function (e) {
     e.preventDefault();

@@ -1316,11 +1316,11 @@
       </div>
 
       <div class="nav-item">
-        <a class="font-label-md text-label-md" href="news.html">News</a>
+        <a class="font-label-md text-label-md" href="#gallery">Gallery</a>
       </div>
 
       <div class="nav-item">
-        <a class="font-label-md text-label-md" href="#gallery">Gallery</a>
+        <a class="font-label-md text-label-md" href="news.html">News</a>
       </div>
 
       <div class="nav-item">
@@ -1396,9 +1396,9 @@
         </div>
       </div>
 
-      <a href="news.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">newspaper</span>News</a>
-
       <a href="#gallery"><span class="material-symbols-outlined nav-icon" aria-hidden="true">photo_library</span>Gallery</a>
+
+      <a href="news.html"><span class="material-symbols-outlined nav-icon" aria-hidden="true">newspaper</span>News</a>
 
       <div class="accordion-item">
         <button class="accordion-trigger" aria-expanded="false">
@@ -1454,8 +1454,8 @@
   <section class="relative h-[85vh] w-full overflow-hidden flex items-center justify-center" aria-label="Welcome hero">
     <!-- Hero Slideshow backgrounds -->
     <div id="hero-slideshow" aria-hidden="true">
-      <div class="hero-slide active" style="background-image: url('images/church.jpg');"></div>
-      <div class="hero-slide" style="background-image: url('images/gate%202.jpg');"></div>
+      <div class="hero-slide active" style="background-image: url('images/adven8.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('images/adven7.jpg');"></div>
       <div class="hero-slide" style="background-image: url('images/church3.jpg');"></div>
       <div class="hero-slide" style="background-image: url('images/church%20bld.jpg');"></div>
     </div>
@@ -1574,10 +1574,10 @@
             "He restores my soul; He leads me in the paths of righteousness for His name's sake."
             <span class="block mt-2 not-italic text-secondary font-semibold text-sm tracking-wide">— PSALM 23:3</span>
           </p>
-          <a id="lesson-btn" href="#" class="lesson-btn self-start" target="_blank" rel="noopener noreferrer">
-            <span class="material-symbols-outlined" style="font-size:18px;" aria-hidden="true">open_in_new</span>
-            Read Full Lesson on Sabbath School Net
-          </a>
+          <button id="lesson-btn" type="button" class="lesson-btn self-start">
+            <span class="material-symbols-outlined" style="font-size:18px;" aria-hidden="true">menu_book</span>
+            Read More
+          </button>
         </div>
       </div>
     </article>
@@ -1706,36 +1706,27 @@
           </div>
         </div>
 
-        <a id="watch-live-btn"
-          href="https://web.facebook.com/profile.php?id=100091185906540"
-          target="_blank"
-          rel="noopener noreferrer"
+        <button id="watch-live-btn" type="button"
           class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container px-7 py-3.5 rounded-xl font-label-md text-label-md hover:bg-secondary-fixed transition-all active:scale-95">
          <span class="material-symbols-outlined" style="font-size:20px;" aria-hidden="true">play_circle</span>
           <span id="watch-live-btn-text">Watch on Facebook</span>
-        </a>
+        </button>
       </div>
 
-      <!-- Right: Facebook video widget — plays inline on this page, does NOT redirect to facebook.com -->
-      <div class="lg:col-span-5">
-        <div class="rounded-xl overflow-hidden bg-black/20" style="max-height: 320px;">
-
-          <!-- Loads once per page. If index.html already has an fb-root/SDK script elsewhere, delete this pair and keep only the fb-page div below. -->
-          <div id="fb-root"></div>
-          <script async defer crossorigin="anonymous"
-            src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v20.0">
-          </script>
-
-          <div class="fb-page"
-            data-href="https://www.facebook.com/profile.php?id=100091185906540"
-            data-tabs="videos"
-            data-width="500"
-            data-height="320"
-            data-small-header="true"
-            data-adapt-container-width="true"
-            data-hide-cover="true"
-            data-show-facepile="false">
-          </div>
+      <!-- Right: latest sermon video — plays inline on this page -->
+      <div class="lg:col-span-5" id="facebook-video-widget" tabindex="-1">
+        <div class="rounded-xl overflow-hidden bg-black/20 aspect-video">
+          <iframe
+            id="facebook-video-player"
+            class="w-full h-full"
+            src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fweb.facebook.com%2F100091185906540%2Fvideos%2F1709810303424421%2F&show_text=true&width=560&t=0"
+            title="Latest sermon video"
+            style="border:none;overflow:hidden"
+            scrolling="no"
+            frameborder="0"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            allowfullscreen="true">
+          </iframe>
 
         </div>
       </div>
@@ -2258,6 +2249,7 @@
   /* ── Sabbath School Lesson: day switcher, live from ssnet.org ── */
   let lessonWeekData = null;
   let selectedDayKey = null;
+  let lessonExpanded = false;
 
   async function loadLesson() {
     const data = await apiFetch('/api/daily-lesson');
@@ -2283,6 +2275,7 @@
       tabsEl.querySelectorAll('.lesson-day-tab').forEach(function (btn) {
         btn.addEventListener('click', function () {
           selectedDayKey = btn.dataset.day;
+          lessonExpanded = false;
           renderLessonDay();
           tabsEl.querySelectorAll('.lesson-day-tab').forEach(function (b) {
             b.classList.toggle('active', b.dataset.day === selectedDayKey);
@@ -2312,11 +2305,23 @@
         : lessonWeekData.weekTitle;
     }
     if (bodyEl) {
-      bodyEl.textContent = day.excerpt
-        ? day.excerpt + '…'
-        : 'Tap "Read Full Lesson" to study today\'s section in full.';
+      if (lessonExpanded && Array.isArray(day.content) && day.content.length) {
+        bodyEl.innerHTML = day.content.map(function (paragraph) {
+          return '<span class="block mb-4">' + esc(paragraph) + '</span>';
+        }).join('');
+      } else {
+        bodyEl.textContent = day.excerpt || 'The full lesson for this day is not available right now.';
+      }
     }
-    if (btnEl) btnEl.href = lessonWeekData.lessonUrl + '#' + day.key;
+    if (btnEl) {
+      btnEl.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;" aria-hidden="true">' +
+        (lessonExpanded ? 'expand_less' : 'menu_book') + '</span>' +
+        (lessonExpanded ? 'Show Less' : 'Read More');
+      btnEl.onclick = function () {
+        lessonExpanded = !lessonExpanded;
+        renderLessonDay();
+      };
+    }
   }
 
   /* ── Announcements: card carousel ── */
