@@ -534,6 +534,7 @@ function initCounters() {
    §5. GIVE BUTTON + MODAL
 ═══════════════════════════════════════════════ */
 function initGiveButton() {
+  const isCrusadePage = document.body.dataset.page === 'index';
   const rippleStyle = document.createElement('style');
   rippleStyle.textContent = `
     .btn-ripple { position: relative; overflow: hidden; }
@@ -557,37 +558,76 @@ function initGiveButton() {
     #give-modal.active { opacity: 1; pointer-events: all; }
     #give-modal-box {
       background: #fff; border-radius: 20px; padding: 40px;
-      max-width: 480px; width: 100%; position: relative;
+      max-width: 380px; width: 100%; position: relative;
       transform: translateY(30px) scale(0.96);
       transition: transform 0.35s cubic-bezier(.4,0,.2,1);
       box-shadow: 0 32px 80px rgba(4,21,52,0.25);
-      max-height: 90vh; overflow-y: auto;
     }
     #give-modal.active #give-modal-box { transform: translateY(0) scale(1); }
-    .give-amount-btn {
-      padding: 12px 0; border: 2px solid #e2e2e2;
-      border-radius: 10px; font-weight: 600; font-size: 16px;
-      cursor: pointer; transition: all 0.2s;
-      background: #fff; color: #041534; font-family: Inter, sans-serif;
+    #give-modal.is-crusade { background: rgba(23,8,4,0.84); }
+    #give-modal.is-crusade #give-modal-box {
+      display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+      max-width: 980px; height: min(760px, calc(100vh - 40px)); max-height: calc(100vh - 40px);
+      overflow: hidden; padding: 0; border: 1px solid rgba(255,255,255,0.45);
+      border-radius: 20px; background: #fffaf4;
     }
-    .give-amount-btn:hover,
-    .give-amount-btn.selected { border-color: #755b00; background: #fed977; }
-    .give-input {
-      width: 100%; border: 2px solid #e2e2e2; border-radius: 10px;
-      padding: 14px 16px; font-size: 18px; outline: none;
-      transition: border-color 0.2s; box-sizing: border-box;
-      font-family: Inter, sans-serif;
+    .crusade-poster-wrap {
+      min-width: 0; min-height: 0; display: flex; align-items: center; justify-content: center;
+      overflow: hidden; background: #210d07;
     }
-    .give-input:focus { border-color: #755b00; }
-    .give-submit {
-      width: 100%; background: #041534; color: #fff;
-      border: none; border-radius: 12px; padding: 16px;
-      font-size: 16px; font-weight: 600; cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      margin-top: 8px; font-family: Inter, sans-serif;
+    .crusade-poster {
+      display: block; width: 100%; height: 100%; object-fit: contain;
     }
-    .give-submit:hover  { background: #755b00; }
-    .give-submit:active { transform: scale(0.98); }
+    .crusade-content {
+      position: relative; display: flex; flex-direction: column; justify-content: center;
+      padding: 48px 42px 40px; color: #28140e;
+    }
+    .crusade-eyebrow {
+      display: inline-flex; align-self: flex-start; align-items: center; gap: 7px;
+      padding: 7px 11px; border-radius: 999px; background: #f5e7d6;
+      color: #7b2b17; font-size: 11px; font-weight: 700; letter-spacing: 0;
+    }
+    .crusade-title {
+      margin: 18px 0 10px; color: #4d1a0f;
+      font-family: 'Playfair Display', serif; font-size: 38px; line-height: 1.08; font-weight: 700;
+    }
+    .crusade-subtitle {
+      margin: 0 0 22px; color: #79513f; font-size: 16px; line-height: 1.55;
+    }
+    .crusade-details {
+      display: grid; gap: 12px; margin-bottom: 22px; padding: 16px 18px;
+      border-left: 3px solid #ce6a25; background: #f8eee3;
+    }
+    .crusade-detail {
+      display: flex; align-items: center; gap: 12px;
+      color: #4d1a0f; font-size: 15px; font-weight: 700;
+    }
+    .crusade-detail .material-symbols-outlined { color: #aa4b20; font-size: 22px; }
+    .crusade-invite { margin: 0 0 22px; color: #79513f; font-size: 15px; line-height: 1.55; }
+    .crusade-cta {
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      width: 100%; padding: 14px 18px; border-radius: 8px;
+      background: #8d2d17; color: #fff; text-decoration: none; font-weight: 700;
+      box-shadow: 0 8px 20px rgba(105,35,17,0.2); transition: background 0.2s, transform 0.2s;
+    }
+    .crusade-cta:hover { background: #68200f; transform: translateY(-1px); }
+    .crusade-cta:focus-visible { outline: 3px solid #d99a36; outline-offset: 3px; }
+    .crusade-welcome { margin: 13px 0 0; color: #987761; font-size: 12px; text-align: center; }
+    #give-modal.is-crusade .modal-close-give { z-index: 1; color: #4d1a0f; }
+    @media (max-width: 760px) {
+      #give-modal.is-crusade { padding: 12px; }
+      #give-modal.is-crusade #give-modal-box {
+        display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(190px, 31vh) auto;
+        width: 100%; max-width: 480px; height: auto; max-height: calc(100vh - 24px);
+        overflow-y: auto; border-radius: 16px;
+      }
+      .crusade-content { padding: 24px 24px 22px; }
+      .crusade-title { margin-top: 14px; font-size: 30px; }
+      .crusade-subtitle { margin-bottom: 16px; font-size: 15px; }
+      .crusade-details { gap: 9px; margin-bottom: 16px; padding: 12px 14px; }
+      .crusade-invite { margin-bottom: 16px; font-size: 14px; }
+      #give-modal.is-crusade .modal-close-give { background: rgba(255,250,244,0.94); }
+    }
     .modal-close-give {
       position: absolute; top: 16px; right: 16px;
       width: 36px; height: 36px; border-radius: 50%;
@@ -596,10 +636,8 @@ function initGiveButton() {
       transition: background 0.2s;
     }
     .modal-close-give:hover { background: #e2e2e2; }
-
     @media (max-width: 480px) {
       #give-modal-box { padding: 28px 20px; border-radius: 16px; }
-      .give-amount-btn { font-size: 14px; }
     }
   `;
   document.head.appendChild(rippleStyle);
@@ -623,69 +661,40 @@ function initGiveButton() {
 
   const modal = document.createElement('div');
   modal.id = 'give-modal';
+  if (isCrusadePage) modal.classList.add('is-crusade');
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
-  modal.setAttribute('aria-label', 'Support Makeni Central SDA');
-  modal.innerHTML = `
+  modal.setAttribute('aria-label', isCrusadePage ? 'Watch and Be Ready Crusade' : 'Giving coming soon');
+  modal.innerHTML = isCrusadePage ? `
+    <div id="give-modal-box">
+      <button class="modal-close-give" aria-label="Close">✕</button>
+      <div class="crusade-poster-wrap">
+        <img class="crusade-poster" src="images/poster.jpg" alt="Watch and Be Ready Crusade, October 18 to 31, 2026, at Makeni Central SDA Church">
+      </div>
+      <div class="crusade-content">
+        <span class="crusade-eyebrow"><span class="material-symbols-outlined" aria-hidden="true">church</span>MAKENI CENTRAL SDA CHURCH PRESENTS</span>
+        <h2 class="crusade-title">Watch and Be Ready</h2>
+        <p class="crusade-subtitle">A special crusade for our whole community. Come and be part of it.</p>
+        <div class="crusade-details">
+          <div class="crusade-detail"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span>18-31 October 2026</div>
+          <div class="crusade-detail"><span class="material-symbols-outlined" aria-hidden="true">schedule</span>Every evening, 17:30-20:00</div>
+        </div>
+        <p class="crusade-invite">Come one, come all. Everyone is welcome for evenings of worship, hope, and inspiration in Lusaka.</p>
+        <a class="crusade-cta" href="https://www.google.com/maps/dir/?api=1&destination=Makeni+Central+Seventh-Day+Adventist+Church+Lusaka+Zambia" target="_blank" rel="noopener noreferrer">
+          <span class="material-symbols-outlined" aria-hidden="true">directions</span>
+          Find us at Makeni Central
+          <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+        </a>
+        <p class="crusade-welcome">Bring your family and friends. We look forward to welcoming you.</p>
+      </div>
+    </div>` : `
     <div id="give-modal-box">
       <button class="modal-close-give" aria-label="Close">✕</button>
       <h2 style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#041534;margin-bottom:6px;">
-        Support the Church
+        Coming Soon
       </h2>
-      <p style="color:#45464e;font-size:14px;margin-bottom:24px;">
-        Your gift helps us grow, serve, and build together.
-      </p>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;">
-        <button class="give-amount-btn" data-amount="50">ZMW 50</button>
-        <button class="give-amount-btn" data-amount="100">ZMW 100</button>
-        <button class="give-amount-btn" data-amount="250">ZMW 250</button>
-        <button class="give-amount-btn" data-amount="500">ZMW 500</button>
-        <button class="give-amount-btn" data-amount="1000">ZMW 1,000</button>
-        <button class="give-amount-btn" data-amount="custom" style="font-size:13px;">Custom</button>
-      </div>
-      <input class="give-input" id="give-custom-input" type="number"
-             placeholder="Enter amount (ZMW)" min="1"
-             style="display:none;margin-bottom:14px;" aria-label="Custom amount"/>
-      <p style="font-size:13px;color:#75777f;margin-bottom:14px;">
-        💳 Secure giving via mobile money or bank transfer.
-      </p>
-      <button class="give-submit btn-ripple">Give Now ✦</button>
-      <p id="give-thanks" style="display:none;text-align:center;margin-top:16px;color:#755b00;font-weight:600;font-size:15px;">
-        🙏 Thank you for your generosity!
-      </p>
     </div>`;
   document.body.appendChild(modal);
-
-  let selectedAmount = null;
-  const customInput  = modal.querySelector('#give-custom-input');
-
-  modal.querySelectorAll('.give-amount-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      modal.querySelectorAll('.give-amount-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedAmount = btn.dataset.amount;
-      customInput.style.display = selectedAmount === 'custom' ? 'block' : 'none';
-      if (selectedAmount === 'custom') customInput.focus();
-    });
-  });
-
-  modal.querySelector('.give-submit').addEventListener('click', async () => {
-    const amount = selectedAmount === 'custom'
-      ? parseFloat(customInput.value)
-      : parseFloat(selectedAmount);
-    if (!amount || amount <= 0) {
-      window.SDAToast?.('Please select or enter an amount.', 'error');
-      return;
-    }
-    const submitBtn = modal.querySelector('.give-submit');
-    submitBtn.textContent = 'Processing…';
-    submitBtn.disabled    = true;
-    if (typeof apiPost === 'function') await apiPost('/donate', { amount, currency: 'ZMW' });
-    modal.querySelector('#give-thanks').style.display = 'block';
-    submitBtn.style.display = 'none';
-    window.SDAToast?.('🙏 Gift recorded — thank you!', 'success', 4000);
-    setTimeout(closeGiveModal, 2800);
-  });
 
   function openGiveModal() {
     modal.classList.add('active');
@@ -695,12 +704,6 @@ function initGiveButton() {
   function closeGiveModal() {
     modal.classList.remove('active');
     document.body.style.overflow = '';
-    modal.querySelector('#give-thanks').style.display = 'none';
-    const sub = modal.querySelector('.give-submit');
-    sub.style.display = ''; sub.disabled = false; sub.textContent = 'Give Now ✦';
-    selectedAmount = null;
-    customInput.value = ''; customInput.style.display = 'none';
-    modal.querySelectorAll('.give-amount-btn').forEach(b => b.classList.remove('selected'));
   }
 
   modal.querySelector('.modal-close-give').addEventListener('click', closeGiveModal);
