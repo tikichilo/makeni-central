@@ -21,8 +21,14 @@
  *  GET  /api/recaps                    — Event recap galleries
  *  GET  /api/hero-slideshow            — Shuffled hero slideshow images
  *  GET  /api/gallery                   — Home page Gallery photos (optional ?category=)
+ *  GET  /api/daily-lesson              — Daily lesson pulled from ssnet.org
+ *  GET  /api/facebook-live             — Is the Facebook page live right now?
  *
- *  — Admin endpoints —
+ *  — Auth —
+ *  POST /api/admin/login               — { password } -> { token }  (rate limited)
+ *  GET  /api/admin/verify              — 200 if the Bearer token is still valid
+ *
+ *  — Admin endpoints (ALL require  Authorization: Bearer <token>) —
  *  GET    /api/donations             — List all donations
  *  DELETE /api/discussions/:id       — Delete a discussion
  *  POST   /api/fund/goal             — Update fundraising goal
@@ -39,33 +45,229 @@
  *  DELETE /api/recaps/:id            — Remove a recap
  *  POST   /api/gallery               — Add Gallery photo (multipart: photo + title + category)
  *  DELETE /api/gallery/:id           — Remove a Gallery photo
+ *
+ *  — Required environment variables —
+ *  MONGO_URI              MongoDB connection string
+ *  ADMIN_PASSWORD         Password for the admin dashboard (use a long one)
+ *  ADMIN_TOKEN_SECRET     Long random string used to sign admin tokens
+ *                         (generate: node -e "console.log(require('crypto').randomBytes(48).toString('hex'))")
+ *  — Optional —
+ *  ALLOWED_ORIGINS        Comma-separated list of extra origins allowed to call the API
+ *                         (only needed if a frontend is hosted on a DIFFERENT domain)
+ *  FACEBOOK_PAGE_ID, FACEBOOK_ACCESS_TOKEN, PORT, NODE_ENV
  */
 
 'use strict';
 
-const path     = require('path');
-const fs       = require('fs');
-const express  = require('express');
-const mongoose = require('mongoose');
-const cors     = require('cors');
-const multer   = require('multer');
 require('dotenv').config();
+
+const path      = require('path');
+const fs        = require('fs');
+const crypto    = require('crypto');
+const express   = require('express');
+const mongoose  = require('mongoose');
+const cors      = require('cors');
+const multer    = require('multer');
+const helmet    = require('helmet');
+const rateLimit = require('express-rate-limit');
+const cheerio   = require('cheerio');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+const IS_PROD = process.env.NODE_ENV === 'production';
+
+const ADMIN_PASSWORD     = process.env.ADMIN_PASSWORD     || '';
+const ADMIN_TOKEN_SECRET = process.env.ADMIN_TOKEN_SECRET || '';
+const ADMIN_TOKEN_TTL_MS = 8 * 60 * 60 * 1000; // admin stays logged in for 8 hours
+const ADMIN_CONFIGURED   = Boolean(ADMIN_PASSWORD && ADMIN_TOKEN_SECRET);
+
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '')
+  .split(',').map(s => s.trim()).filter(Boolean);
+
+if (!ADMIN_CONFIGURED) {
+  console.warn('⚠ ADMIN_PASSWORD and/or ADMIN_TOKEN_SECRET not set — all admin routes are DISABLED until you set them.');
+}
+if (ADMIN_TOKEN_SECRET && ADMIN_TOKEN_SECRET.length < 32) {
+  console.warn('⚠ ADMIN_TOKEN_SECRET is short — use at least 32 random characters.');
+}
+
+process.on('unhandledRejection', reason => {
+  console.error('Unhandled promise rejection:', reason);
+});
 
 
 /* ═══════════════════════════════════════════════
-   MIDDLEWARE
+   SECURITY MIDDLEWARE
 ═══════════════════════════════════════════════ */
-app.use(cors());
-app.use(express.json());
+
+// Render (and most hosts) sit behind a reverse proxy. Without this,
+// every visitor looks like the same IP and rate limiting breaks.
+app.set('trust proxy', 1);
+
+// Security headers (HSTS, nosniff, frame protection, no X-Powered-By…).
+// CSP is OFF for now because the pages likely use inline scripts/styles and
+// third-party embeds — turning it on blind would break the site. See the
+// notes that came with this file for how to roll a CSP out safely.
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+
+// CORS: the frontend is served by this same server, so same-origin calls
+// need no CORS at all. Only origins you list in ALLOWED_ORIGINS (plus
+// localhost outside production) may call the API from another site.
+const LOCAL_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+app.use(cors({
+  origin(origin, cb) {
+    if (!origin) return cb(null, true); // same-origin, curl, server-to-server
+    if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    if (!IS_PROD && LOCAL_ORIGIN.test(origin)) return cb(null, true);
+    return cb(null, false);
+  },
+}));
+
+// Small body limit — nothing here needs more than a few KB of JSON
+// (images go through multer, not this parser).
+app.use(express.json({ limit: '20kb' }));
+
+// ── Rate limiting ──
+const rlMessage = text => ({ error: text });
+const rlBase = { standardHeaders: true, legacyHeaders: false };
+
+// Blanket limit for every /api call, per IP
+const apiLimiter = rateLimit({
+  ...rlBase, windowMs: 15 * 60 * 1000, limit: 1500,
+  message: rlMessage('Too many requests — please slow down.'),
+});
+// Brute-force protection for the admin password
+const loginLimiter = rateLimit({
+  ...rlBase, windowMs: 15 * 60 * 1000, limit: 8,
+  message: rlMessage('Too many login attempts — try again in 15 minutes.'),
+});
+// Public things that create data (donations, discussions, comments, visits)
+const writeLimiter = rateLimit({
+  ...rlBase, windowMs: 10 * 60 * 1000, limit: 40,
+  message: rlMessage('Too many submissions — please try again in a few minutes.'),
+});
+// Likes / dislikes / reactions
+const reactLimiter = rateLimit({
+  ...rlBase, windowMs: 60 * 1000, limit: 40,
+  message: rlMessage('Too many reactions — please slow down.'),
+});
+
+app.use('/api', apiLimiter);
+
+// Every :id in a route must be a real 24-char hex ObjectId. This also
+// stops malformed ids from causing 500 CastErrors.
+const OBJECT_ID_RE = /^[a-f\d]{24}$/i;
+const isObjectId = v => typeof v === 'string' && OBJECT_ID_RE.test(v);
+app.param('id', (req, res, next, id) => {
+  if (!isObjectId(id)) return res.status(400).json({ error: 'Invalid id' });
+  next();
+});
+
+
+/* ═══════════════════════════════════════════════
+   INPUT HELPERS
+═══════════════════════════════════════════════ */
+
+// Returns a clean string: must be a string, control characters removed,
+// HTML tags stripped, trimmed, length-capped. Anything else becomes ''.
+// (Your frontend should STILL render user text with textContent, not
+// innerHTML — this is a second layer of defence, not a replacement.)
+function cleanText(value, max) {
+  if (typeof value !== 'string') return '';
+  return value
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
+    .replace(/<[a-zA-Z\/!?][^>]*>?/g, '')
+    .trim()
+    .slice(0, max);
+}
+
+// Accepts only a finite number (or numeric string) — rejects objects,
+// arrays, NaN and Infinity.
+function toFiniteNumber(value) {
+  if (typeof value !== 'number' && typeof value !== 'string') return NaN;
+  if (typeof value === 'string' && value.trim() === '') return NaN;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+function isHttpUrl(value) {
+  return typeof value === 'string' && /^https?:\/\/[^\s]+$/i.test(value);
+}
+
+
+/* ═══════════════════════════════════════════════
+   ADMIN AUTH — password login -> signed, expiring token
+   No extra packages: uses Node's built-in crypto.
+═══════════════════════════════════════════════ */
+function sha256(value) {
+  return crypto.createHash('sha256').update(String(value)).digest();
+}
+
+// Constant-time string comparison (hashing first makes lengths equal)
+function safeEqual(a, b) {
+  return crypto.timingSafeEqual(sha256(a), sha256(b));
+}
+
+function signToken() {
+  const exp = String(Date.now() + ADMIN_TOKEN_TTL_MS);
+  const sig = crypto.createHmac('sha256', ADMIN_TOKEN_SECRET).update(exp).digest('base64url');
+  return `${exp}.${sig}`;
+}
+
+function verifyToken(token) {
+  if (typeof token !== 'string') return false;
+  const [expStr, sig] = token.split('.');
+  if (!expStr || !sig) return false;
+
+  const exp = Number(expStr);
+  if (!Number.isFinite(exp) || exp < Date.now()) return false;
+
+  const expected = crypto.createHmac('sha256', ADMIN_TOKEN_SECRET).update(expStr).digest('base64url');
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+// Put this BEFORE any multer middleware so strangers can't upload files.
+function requireAdmin(req, res, next) {
+  if (!ADMIN_CONFIGURED) {
+    return res.status(503).json({ error: 'Admin access is not configured on the server' });
+  }
+  const header = req.get('authorization') || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
+  if (!verifyToken(token)) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  res.set('Cache-Control', 'no-store');
+  next();
+}
+
+app.post('/api/admin/login', loginLimiter, (req, res) => {
+  if (!ADMIN_CONFIGURED) {
+    return res.status(503).json({ error: 'Admin access is not configured on the server' });
+  }
+  const password = typeof (req.body || {}).password === 'string' ? req.body.password : '';
+  if (!password || !safeEqual(password, ADMIN_PASSWORD)) {
+    return res.status(401).json({ error: 'Incorrect password' });
+  }
+  res.set('Cache-Control', 'no-store');
+  res.json({ token: signToken(), expiresInMs: ADMIN_TOKEN_TTL_MS });
+});
+
+app.get('/api/admin/verify', requireAdmin, (req, res) => {
+  res.json({ ok: true });
+});
 
 
 /* ═══════════════════════════════════════════════
    STATIC FRONTEND FILES
+   Anything inside /public is world-readable — never put .env files,
+   database backups or private documents in there.
 ═══════════════════════════════════════════════ */
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { dotfiles: 'ignore' }));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -76,10 +278,11 @@ app.get('/', (req, res) => {
    UPLOADS (event posters + recap gallery images + gallery photos)
    Stored under public/uploads/... so express.static above serves them
    directly at /uploads/events/<file>, /uploads/recaps/<file>, and
-   /uploads/gallery/<file> — no extra route needed. Non-image files
-   and anything over 5MB are rejected before they touch disk.
+   /uploads/gallery/<file>. Uploads are admin-only, restricted to
+   JPG/PNG/WEBP, max 5MB, and the real file contents are checked
+   (not just the label the browser sends) before they are kept.
 ═══════════════════════════════════════════════ */
-const UPLOAD_ROOT       = path.join(__dirname, 'public', 'uploads');
+const UPLOAD_ROOT        = path.join(__dirname, 'public', 'uploads');
 const EVENT_UPLOAD_DIR   = path.join(UPLOAD_ROOT, 'events');
 const RECAP_UPLOAD_DIR   = path.join(UPLOAD_ROOT, 'recaps');
 const GALLERY_UPLOAD_DIR = path.join(UPLOAD_ROOT, 'gallery');
@@ -99,14 +302,17 @@ function makeStorage(dir) {
     filename: (req, file, cb) => {
       const ext = path.extname(file.originalname).toLowerCase();
       const safeExt = ['.jpg', '.jpeg', '.png', '.webp'].includes(ext) ? ext : '.jpg';
-      cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${safeExt}`);
+      // Random name from the server — the visitor's filename is never used on disk
+      cb(null, `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${safeExt}`);
     },
   });
 }
 
 function imageFileFilter(req, file, cb) {
   if (!IMAGE_MIME_TYPES.includes(file.mimetype)) {
-    return cb(new Error('Only JPG, PNG, and WEBP images are allowed'));
+    const err = new Error('Only JPG, PNG, and WEBP images are allowed');
+    err.code = 'INVALID_FILE_TYPE';
+    return cb(err);
   }
   cb(null, true);
 }
@@ -114,7 +320,7 @@ function imageFileFilter(req, file, cb) {
 const uploadEventPoster = multer({
   storage: makeStorage(EVENT_UPLOAD_DIR),
   fileFilter: imageFileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 5 * 1024 * 1024, files: 1 }, // 5MB
 });
 
 const uploadRecapImages = multer({
@@ -126,14 +332,56 @@ const uploadRecapImages = multer({
 const uploadGalleryPhoto = multer({
   storage: makeStorage(GALLERY_UPLOAD_DIR),
   fileFilter: imageFileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 5 * 1024 * 1024, files: 1 }, // 5MB
 });
+
+// Looks at the first bytes of the file to confirm it really is a
+// JPEG / PNG / WEBP (the browser-supplied mimetype can be faked).
+function detectImageType(buf) {
+  if (buf.length < 12) return null;
+  if (buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF) return 'jpg';
+  if (buf.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]))) return 'png';
+  if (buf.subarray(0, 4).toString('ascii') === 'RIFF' && buf.subarray(8, 12).toString('ascii') === 'WEBP') return 'webp';
+  return null;
+}
+
+async function fileLooksLikeImage(filePath) {
+  let handle;
+  try {
+    handle = await fs.promises.open(filePath, 'r');
+    const buf = Buffer.alloc(12);
+    await handle.read(buf, 0, 12, 0);
+    return detectImageType(buf) !== null;
+  } catch (err) {
+    return false;
+  } finally {
+    if (handle) await handle.close();
+  }
+}
+
+// Runs right after multer. If any saved file isn't a genuine image,
+// every file from this request is deleted and the request is rejected.
+function verifyUploadedImages(req, res, next) {
+  const files = req.files || (req.file ? [req.file] : []);
+  Promise.all(files.map(f => fileLooksLikeImage(f.path)))
+    .then(results => {
+      if (results.every(Boolean)) return next();
+      files.forEach(f => fs.unlink(f.path, () => {}));
+      res.status(400).json({ error: 'Only real JPG, PNG, and WEBP images are allowed' });
+    })
+    .catch(next);
+}
 
 // Best-effort file deletion — never throws, just logs if it fails
 // (e.g. file already gone). Used when deleting events/recaps/gallery photos.
+// Refuses to touch anything outside public/uploads.
 function deleteUploadedFile(publicUrl) {
-  if (!publicUrl) return;
+  if (!publicUrl || typeof publicUrl !== 'string') return;
   const filePath = path.join(__dirname, 'public', publicUrl);
+  if (!filePath.startsWith(UPLOAD_ROOT + path.sep)) {
+    console.warn('Refused to delete file outside uploads folder:', publicUrl);
+    return;
+  }
   fs.unlink(filePath, err => {
     if (err && err.code !== 'ENOENT') {
       console.warn('Could not delete uploaded file:', filePath, err.message);
@@ -172,7 +420,7 @@ mongoose.connection.on('disconnected', () => {
 // ── Donation ──
 const donationSchema = new mongoose.Schema({
   amount:    { type: Number, required: true, min: 1 },
-  currency:  { type: String, default: 'ZMW' },
+  currency:  { type: String, default: 'ZMW', maxlength: 3 },
   createdAt: { type: Date,   default: Date.now },
 });
 const Donation = mongoose.model('Donation', donationSchema);
@@ -217,7 +465,7 @@ const lessonSchema = new mongoose.Schema({
   title:     { type: String, required: true, maxlength: 100 },
   verse:     { type: String, default: '',    maxlength: 200 },
   body:      { type: String, required: true, maxlength: 1000 },
-  url:       { type: String, default: '' },
+  url:       { type: String, default: '',    maxlength: 500 },
   updatedAt: { type: Date,   default: Date.now },
 });
 const Lesson = mongoose.model('Lesson', lessonSchema);
@@ -322,22 +570,32 @@ const GalleryPhoto = mongoose.model('GalleryPhoto', galleryPhotoSchema);
 ═══════════════════════════════════════════════ */
 
 // ── POST /api/donate ──
-app.post('/api/donate', async (req, res) => {
-  try {
-    const { amount, currency } = req.body;
+// NOTE: this only RECORDS what the visitor says they gave. Nothing here
+// verifies a real payment, so treat the fund total as "pledged" unless
+// you connect a payment/mobile-money confirmation.
+const MAX_DONATION = 1000000;
 
-    if (!amount || isNaN(amount) || Number(amount) <= 0) {
+app.post('/api/donate', writeLimiter, async (req, res) => {
+  try {
+    const { amount, currency } = req.body || {};
+
+    const value = toFiniteNumber(amount);
+    if (!Number.isFinite(value) || value <= 0) {
       return res.status(400).json({ error: 'Invalid amount' });
     }
+    if (value > MAX_DONATION) {
+      return res.status(400).json({ error: 'Amount is too large' });
+    }
+    const rounded = Math.round(value * 100) / 100;
 
-    const donation = await Donation.create({
-      amount:   Number(amount),
-      currency: currency || 'ZMW',
-    });
+    const code = typeof currency === 'string' ? currency.trim().toUpperCase() : '';
+    const safeCurrency = /^[A-Z]{3}$/.test(code) ? code : 'ZMW';
+
+    const donation = await Donation.create({ amount: rounded, currency: safeCurrency });
 
     await Fund.findOneAndUpdate(
       {},
-      { $inc: { raised: Number(amount), donors: 1 } },
+      { $inc: { raised: rounded, donors: 1 } },
       { upsert: true, new: true }
     );
 
@@ -368,12 +626,14 @@ app.get('/api/fund', async (req, res) => {
 // ── GET /api/discussions ──
 app.get('/api/discussions', async (req, res) => {
   try {
-    const { category } = req.query;
+    // Only a plain string is accepted — blocks ?category[$ne]=x style injection
+    const category = typeof req.query.category === 'string' ? req.query.category : '';
     const filter = category && category !== 'all' ? { category } : {};
 
     const discussions = await Discussion
       .find(filter)
       .sort({ createdAt: -1 })
+      .limit(300)
       .lean();
 
     res.json(discussions);
@@ -386,20 +646,19 @@ app.get('/api/discussions', async (req, res) => {
 
 
 // ── POST /api/discussions ──
-app.post('/api/discussions', async (req, res) => {
+app.post('/api/discussions', writeLimiter, async (req, res) => {
   try {
-    const { name, category, title, body } = req.body;
+    const b = req.body || {};
+    const name     = cleanText(b.name, 100);
+    const category = cleanText(b.category, 60);
+    const title    = cleanText(b.title, 100);
+    const body     = cleanText(b.body, 1000);
 
     if (!name || !category || !title || !body) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    const discussion = await Discussion.create({
-      name:     name.slice(0, 100),
-      category: category.slice(0, 60),
-      title:    title.slice(0, 100),
-      body:     body.slice(0, 1000),
-    });
+    const discussion = await Discussion.create({ name, category, title, body });
 
     res.status(201).json({ success: true, id: discussion._id });
 
@@ -411,7 +670,7 @@ app.post('/api/discussions', async (req, res) => {
 
 
 // ── POST /api/discussions/:id/like ──
-app.post('/api/discussions/:id/like', async (req, res) => {
+app.post('/api/discussions/:id/like', reactLimiter, async (req, res) => {
   try {
     const discussion = await Discussion.findByIdAndUpdate(
       req.params.id,
@@ -430,6 +689,26 @@ app.post('/api/discussions/:id/like', async (req, res) => {
 });
 
 
+// ── POST /api/discussions/:id/dislike ──
+app.post('/api/discussions/:id/dislike', reactLimiter, async (req, res) => {
+  try {
+    const discussion = await Discussion.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { dislikes: 1 } },
+      { new: true }
+    );
+
+    if (!discussion) return res.status(404).json({ error: 'Not found' });
+
+    res.json({ dislikes: discussion.dislikes });
+
+  } catch (err) {
+    console.error('POST /api/discussions/:id/dislike:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
 // ── GET /api/discussions/:id/comments ──
 // Oldest first, so a reply thread reads top-to-bottom naturally.
 app.get('/api/discussions/:id/comments', async (req, res) => {
@@ -437,6 +716,7 @@ app.get('/api/discussions/:id/comments', async (req, res) => {
     const comments = await Comment
       .find({ discussionId: req.params.id })
       .sort({ createdAt: 1 })
+      .limit(1000)
       .lean();
 
     res.json(comments);
@@ -449,9 +729,11 @@ app.get('/api/discussions/:id/comments', async (req, res) => {
 
 
 // ── POST /api/discussions/:id/comments ──
-app.post('/api/discussions/:id/comments', async (req, res) => {
+app.post('/api/discussions/:id/comments', writeLimiter, async (req, res) => {
   try {
-    const { name, body, parentCommentId } = req.body;
+    const b = req.body || {};
+    const name = cleanText(b.name, 100);
+    const body = cleanText(b.body, 500);
 
     if (!name || !body) {
       return res.status(400).json({ error: 'Name and comment are required' });
@@ -461,7 +743,11 @@ app.post('/api/discussions/:id/comments', async (req, res) => {
     if (!discussionExists) return res.status(404).json({ error: 'Discussion not found' });
 
     let parentId = null;
-    if (parentCommentId) {
+    const { parentCommentId } = b;
+    if (parentCommentId !== undefined && parentCommentId !== null && parentCommentId !== '') {
+      if (!isObjectId(parentCommentId)) {
+        return res.status(400).json({ error: 'Invalid parent comment' });
+      }
       const parent = await Comment.findOne({
         _id: parentCommentId,
         discussionId: req.params.id,
@@ -473,8 +759,8 @@ app.post('/api/discussions/:id/comments', async (req, res) => {
     const comment = await Comment.create({
       discussionId: req.params.id,
       parentCommentId: parentId,
-      name:         name.slice(0, 100),
-      body:         body.slice(0, 500),
+      name,
+      body,
     });
 
     const discussion = await Discussion.findByIdAndUpdate(
@@ -531,6 +817,7 @@ app.get('/api/announcements', async (req, res) => {
     const announcements = await Announcement
       .find({ $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }] })
       .sort({ createdAt: -1 })
+      .limit(200)
       .lean();
 
     res.json(announcements);
@@ -547,31 +834,37 @@ app.get('/api/announcements', async (req, res) => {
 // so this trusts the client's `active` flag (toggle on/off) rather than
 // tracking who reacted — matches the news.html frontend, which already
 // tracks each visitor's own toggle state in localStorage and just tells
-// the server whether to add or remove one from the count.
-app.post('/api/announcements/:id/react', async (req, res) => {
+// the server whether to add or remove one from the count. Rate limiting
+// keeps the counts from being spammed. Decrements never go below 0.
+app.post('/api/announcements/:id/react', reactLimiter, async (req, res) => {
   try {
-    const { reaction, active } = req.body;
+    const { reaction, active } = req.body || {};
 
-    if (!ANNOUNCEMENT_REACTION_KEYS.includes(reaction)) {
+    if (typeof reaction !== 'string' || !ANNOUNCEMENT_REACTION_KEYS.includes(reaction)) {
       return res.status(400).json({ error: 'Invalid reaction type' });
     }
 
-    const delta = active ? 1 : -1;
-    let ann = await Announcement.findByIdAndUpdate(
-      req.params.id,
-      { $inc: { [`reactions.${reaction}`]: delta } },
-      { new: true }
-    );
+    const field = `reactions.${reaction}`;
+    const adding = active === true || active === 'true';
+    let ann;
+
+    if (adding) {
+      ann = await Announcement.findByIdAndUpdate(
+        req.params.id,
+        { $inc: { [field]: 1 } },
+        { new: true }
+      );
+    } else {
+      // Only decrement when the counter is above zero (atomic — no clamp step needed)
+      ann = await Announcement.findOneAndUpdate(
+        { _id: req.params.id, [field]: { $gt: 0 } },
+        { $inc: { [field]: -1 } },
+        { new: true }
+      );
+      if (!ann) ann = await Announcement.findById(req.params.id);
+    }
 
     if (!ann) return res.status(404).json({ error: 'Not found' });
-
-    // Guard against the count dipping below 0 (e.g. a stale toggle from
-    // a second tab). $min could do this atomically, but a follow-up
-    // clamp is simpler and this endpoint is low-stakes/low-traffic.
-    if (ann.reactions[reaction] < 0) {
-      ann.reactions[reaction] = 0;
-      await ann.save();
-    }
 
     res.json({ success: true, reactions: ann.reactions });
 
@@ -584,11 +877,11 @@ app.post('/api/announcements/:id/react', async (req, res) => {
 
 // ── POST /api/visits ──
 // Saves a "Plan Your Visit" submission: date, service, name, phone.
-app.post('/api/visits', async (req, res) => {
+app.post('/api/visits', writeLimiter, async (req, res) => {
   try {
-    const { date, service, time, name, phone } = req.body;
+    const { date, service, time, name, phone } = req.body || {};
 
-    if (!date || !service) {
+    if (!date || typeof date !== 'string' || !service || typeof service !== 'string') {
       return res.status(400).json({ error: 'Date and service are required' });
     }
 
@@ -601,12 +894,16 @@ app.post('/api/visits', async (req, res) => {
       return res.status(400).json({ error: 'Invalid service' });
     }
 
+    const safePhone = typeof phone === 'string'
+      ? phone.replace(/[^\d+()\-\s]/g, '').trim().slice(0, 20)
+      : '';
+
     const visit = await Visit.create({
       date:    parsedDate,
       service,
-      time:    (time || '').slice(0, 60),
-      name:    (name || '').slice(0, 100),
-      phone:   (phone || '').slice(0, 20),
+      time:    cleanText(time, 60),
+      name:    cleanText(name, 100),
+      phone:   safePhone,
     });
 
     res.status(201).json({ success: true, id: visit._id });
@@ -628,6 +925,7 @@ app.get('/api/events', async (req, res) => {
     const events = await Event
       .find({ date: { $gte: now } })
       .sort({ date: 1 })
+      .limit(200)
       .lean();
 
     res.json(events);
@@ -662,7 +960,7 @@ app.get('/api/events/featured', async (req, res) => {
 // Newest recap galleries first.
 app.get('/api/recaps', async (req, res) => {
   try {
-    const recaps = await Recap.find().sort({ createdAt: -1 }).lean();
+    const recaps = await Recap.find().sort({ createdAt: -1 }).limit(200).lean();
     res.json(recaps);
 
   } catch (err) {
@@ -715,10 +1013,10 @@ app.get('/api/hero-slideshow', async (req, res) => {
 // omit (or pass "all") to get everything.
 app.get('/api/gallery', async (req, res) => {
   try {
-    const { category } = req.query;
+    const category = typeof req.query.category === 'string' ? req.query.category : '';
     const filter = category && category !== 'all' ? { category } : {};
 
-    const photos = await GalleryPhoto.find(filter).sort({ createdAt: -1 }).lean();
+    const photos = await GalleryPhoto.find(filter).sort({ createdAt: -1 }).limit(500).lean();
     res.json(photos);
 
   } catch (err) {
@@ -729,13 +1027,13 @@ app.get('/api/gallery', async (req, res) => {
 
 
 /* ═══════════════════════════════════════════════
-   ROUTES — ADMIN
+   ROUTES — ADMIN (every route below requires a valid admin token)
 ═══════════════════════════════════════════════ */
 
 // ── GET /api/donations ──
-app.get('/api/donations', async (req, res) => {
+app.get('/api/donations', requireAdmin, async (req, res) => {
   try {
-    const donations = await Donation.find().sort({ createdAt: -1 }).lean();
+    const donations = await Donation.find().sort({ createdAt: -1 }).limit(2000).lean();
     res.json(donations);
 
   } catch (err) {
@@ -748,14 +1046,15 @@ app.get('/api/donations', async (req, res) => {
 // ── GET /api/visits ──
 // Lists planned visits, soonest upcoming first; optional ?upcoming=true
 // filters out past dates so the admin only sees what's still ahead.
-app.get('/api/visits', async (req, res) => {
+// Contains visitor names + phone numbers, so it is admin-only.
+app.get('/api/visits', requireAdmin, async (req, res) => {
   try {
     const { upcoming } = req.query;
     const filter = upcoming === 'true'
       ? { date: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) } }
       : {};
 
-    const visits = await Visit.find(filter).sort({ date: 1 }).lean();
+    const visits = await Visit.find(filter).sort({ date: 1 }).limit(2000).lean();
     res.json(visits);
 
   } catch (err) {
@@ -766,7 +1065,7 @@ app.get('/api/visits', async (req, res) => {
 
 
 // ── DELETE /api/discussions/:id ──
-app.delete('/api/discussions/:id', async (req, res) => {
+app.delete('/api/discussions/:id', requireAdmin, async (req, res) => {
   try {
     const discussion = await Discussion.findByIdAndDelete(req.params.id);
 
@@ -785,7 +1084,7 @@ app.delete('/api/discussions/:id', async (req, res) => {
 
 
 // ── DELETE /api/comments/:id ──
-app.delete('/api/comments/:id', async (req, res) => {
+app.delete('/api/comments/:id', requireAdmin, async (req, res) => {
   try {
     const comment = await Comment.findByIdAndDelete(req.params.id);
 
@@ -803,17 +1102,17 @@ app.delete('/api/comments/:id', async (req, res) => {
 
 
 // ── POST /api/fund/goal ──
-app.post('/api/fund/goal', async (req, res) => {
+app.post('/api/fund/goal', requireAdmin, async (req, res) => {
   try {
-    const { goal } = req.body;
+    const goal = toFiniteNumber((req.body || {}).goal);
 
-    if (!goal || isNaN(goal) || Number(goal) <= 0) {
+    if (!Number.isFinite(goal) || goal <= 0 || goal > 1e9) {
       return res.status(400).json({ error: 'Invalid goal amount' });
     }
 
     const fund = await Fund.findOneAndUpdate(
       {},
-      { $set: { goal: Number(goal) } },
+      { $set: { goal } },
       { upsert: true, new: true }
     );
 
@@ -828,21 +1127,23 @@ app.post('/api/fund/goal', async (req, res) => {
 
 // ── POST /api/lesson ──
 // Always replaces — only one lesson is active at a time.
-app.post('/api/lesson', async (req, res) => {
+app.post('/api/lesson', requireAdmin, async (req, res) => {
   try {
-    const { title, verse, body, url } = req.body;
+    const b = req.body || {};
+    const title = cleanText(b.title, 100);
+    const verse = cleanText(b.verse, 200);
+    const body  = cleanText(b.body, 1000);
+    const url   = typeof b.url === 'string' ? b.url.trim() : '';
 
     if (!title || !body) {
       return res.status(400).json({ error: 'Title and body are required' });
     }
+    if (url && (!isHttpUrl(url) || url.length > 500)) {
+      return res.status(400).json({ error: 'URL must start with http:// or https://' });
+    }
 
     await Lesson.deleteMany({});
-    await Lesson.create({
-      title: title.slice(0, 100),
-      verse: (verse || '').slice(0, 200),
-      body:  body.slice(0, 1000),
-      url:   url || '',
-    });
+    await Lesson.create({ title, verse, body, url });
 
     res.json({ success: true });
 
@@ -855,9 +1156,10 @@ app.post('/api/lesson', async (req, res) => {
 
 // ── POST /api/theme ──
 // Always replaces — only one theme is active at a time.
-app.post('/api/theme', async (req, res) => {
+app.post('/api/theme', requireAdmin, async (req, res) => {
   try {
-    const { heading, ref, body } = req.body;
+    const b = req.body || {};
+    const heading = cleanText(b.heading, 60);
 
     if (!heading) {
       return res.status(400).json({ error: 'Heading is required' });
@@ -865,9 +1167,9 @@ app.post('/api/theme', async (req, res) => {
 
     await Theme.deleteMany({});
     await Theme.create({
-      heading: heading.slice(0, 60),
-      ref:     (ref  || '').slice(0, 40),
-      body:    (body || '').slice(0, 300),
+      heading,
+      ref:  cleanText(b.ref, 40),
+      body: cleanText(b.body, 300),
     });
 
     res.json({ success: true });
@@ -880,19 +1182,28 @@ app.post('/api/theme', async (req, res) => {
 
 
 // ── POST /api/announcements ──
-app.post('/api/announcements', async (req, res) => {
+app.post('/api/announcements', requireAdmin, async (req, res) => {
   try {
-    const { text, title, category, expiresAt } = req.body;
+    const b = req.body || {};
+    const text = cleanText(b.text, 200);
 
     if (!text) {
       return res.status(400).json({ error: 'Text is required' });
     }
 
+    let expiresAt = null;
+    if (b.expiresAt) {
+      expiresAt = new Date(b.expiresAt);
+      if (typeof b.expiresAt !== 'string' || isNaN(expiresAt.getTime())) {
+        return res.status(400).json({ error: 'Invalid expiry date' });
+      }
+    }
+
     const ann = await Announcement.create({
-      text:      text.slice(0, 200),
-      title:     (title || '').slice(0, 100),
-      category:  (category || 'general').slice(0, 40).toLowerCase(),
-      expiresAt: expiresAt ? new Date(expiresAt) : null,
+      text,
+      title:    cleanText(b.title, 100),
+      category: cleanText(b.category, 40).toLowerCase() || 'general',
+      expiresAt,
     });
 
     res.status(201).json({ success: true, id: ann._id });
@@ -905,7 +1216,7 @@ app.post('/api/announcements', async (req, res) => {
 
 
 // ── DELETE /api/announcements/:id ──
-app.delete('/api/announcements/:id', async (req, res) => {
+app.delete('/api/announcements/:id', requireAdmin, async (req, res) => {
   try {
     const ann = await Announcement.findByIdAndDelete(req.params.id);
 
@@ -924,34 +1235,36 @@ app.delete('/api/announcements/:id', async (req, res) => {
 // multipart/form-data: fields (title, date, time, location, info) +
 // a single `poster` file. Poster is optional — an event without one
 // just renders without a cover image on the frontend.
-app.post('/api/events', uploadEventPoster.single('poster'), async (req, res) => {
+app.post('/api/events', requireAdmin, uploadEventPoster.single('poster'), verifyUploadedImages, async (req, res) => {
   try {
-    const { title, date, time, location, info } = req.body;
+    const b = req.body || {};
+    const title = cleanText(b.title, 120);
 
-    if (!title || !date) {
+    if (!title || !b.date || typeof b.date !== 'string') {
       if (req.file) deleteUploadedFile(`/uploads/events/${req.file.filename}`);
       return res.status(400).json({ error: 'Title and date are required' });
     }
 
-    const parsedDate = new Date(date);
+    const parsedDate = new Date(b.date);
     if (isNaN(parsedDate.getTime())) {
       if (req.file) deleteUploadedFile(`/uploads/events/${req.file.filename}`);
       return res.status(400).json({ error: 'Invalid date' });
     }
 
     const event = await Event.create({
-      title:     title.slice(0, 120),
+      title,
       posterUrl: req.file ? `/uploads/events/${req.file.filename}` : '',
       date:      parsedDate,
-      time:      (time || '').slice(0, 60),
-      location:  (location || '').slice(0, 150),
-      info:      (info || '').slice(0, 1000),
+      time:      cleanText(b.time, 60),
+      location:  cleanText(b.location, 150),
+      info:      cleanText(b.info, 1000),
     });
 
     res.status(201).json({ success: true, id: event._id });
 
   } catch (err) {
     console.error('POST /api/events:', err);
+    if (req.file) deleteUploadedFile(`/uploads/events/${req.file.filename}`);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -960,7 +1273,7 @@ app.post('/api/events', uploadEventPoster.single('poster'), async (req, res) => 
 // ── PATCH /api/events/:id/feature ──
 // Marks one event as featured, unmarking any other — only one event
 // can be featured at a time, matching the single Featured Event section.
-app.patch('/api/events/:id/feature', async (req, res) => {
+app.patch('/api/events/:id/feature', requireAdmin, async (req, res) => {
   try {
     const exists = await Event.exists({ _id: req.params.id });
     if (!exists) return res.status(404).json({ error: 'Not found' });
@@ -978,7 +1291,7 @@ app.patch('/api/events/:id/feature', async (req, res) => {
 
 
 // ── DELETE /api/events/:id ──
-app.delete('/api/events/:id', async (req, res) => {
+app.delete('/api/events/:id', requireAdmin, async (req, res) => {
   try {
     const event = await Event.findByIdAndDelete(req.params.id);
 
@@ -998,9 +1311,10 @@ app.delete('/api/events/:id', async (req, res) => {
 // ── POST /api/recaps ──
 // multipart/form-data: fields (title, description) + up to 10 files
 // under the `images` field. At least one image is required.
-app.post('/api/recaps', uploadRecapImages.array('images', 10), async (req, res) => {
+app.post('/api/recaps', requireAdmin, uploadRecapImages.array('images', 10), verifyUploadedImages, async (req, res) => {
   try {
-    const { title, description } = req.body;
+    const b = req.body || {};
+    const title = cleanText(b.title, 120);
 
     if (!title) {
       (req.files || []).forEach(f => deleteUploadedFile(`/uploads/recaps/${f.filename}`));
@@ -1014,8 +1328,8 @@ app.post('/api/recaps', uploadRecapImages.array('images', 10), async (req, res) 
     const images = req.files.map(f => `/uploads/recaps/${f.filename}`);
 
     const recap = await Recap.create({
-      title:       title.slice(0, 120),
-      description: (description || '').slice(0, 1000),
+      title,
+      description: cleanText(b.description, 1000),
       images,
     });
 
@@ -1030,7 +1344,7 @@ app.post('/api/recaps', uploadRecapImages.array('images', 10), async (req, res) 
 
 
 // ── DELETE /api/recaps/:id ──
-app.delete('/api/recaps/:id', async (req, res) => {
+app.delete('/api/recaps/:id', requireAdmin, async (req, res) => {
   try {
     const recap = await Recap.findByIdAndDelete(req.params.id);
 
@@ -1052,9 +1366,11 @@ app.delete('/api/recaps/:id', async (req, res) => {
 // Both title and category are required; category must be one of
 // GALLERY_CATEGORIES so it always lines up with a filter pill on the
 // home page.
-app.post('/api/gallery', uploadGalleryPhoto.single('photo'), async (req, res) => {
+app.post('/api/gallery', requireAdmin, uploadGalleryPhoto.single('photo'), verifyUploadedImages, async (req, res) => {
   try {
-    const { title, category } = req.body;
+    const b = req.body || {};
+    const title = cleanText(b.title, 120);
+    const category = typeof b.category === 'string' ? b.category : '';
 
     if (!title || !category) {
       if (req.file) deleteUploadedFile(`/uploads/gallery/${req.file.filename}`);
@@ -1071,7 +1387,7 @@ app.post('/api/gallery', uploadGalleryPhoto.single('photo'), async (req, res) =>
     }
 
     const photo = await GalleryPhoto.create({
-      title:    title.slice(0, 120),
+      title,
       category,
       imageUrl: `/uploads/gallery/${req.file.filename}`,
     });
@@ -1087,7 +1403,7 @@ app.post('/api/gallery', uploadGalleryPhoto.single('photo'), async (req, res) =>
 
 
 // ── DELETE /api/gallery/:id ──
-app.delete('/api/gallery/:id', async (req, res) => {
+app.delete('/api/gallery/:id', requireAdmin, async (req, res) => {
   try {
     const photo = await GalleryPhoto.findByIdAndDelete(req.params.id);
 
@@ -1103,8 +1419,6 @@ app.delete('/api/gallery/:id', async (req, res) => {
   }
 });
 
-
-const cheerio = require('cheerio');
 
 /* ═══════════════════════════════════════════════
    DAILY LESSON — pulled live from ssnet.org
@@ -1189,6 +1503,7 @@ async function fetchLessonPage(url) {
 
   const response = await fetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MakeniCentralSDA-site/1.0)' },
+    signal: AbortSignal.timeout(8000), // don't let a slow ssnet.org hang our requests
   });
   if (!response.ok) throw new Error(`ssnet.org responded ${response.status}`);
   const html = await response.text();
@@ -1255,8 +1570,8 @@ async function fetchLessonPage(url) {
 // their markup — the frontend keeps its static placeholder in that case.
 app.get('/api/daily-lesson', async (req, res) => {
   try {
-    const dateStr = req.query.date || getTodayInZambia();
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const dateStr = req.query.date === undefined ? getTodayInZambia() : req.query.date;
+    if (typeof dateStr !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
       return res.status(400).json({ error: 'Invalid date' });
     }
 
@@ -1286,30 +1601,41 @@ app.get('/api/daily-lesson', async (req, res) => {
    FACEBOOK LIVE
    Requires FACEBOOK_PAGE_ID and FACEBOOK_ACCESS_TOKEN in the server
    environment. The token stays server-side and is never sent to the browser.
+   Results are cached for 30s so visitors can't burn through Facebook's
+   API rate limit.
 ═══════════════════════════════════════════════ */
+const FB_CACHE_TTL = 30 * 1000;
+let fbCache = { at: 0, data: null };
+
 app.get('/api/facebook-live', async (req, res) => {
   const pageId = process.env.FACEBOOK_PAGE_ID || '100091185906540';
   const accessToken = process.env.FACEBOOK_ACCESS_TOKEN;
 
   if (!accessToken) return res.json({ live: false, configured: false });
 
+  if (fbCache.data && Date.now() - fbCache.at < FB_CACHE_TTL) {
+    return res.json(fbCache.data);
+  }
+
   try {
-    const endpoint = new URL(`https://graph.facebook.com/v20.0/${pageId}/live_videos`);
+    const endpoint = new URL(`https://graph.facebook.com/v20.0/${encodeURIComponent(pageId)}/live_videos`);
     endpoint.searchParams.set('fields', 'id,permalink_url,status,title,creation_time');
     endpoint.searchParams.set('status', 'LIVE');
     endpoint.searchParams.set('access_token', accessToken);
 
-    const response = await fetch(endpoint);
+    const response = await fetch(endpoint, { signal: AbortSignal.timeout(8000) });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error?.message || `HTTP ${response.status}`);
 
     const liveVideo = Array.isArray(payload.data) ? payload.data[0] : null;
-    res.json({
+    const data = {
       live: Boolean(liveVideo?.permalink_url),
       configured: true,
       videoUrl: liveVideo?.permalink_url || null,
       title: liveVideo?.title || '',
-    });
+    };
+    fbCache = { at: Date.now(), data };
+    res.json(data);
   } catch (err) {
     console.error('GET /api/facebook-live:', err.message);
     res.json({ live: false, configured: true });
@@ -1318,50 +1644,45 @@ app.get('/api/facebook-live', async (req, res) => {
 
 
 /* ═══════════════════════════════════════════════
-   ERROR HANDLING — must be registered after all routes.
+   404 FOR UNKNOWN API ROUTES + ERROR HANDLING
+   Both must be registered after all routes.
    Catches multer upload errors (bad file type, too large, too many
-   files) and returns clean JSON instead of Express's default HTML
-   stack trace, so the dashboard can show a real error message.
+   files) and bad JSON bodies, and returns clean JSON instead of
+   Express's default HTML stack trace.
 ═══════════════════════════════════════════════ */
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
 app.use((err, req, res, next) => {
+  if (res.headersSent) return next(err);
+
   if (err instanceof multer.MulterError) {
     const messages = {
       LIMIT_FILE_SIZE:       'Image is too large — max 5MB per file.',
       LIMIT_FILE_COUNT:      'Too many images — max 10 per recap.',
-      LIMIT_UNEXPECTED_FILE: 'Too many images — max 10 per recap.',
+      LIMIT_UNEXPECTED_FILE: 'Too many images, or the wrong upload field was used.',
     };
     return res.status(400).json({ error: messages[err.code] || err.message });
   }
-  if (err && /Only image files are allowed/.test(err.message || '')) {
+  if (err && err.code === 'INVALID_FILE_TYPE') {
     return res.status(400).json({ error: err.message });
   }
+  if (err && err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'Malformed JSON in request body' });
+  }
+  if (err && err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Request body is too large' });
+  }
+
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'Server error' });
 });
+
 
 /* ═══════════════════════════════════════════════
    START SERVER
 ═══════════════════════════════════════════════ */
 app.listen(PORT, () => {
   console.log(`\x1b[33m✦ Makeni Central SDA — server running on port ${PORT}\x1b[0m`);
-});
-
-
-// ── POST /api/discussions/:id/dislike ──
-app.post('/api/discussions/:id/dislike', async (req, res) => {
-  try {
-    const discussion = await Discussion.findByIdAndUpdate(
-      req.params.id,
-      { $inc: { dislikes: 1 } },
-      { new: true }
-    );
-
-    if (!discussion) return res.status(404).json({ error: 'Not found' });
-
-    res.json({ dislikes: discussion.dislikes });
-
-  } catch (err) {
-    console.error('POST /api/discussions/:id/dislike:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
 });
