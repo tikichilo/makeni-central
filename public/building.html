@@ -4,67 +4,47 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>New Building Project | Makeni Central Seventh-day Adventist Church</title>
-<meta name="description" content="Follow the progress of Makeni Central Seventh-day Adventist Church's new sanctuary in Lusaka, Zambia — construction updates, fundraising progress, and how you can give.">
+<meta name="description" content="Follow the progress of Makeni Central Seventh-day Adventist Church's new sanctuary in Lusaka, Zambia — construction updates, an interactive 3D model, and the vision for our new building.">
 <link rel="canonical" href="https://mccadventist.org/building.html">
 <meta property="og:title" content="New Building Project — Makeni Central Seventh-day Adventist Church">
 <meta property="og:description" content="Building our future together — a sacred sanctuary designed to foster worship, community, and spiritual growth.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/building.html">
 <meta property="og:image" content="https://mccadventist.org/images/jjz.png">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="js/Tailwind-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="sda-shared.css"/>
 <style>
-  /* ── Hero Slideshow ── */
-  .building-hero-slide {
+  /* ── Hero: interactive 3D model only ── */
+  .building-hero { min-height: 420px; background: #0a1932; }
+  .hero-poster {
     position: absolute;
     inset: 0;
-    opacity: 0;
-    transition: opacity 1.2s ease-in-out;
-    will-change: opacity, transform;
-  }
-  .building-hero-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    z-index: 0;
   }
-  .building-hero-slide.active {
-    opacity: 1;
-    animation: heroZoom 14s ease-out forwards;
-  }
-  .building-hero-slide.prev {
-    opacity: 0;
-  }
-  @keyframes heroZoom {
-    0%   { transform: scale(1); }
-    100% { transform: scale(1.06); }
-  }
-
-  /* Hero dots */
-  .building-hero-dots {
+  .hero-3d { position: absolute; inset: 0; z-index: 5; }
+  .hero-3d .c3d { width: 100%; height: 100%; background: transparent; }
+  .hero-3d .c3d-loader { background: rgba(10,25,50,.35); }
+  .hero-shade {
     position: absolute;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 8px;
-    z-index: 20;
+    left: 0; right: 0; bottom: 0;
+    height: 55%;
+    z-index: 10;
+    pointer-events: none;
+    background: linear-gradient(to top, rgba(10,25,50,.88) 0%, rgba(10,25,50,.45) 45%, transparent 100%);
   }
-  .building-hero-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.4);
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.3s;
-    padding: 0;
-  }
-  .building-hero-dot.active {
-    background: #fed977;
-    transform: scale(1.3);
+  /* Text sits on top but never blocks dragging the model */
+  .hero-content { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; pointer-events: none; }
+  @media (max-width: 640px) {
+    .building-hero { height: 78vh; min-height: 560px; }
+    .hero-content p { display: none; }
+    .hero-content h1 { margin-bottom: 0; font-size: 2rem; line-height: 1.15; }
   }
 
   /* ── Gallery image placeholder ── */
@@ -329,80 +309,30 @@
 <main class="pt-20">
 
   <!-- ══════════════ HERO ══════════════ -->
-  <!--
-    HERO SLIDESHOW
-    Add your building photos to the images/ folder and update the src attributes below.
-    Recommended: 3–5 landscape photos, at least 1400px wide.
-    Caption text is in the <span> inside each slide's overlay div.
-  -->
-  <section id="building-hero" class="building-hero relative h-[80vh] flex items-end overflow-hidden" aria-label="New building hero">
+  <!-- HERO: interactive 3D model (church3d.js + Three.js r128, loaded by the script at the bottom) -->
+  <section id="building-hero" class="building-hero relative h-[80vh] overflow-hidden" aria-label="Interactive 3D model of the new church building">
 
-    <!-- Slide 1 -->
-    <div class="building-hero-slide active" aria-hidden="true">
-      <img src="images/jjz.png" alt="New Makeni Central SDA Church building construction site"/>
-      <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent"></div>
-    </div>
+    <!-- Poster: visible while the 3D model loads, or if WebGL is unavailable -->
+    <img class="hero-poster" src="images/jjz.png" alt="Artist's impression of the new Makeni Central SDA Church building" fetchpriority="high"/>
 
-    <!-- Slide 2 -->
-    <div class="building-hero-slide" aria-hidden="true">
-      <img src="images/church bld.jpg" alt="Foundation work in progress"/>
-      <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent"></div>
-    </div>
+    <!-- Interactive 3D model (mounted by the script at the bottom of the page) -->
+    <div class="hero-3d" id="hero-3d"></div>
 
-    <!-- Slide 3 -->
-    <div class="building-hero-slide" aria-hidden="true">
-      <img src="images/b1.jpg" alt="Church members supporting the building project"/>
-      <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent"></div>
-    </div>
+    <!-- Legibility gradient (non-interactive) -->
+    <div class="hero-shade" aria-hidden="true"></div>
 
-
-
-    <!-- Hero text (always on top) -->
-    <div class="relative z-10 w-full max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pb-16 md:pb-section-gap">
-      <h1 class="font-display-lg text-display-lg text-on-primary mb-6 text-shadow-premium">Building Our Future Together</h1>
-      <p class="font-body-lg text-body-lg text-on-primary/90 max-w-2xl mb-8">
-        A sacred sanctuary designed to foster worship, community, and spiritual growth for generations to come.
-      </p>
-    </div>
-
-    <!-- Dot indicators -->
-    <div class="building-hero-dots" id="building-hero-dots" role="tablist" aria-label="Hero slideshow navigation">
-      <button class="building-hero-dot active" role="tab" aria-selected="true"  aria-label="Slide 1"></button>
-      <button class="building-hero-dot"        role="tab" aria-selected="false" aria-label="Slide 2"></button>
-      <button class="building-hero-dot"        role="tab" aria-selected="false" aria-label="Slide 3"></button>
+    <!-- Hero text (non-interactive so the model can be dragged underneath) -->
+    <div class="hero-content">
+      <div class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pb-16 md:pb-20">
+        <h1 class="font-display-lg text-display-lg text-on-primary mb-6 text-shadow-premium">Building Our Future Together</h1>
+        <p class="font-body-lg text-body-lg text-on-primary/90 max-w-2xl">
+          A sacred sanctuary designed to foster worship, community, and spiritual growth for generations to come.
+        </p>
+      </div>
     </div>
 
   </section>
 
-
-  <!-- ══════════════ FUND STATS ══════════════ -->
-  <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pt-section-gap">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
-        <p class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-2">Raised</p>
-        <p class="font-headline-md text-headline-md text-primary" data-func="fund-raised">ZMW —</p>
-      </div>
-      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-outline-variant">
-        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mb-2">Goal</p>
-        <p class="font-headline-md text-headline-md text-primary" data-func="fund-goal">ZMW —</p>
-      </div>
-      <div class="bg-primary p-8 rounded-xl sacred-shadow text-center border-t-4 border-secondary">
-        <p class="font-label-md text-label-md text-secondary-fixed uppercase tracking-widest mb-2">Complete</p>
-        <p class="font-headline-md text-headline-md text-on-primary" data-func="fund-percent">—%</p>
-      </div>
-      <div class="bg-surface-container-lowest p-8 rounded-xl sacred-shadow text-center border-t-4 border-outline-variant">
-        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mb-2">Donors</p>
-        <p class="font-headline-md text-headline-md text-primary" data-func="fund-donors">—</p>
-      </div>
-    </div>
-    <div class="mb-4 flex justify-between items-center">
-      <span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Fundraising Progress</span>
-      <span class="font-label-md text-label-md text-primary" data-func="fund-percent">—%</span>
-    </div>
-    <div class="h-3 bg-surface-container-highest rounded-full overflow-hidden mb-section-gap">
-      <div class="h-full bg-secondary rounded-full" data-func="fund-bar" style="width:0%"></div>
-    </div>
-  </section>
 
   <!-- ══════════════ PROGRESS TRACKER ══════════════ -->
   <section class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop">
@@ -551,9 +481,9 @@
         <h2 class="font-headline-lg text-headline-lg text-primary mb-2">Construction Gallery</h2>
         <p class="font-body-md text-body-md text-on-surface-variant">Witness the transformation as we build together.</p>
       </div>
-      <button class="font-label-md text-label-md text-primary flex items-center gap-2 hover:text-secondary transition-all">
+      <a href="index.html#gallery" class="font-label-md text-label-md text-primary flex items-center gap-2 hover:text-secondary transition-all">
         VIEW ALL <span class="material-symbols-outlined">arrow_forward</span>
-      </button>
+      </a>
     </div>
 
     <!-- Bento Grid Gallery -->
@@ -583,7 +513,7 @@
           />
         </div>
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6 z-10 pointer-events-none">
-          <span class="font-label-md text-label-md text-white"> Progress</span>
+          <span class="font-label-md text-label-md text-white">Construction Progress</span>
         </div>
       </div>
 
@@ -596,6 +526,9 @@
             onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>roofing</span><span class=\'ph-label\'>gallery-3.jpg</span>'"
           />
         </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4 z-10 pointer-events-none">
+          <span class="font-label-md text-label-md text-white">Site Update</span>
+        </div>
       </div>
 
       <!-- Bottom right small tile 2 -->
@@ -606,6 +539,9 @@
             alt="Aerial view of the construction site"
             onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>landscape</span><span class=\'ph-label\'>gallery-4.jpg</span>'"
           />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4 z-10 pointer-events-none">
+          <span class="font-label-md text-label-md text-white">Aerial View</span>
         </div>
       </div>
 
@@ -664,53 +600,51 @@
 <script src="sda.js" defer></script>
 <script src="func.js" defer></script>
 
-<!-- Building hero slideshow (self-contained, no dependency on func.js) -->
+<!-- Building hero: loads Three.js + church3d.js and mounts the 3D model -->
 <script>
 (function () {
-  document.addEventListener('DOMContentLoaded', function () {
-    const slides   = document.querySelectorAll('.building-hero-slide');
-    const dots     = document.querySelectorAll('#building-hero-dots .building-hero-dot');
-    if (!slides.length) return;
-
-    const INTERVAL     = 6000;
-    const RESUME_DELAY = 8000;
-    let current = 0, timer = null, resumeTimer = null;
-
-    function goTo(index) {
-      slides[current].classList.remove('active');
-      slides[current].classList.add('prev');
-      if (dots[current]) { dots[current].classList.remove('active'); dots[current].setAttribute('aria-selected','false'); }
-      const leaving = slides[current];
-      setTimeout(() => leaving.classList.remove('prev'), 1300);
-      current = (index + slides.length) % slides.length;
-      const incoming = slides[current];
-      incoming.style.animation = 'none';
-      incoming.offsetHeight;
-      incoming.style.animation = '';
-      incoming.classList.add('active');
-      if (dots[current]) { dots[current].classList.add('active'); dots[current].setAttribute('aria-selected','true'); }
-    }
-
-    function startAuto() { stopAuto(); timer = setInterval(() => goTo(current + 1), INTERVAL); }
-    function stopAuto()  { if (timer) { clearInterval(timer); timer = null; } }
-
-    dots.forEach((dot, i) => {
-      dot.addEventListener('click', () => {
-        if (i === current) return;
-        stopAuto(); clearTimeout(resumeTimer);
-        goTo(i);
-        resumeTimer = setTimeout(startAuto, RESUME_DELAY);
-      });
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var abs = new URL(src, document.baseURI).href;
+      var existing = Array.prototype.find.call(document.scripts, function (s) { return s.src === abs; });
+      if (existing && existing.dataset.loaded === 'true') return resolve();
+      if (existing && existing.dataset.loading === 'true') {
+        existing.addEventListener('load', resolve, { once: true });
+        existing.addEventListener('error', function () { reject(new Error('Failed to load ' + src)); }, { once: true });
+        return;
+      }
+      var s = existing || document.createElement('script');
+      s.src = src;
+      s.dataset.loading = 'true';
+      s.onload  = function () { s.dataset.loaded = 'true'; delete s.dataset.loading; resolve(); };
+      s.onerror = function () { delete s.dataset.loading; reject(new Error('Failed to load ' + src)); };
+      if (!existing) document.head.appendChild(s);
     });
+  }
 
-    const hero = document.getElementById('building-hero');
-    if (hero) {
-      hero.addEventListener('mouseenter', stopAuto);
-      hero.addEventListener('mouseleave', startAuto);
+  async function initHero3D() {
+    var wrap = document.getElementById('hero-3d');
+    if (!wrap) return;
+    try {
+      if (!window.THREE) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js');
+      if (!window.Church3D) await loadScript('church3d.js');
+      if (!window.Church3D || typeof window.Church3D.mount !== 'function') {
+        throw new Error('The Church3D viewer did not initialise.');
+      }
+      window.Church3D.mount(wrap, {
+        autoRotate: true,
+        wheelZoom: 'ctrl',      // page keeps scrolling; Ctrl/Cmd + wheel zooms
+        touchAction: 'pan-y',   // swipe sideways to rotate, vertical swipe scrolls the page
+        fallbackImage: 'images/jjz.png'
+      });
+    } catch (err) {
+      // The poster image stays visible if the viewer cannot load.
+      console.error('[Building 3D viewer]', err);
     }
+  }
 
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) startAuto();
-  });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initHero3D);
+  else initHero3D();
 })();
 </script>
 
