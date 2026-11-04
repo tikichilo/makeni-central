@@ -147,7 +147,7 @@
         <nav aria-label="Footer community links">
           <h2 class="site-footer-heading">Community</h2>
           <ul class="site-footer-list" role="list">
-            <li><a href="index.html#watch-live">Watch Live</a></li>
+            <li><a href="index.html#service-times">Service Times</a></li>
             <li><a href="youth.html">Youth Board</a></li>
             <li><a href="building.html">New Building</a></li>
             <li><a href="index.html#plan-visit-btn">Plan a Visit</a></li>

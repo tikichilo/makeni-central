@@ -1028,24 +1028,6 @@
   color: #755b00;
 }
 
-  /* ── Watch Live status dot ── */
-.live-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #75777f;
-  flex-shrink: 0;
-  transition: background 0.3s ease;
-}
-.live-dot.is-live {
-  background: #ef4444;
-  animation: liveBlink 1.4s ease-in-out infinite;
-}
-@keyframes liveBlink {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
-  50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
-}
-
   /* ═══════════════════════════════════════════
    MOBILE SCALE FIX
    (only the parts NOT already in sda-shared.css —
@@ -1707,61 +1689,40 @@
   </div>
 </div>
 
-<!-- ══════════════ WATCH LIVE ══════════════ -->
-<section id="watch-live" class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pt-section-gap" aria-labelledby="watch-live-heading">
+<!-- ══════════════ SERVICE TIMES ══════════════ -->
+<section id="service-times" class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pt-section-gap" aria-labelledby="service-times-heading">
   <div class="bg-primary rounded-xl sacred-shadow overflow-hidden relative">
     <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 20% 80%, #fff 1px, transparent 1px); background-size: 24px 24px;" aria-hidden="true"></div>
 
-    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center p-10 lg:p-12">
-
-      <!-- Left: text + CTA -->
-      <div class="lg:col-span-7">
-        <div class="flex items-center gap-2 mb-4">
-          <span class="live-dot" id="live-dot" aria-hidden="true"></span>
-          <span class="font-label-md text-label-md text-secondary-fixed uppercase tracking-widest" id="live-status-text">Streams Every Saturday</span>
-        </div>
-
-        <h2 id="watch-live-heading" class="font-headline-md text-headline-md text-on-primary mb-4">Watch the Sermon Live</h2>
-        <p class="font-body-md text-body-md text-on-primary/70 mb-6 leading-relaxed">
-          Can't make it in person? Join us online — we stream every Sabbath straight from the sanctuary.
-        </p>
-
-        <div class="flex flex-wrap gap-x-8 gap-y-3 mb-8">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">music_note</span>
-            <span class="font-body-md text-body-md text-on-primary/80">Song Service <strong class="text-on-primary">10:30 AM</strong></span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-secondary-fixed" style="font-size:20px;" aria-hidden="true">campaign</span>
-            <span class="font-body-md text-body-md text-on-primary/80">Sermon <strong class="text-on-primary">11:30 AM</strong></span>
-          </div>
-        </div>
-
-        <button id="watch-live-btn" type="button"
-          class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container px-7 py-3.5 rounded-xl font-label-md text-label-md hover:bg-secondary-fixed transition-all active:scale-95">
-         <span class="material-symbols-outlined" style="font-size:20px;" aria-hidden="true">play_circle</span>
-          <span id="watch-live-btn-text">Watch on Facebook</span>
-        </button>
+    <div class="relative z-10 p-8 sm:p-10 lg:p-12">
+      <div class="text-center mb-8">
+        <h2 id="service-times-heading" class="font-headline-md text-headline-md text-on-primary mb-3">Worship &amp; Bible Study Times</h2>
+        <p class="font-body-md text-body-md text-on-primary/70">Join us for worship and study together.</p>
       </div>
 
-      <!-- Right: latest sermon video — plays inline on this page -->
-      <div class="lg:col-span-5" id="facebook-video-widget" tabindex="-1">
-        <div class="rounded-xl overflow-hidden bg-black/20 aspect-video">
-          <iframe
-            id="facebook-video-player"
-            class="w-full h-full"
-            src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fweb.facebook.com%2F100091185906540%2Fvideos%2F1709810303424421%2F&show_text=true&width=560&t=0"
-            title="Latest sermon video"
-            style="border:none;overflow:hidden"
-            scrolling="no"
-            frameborder="0"
-            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            allowfullscreen="true">
-          </iframe>
-
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="flex items-center gap-4 rounded-xl bg-on-primary/5 p-5">
+          <span class="material-symbols-outlined text-secondary-fixed" style="font-size:28px;" aria-hidden="true">music_note</span>
+          <div>
+            <h3 class="font-label-md text-label-md text-on-primary/80">Song Service</h3>
+            <time class="font-title-lg text-title-lg text-on-primary" datetime="10:30">10:30 AM</time>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 rounded-xl bg-on-primary/5 p-5">
+          <span class="material-symbols-outlined text-secondary-fixed" style="font-size:28px;" aria-hidden="true">campaign</span>
+          <div>
+            <h3 class="font-label-md text-label-md text-on-primary/80">Sermon</h3>
+            <time class="font-title-lg text-title-lg text-on-primary" datetime="11:30">11:30 AM</time>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 rounded-xl bg-on-primary/5 p-5">
+          <span class="material-symbols-outlined text-secondary-fixed" style="font-size:28px;" aria-hidden="true">menu_book</span>
+          <div>
+            <h3 class="font-label-md text-label-md text-on-primary/80">Bible Study</h3>
+            <time class="font-title-lg text-title-lg text-on-primary" datetime="15:00">03:00 PM</time>
+          </div>
         </div>
       </div>
-
     </div>
   </div>
 </section>
