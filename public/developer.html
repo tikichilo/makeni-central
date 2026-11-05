@@ -10,7 +10,7 @@
 <meta property="og:description" content="Meet the people who built and maintain the Makeni Central Seventh-day Adventist Church website.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/developer.html">
-<meta property="og:image" content="https://mccadventist.org/sda.png">
+<meta property="og:image" content="https://mccadventist.org/sda.png" data-cloudinary-key="/sda.png">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="js/Tailwind-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
@@ -85,6 +85,8 @@
     width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
   }
 </style>
+
+<script src="/image-map.js" defer></script>
 </head>
 
 <body data-page="developer" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
@@ -97,7 +99,7 @@
     </button>
     <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
       <div class="logo-badge">
-        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        <img alt="Makeni Central SDA Logo" data-cloudinary-key="/sda.png" data-local-fallback="sda.png"/>
       </div>
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </div>
@@ -151,7 +153,6 @@
         <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
           <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
           <a href="dorcus.html#dorcas" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
-          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
         </div>
       </div>
 
@@ -218,7 +219,6 @@
         <div class="accordion-panel">
           <a href="ministries.html#childrens-ministry">Children's Ministry</a>
           <a href="ministries.html#dorcas">Dorcas</a>
-          <a href="ministries.html#womens-ministries">Women's Ministries</a>
         </div>
       </div>
 
@@ -266,7 +266,7 @@
       <!-- Elder Geoffrey Aori — Supervisor -->
       <article class="team-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow">
         <div class="team-photo-wrap">
-          <img src="images/aori.jpg" alt="Elder Geoffrey Aori"/>
+          <img alt="Elder Geoffrey Aori" data-cloudinary-key="/images/aori.jpg" data-local-fallback="images/aori.jpg" loading="lazy" decoding="async" width="400" height="533"/>
         </div>
         <span class="team-role-badge">Supervisor</span>
         <h3 class="font-title-lg text-title-lg text-primary mb-1">Elder Geoffrey Aori</h3>
@@ -276,7 +276,7 @@
     <!-- Tiki Chilomo — Programmer -->
       <article class="team-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow">
         <div class="team-photo-wrap">
-          <img src="images/tiki.jpg" alt="Tiki Chilomo"/>
+          <img alt="Tiki Chilomo" data-cloudinary-key="/images/tiki.jpg" data-local-fallback="images/tiki.jpg" loading="lazy" decoding="async" width="400" height="533"/>
         </div>
         <span class="team-role-badge">Programmer</span>
         <h3 class="font-title-lg text-title-lg text-primary mb-1">Tiki Chilomo</h3>
@@ -296,7 +296,7 @@
       <!-- Enock Chilimina — Media & Photography -->
       <article class="team-card bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 sacred-shadow">
         <div class="team-photo-wrap">
-          <img src="images/enock.jpg" alt="Enock Chilimina"/> 
+          <img alt="Enock Chilimina" data-cloudinary-key="/images/enock.jpg" data-local-fallback="images/enock.jpg" loading="lazy" decoding="async" width="400" height="533"/>
         </div>
         <span class="team-role-badge">Media &amp; Photography</span>
         <h3 class="font-title-lg text-title-lg text-primary mb-1">Enock Chilimina</h3>

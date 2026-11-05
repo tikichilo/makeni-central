@@ -50,19 +50,19 @@ document.querySelectorAll('.call-btn').forEach((btn) => {
 /* ── Hero photo: feed the leader photo into the blurred hero background ──
    Reads the src straight off the .leader-photo img already in the page,
    so nothing needs to be duplicated or hardcoded per department page. */
-(function wireHeroPhoto(){
+function wireHeroPhoto(){
   const hero = document.querySelector('.dept-hero');
   const photo = document.querySelector('.leader-photo');
   const src = photo && photo.getAttribute('src');
   if (!hero || !src) return;
   hero.style.setProperty('--hero-photo', `url("${src}")`);
-})();
+}
 
 /* ── Leader photo lightbox ──
    Clicking (or Enter/Space on) the leader photo opens a full-size popup.
    One lightbox element is built and reused, even if a page somehow has
    more than one leader photo. */
-(function wirePhotoLightbox(){
+function wirePhotoLightbox(){
   const frames = document.querySelectorAll('.leader-photo-frame');
   if (!frames.length) return;
 
@@ -73,7 +73,7 @@ document.querySelectorAll('.call-btn').forEach((btn) => {
     <button class="photo-lightbox-close" aria-label="Close photo">
       <span class="material-symbols-outlined" aria-hidden="true">close</span>
     </button>
-    <img class="photo-lightbox-img" src="" alt="">
+    <img class="photo-lightbox-img" src="" alt="" loading="eager" decoding="async" width="1600" height="1200">
   `;
   document.body.appendChild(lightbox);
 
@@ -82,7 +82,7 @@ document.querySelectorAll('.call-btn').forEach((btn) => {
   let lastFocused = null;
 
   function openLightbox(img){
-    lightboxImg.src = img.getAttribute('src');
+    lightboxImg.src = window.cloudinaryImageUrl(img.getAttribute('src'), 1600);
     lightboxImg.alt = img.getAttribute('alt') || '';
     lastFocused = document.activeElement;
     lightbox.classList.add('is-open');
@@ -122,7 +122,15 @@ document.querySelectorAll('.call-btn').forEach((btn) => {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && lightbox.classList.contains('is-open')) closeLightbox();
   });
-})();
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  const imageMapReady = window.cloudinaryImageMapReady || Promise.resolve();
+  imageMapReady.then(function () {
+    wireHeroPhoto();
+    wirePhotoLightbox();
+  });
+}, { once: true });
 
 /* ── Scroll reveal ──
    Sections fade/slide in as they enter view. Falls back to "just show

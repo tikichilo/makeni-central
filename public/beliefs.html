@@ -10,7 +10,7 @@
 <meta property="og:description" content="Founded on the Holy Scriptures — explore the 28 Fundamental Beliefs of the Seventh-day Adventist Church.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/beliefs.html">
-<meta property="og:image" content="https://mccadventist.org/sda.png">
+<meta property="og:image" content="https://mccadventist.org/sda.png" data-cloudinary-key="/sda.png">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="js/Tailwind-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
@@ -84,6 +84,8 @@
     .py-24              { padding-top: 56px !important; padding-bottom: 56px !important; }
   }
 </style>
+
+<script src="/image-map.js" defer></script>
 </head>
 
 <body data-page="beliefs" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
@@ -96,7 +98,7 @@
     </button>
     <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
       <div class="logo-badge">
-        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        <img alt="Makeni Central SDA Logo" data-cloudinary-key="/sda.png" data-local-fallback="sda.png"/>
       </div>
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </div>
@@ -150,7 +152,6 @@
         <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
           <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
           <a href="dorcus.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
-          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
         </div>
       </div>
 
@@ -217,7 +218,6 @@
         <div class="accordion-panel">
           <a href="kids.html">Children's Ministry</a>
           <a href="ministries.html#dorcas">Dorcas</a>
-          <a href="ministries.html#womens-ministries">Women's Ministries</a>
         </div>
       </div>
 
@@ -251,7 +251,7 @@
     <div class="absolute inset-0 z-0">
       <div class="img-wrap">
         <img alt="Sunrise breaking over mountain peaks" src="https://images.unsplash.com/photo-1756758005190-92941d91b8b2?auto=format&fit=crop&w=1600&q=80"
-          onerror="this.parentElement.parentElement.style.background='#041534'; this.remove();"/>
+          onerror="this.parentElement.parentElement.style.background='#041534'; this.remove();" loading="eager" decoding="async" width="1600" height="900" fetchpriority="high"/>
       </div>
       <div class="absolute inset-0 navy-gradient"></div>
     </div>
@@ -300,7 +300,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1747738609473-9e92707075eb?auto=format&fit=crop&w=800&q=80" alt="Open Bible resting in warm sunlight"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>menu_book</span><span class=\'ph-label\'>Holy Scriptures</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>menu_book</span><span class=\'ph-label\'>Holy Scriptures</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -317,7 +317,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1757495363009-e435d0570b71?auto=format&fit=crop&w=800&q=80" alt="Starry night sky and the Milky Way"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>diversity_3</span><span class=\'ph-label\'>The Trinity</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>diversity_3</span><span class=\'ph-label\'>The Trinity</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -334,7 +334,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1756758005190-92941d91b8b2?auto=format&fit=crop&w=800&q=80" alt="Golden sunrise over mountain peaks"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>wb_sunny</span><span class=\'ph-label\'>God the Father</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>wb_sunny</span><span class=\'ph-label\'>God the Father</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -351,7 +351,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1612821394773-23f0a7d33ede?auto=format&fit=crop&w=800&q=80" alt="Sunlight streaming through forest trees"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>church</span><span class=\'ph-label\'>God the Son</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>church</span><span class=\'ph-label\'>God the Son</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -368,7 +368,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1507126882445-434b04530d1a?auto=format&fit=crop&w=800&q=80" alt="Two white doves flying"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>air</span><span class=\'ph-label\'>The Holy Spirit</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>air</span><span class=\'ph-label\'>The Holy Spirit</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -385,7 +385,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1759585201008-b113bb7c196d?auto=format&fit=crop&w=800&q=80" alt="Waterfall in a lush green forest"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>park</span><span class=\'ph-label\'>Creation</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>park</span><span class=\'ph-label\'>Creation</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -416,7 +416,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1555231955-348aa2312e19?auto=format&fit=crop&w=800&q=80" alt="Delicate pink blossoms in bloom"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>diversity_1</span><span class=\'ph-label\'>Nature of Humanity</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>diversity_1</span><span class=\'ph-label\'>Nature of Humanity</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -433,7 +433,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1780047053902-9bcf0f8af9fb?auto=format&fit=crop&w=800&q=80" alt="Sunlight breaking through dark storm clouds"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>bolt</span><span class=\'ph-label\'>The Great Controversy</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>bolt</span><span class=\'ph-label\'>The Great Controversy</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -464,7 +464,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1673886138237-ea511ad75104?auto=format&fit=crop&w=800&q=80" alt="Rainbow arcing over a green field"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>brightness_5</span><span class=\'ph-label\'>Life, Death & Resurrection of Christ</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>brightness_5</span><span class=\'ph-label\'>Life, Death & Resurrection of Christ</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -481,7 +481,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1619233651146-7364c945c3ee?auto=format&fit=crop&w=800&q=80" alt="Ocean waves washing onto the shore"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>favorite</span><span class=\'ph-label\'>Experience of Salvation</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>favorite</span><span class=\'ph-label\'>Experience of Salvation</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -498,7 +498,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1759585201008-b113bb7c196d?auto=format&fit=crop&w=800&q=80" alt="Stream of water flowing through a forest"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>eco</span><span class=\'ph-label\'>Growing in Christ</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>eco</span><span class=\'ph-label\'>Growing in Christ</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -541,7 +541,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1756758005190-92941d91b8b2?auto=format&fit=crop&w=800&q=80" alt="Sunrise light over the mountains"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>groups</span><span class=\'ph-label\'>The Church</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>groups</span><span class=\'ph-label\'>The Church</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -558,7 +558,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1757495363009-e435d0570b71?auto=format&fit=crop&w=800&q=80" alt="Night sky filled with stars"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>campaign</span><span class=\'ph-label\'>The Remnant and Its Mission</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>campaign</span><span class=\'ph-label\'>The Remnant and Its Mission</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -575,7 +575,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1753081490091-37ce36d8bbd8?auto=format&fit=crop&w=800&q=80" alt="Golden wheat field ready for harvest"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>handshake</span><span class=\'ph-label\'>Unity in the Body of Christ</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>handshake</span><span class=\'ph-label\'>Unity in the Body of Christ</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -592,7 +592,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1619233651146-7364c945c3ee?auto=format&fit=crop&w=800&q=80" alt="Clear ocean water washing over the shore"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>water_drop</span><span class=\'ph-label\'>Baptism</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>water_drop</span><span class=\'ph-label\'>Baptism</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -609,7 +609,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1727647279740-bb8a586193fa?auto=format&fit=crop&w=800&q=80" alt="Cluster of grapes on the vine"
-              onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>local_dining</span><span class=\'ph-label\'>The Lord&#39;s Supper</span></div>'"/>
+              onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>local_dining</span><span class=\'ph-label\'>The Lord&#39;s Supper</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -626,7 +626,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1507126882445-434b04530d1a?auto=format&fit=crop&w=800&q=80" alt="Doves in flight against the sky"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>volunteer_activism</span><span class=\'ph-label\'>Spiritual Gifts and Ministries</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>volunteer_activism</span><span class=\'ph-label\'>Spiritual Gifts and Ministries</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -643,7 +643,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1747738609473-9e92707075eb?auto=format&fit=crop&w=800&q=80" alt="Bible open in soft light"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>visibility</span><span class=\'ph-label\'>The Gift of Prophecy</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>visibility</span><span class=\'ph-label\'>The Gift of Prophecy</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -674,7 +674,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1756758005190-92941d91b8b2?auto=format&fit=crop&w=800&q=80" alt="Mountain peak at sunrise"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>gavel</span><span class=\'ph-label\'>The Law of God</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>gavel</span><span class=\'ph-label\'>The Law of God</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -691,7 +691,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1759585201008-b113bb7c196d?auto=format&fit=crop&w=800&q=80" alt="Peaceful waterfall in a green forest"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>self_improvement</span><span class=\'ph-label\'>The Sabbath</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>self_improvement</span><span class=\'ph-label\'>The Sabbath</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -708,7 +708,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1753081490091-37ce36d8bbd8?auto=format&fit=crop&w=800&q=80" alt="Golden wheat field ready for harvest"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>volunteer_activism</span><span class=\'ph-label\'>Stewardship</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>volunteer_activism</span><span class=\'ph-label\'>Stewardship</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -725,7 +725,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1555231955-348aa2312e19?auto=format&fit=crop&w=800&q=80" alt="Blossoms flowering in springtime"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>spa</span><span class=\'ph-label\'>Christian Behavior</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>spa</span><span class=\'ph-label\'>Christian Behavior</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -742,7 +742,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1673886138237-ea511ad75104?auto=format&fit=crop&w=800&q=80" alt="Rainbow over a field of trees"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>family_restroom</span><span class=\'ph-label\'>Marriage and the Family</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>family_restroom</span><span class=\'ph-label\'>Marriage and the Family</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -773,7 +773,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1780047053902-9bcf0f8af9fb?auto=format&fit=crop&w=800&q=80" alt="Sunlight breaking through dramatic clouds"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>temple_buddhist</span><span class=\'ph-label\'>Christ&#39;s Ministry in the Heavenly Sanctuary</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>temple_buddhist</span><span class=\'ph-label\'>Christ&#39;s Ministry in the Heavenly Sanctuary</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -790,7 +790,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1757495363009-e435d0570b71?auto=format&fit=crop&w=800&q=80" alt="Vast starry night sky"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>auto_awesome</span><span class=\'ph-label\'>The Second Coming of Christ</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>auto_awesome</span><span class=\'ph-label\'>The Second Coming of Christ</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -807,7 +807,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1612821394773-23f0a7d33ede?auto=format&fit=crop&w=800&q=80" alt="Light breaking through a quiet forest"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>nightlight</span><span class=\'ph-label\'>Death and Resurrection</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>nightlight</span><span class=\'ph-label\'>Death and Resurrection</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -824,7 +824,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1756758005190-92941d91b8b2?auto=format&fit=crop&w=800&q=80" alt="Dawn light breaking over the mountains"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>hourglass_bottom</span><span class=\'ph-label\'>The Millennium and the End of Sin</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>hourglass_bottom</span><span class=\'ph-label\'>The Millennium and the End of Sin</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">
@@ -841,7 +841,7 @@
           <div class="h-48 overflow-hidden relative">
             <div class="img-wrap">
               <img src="https://images.unsplash.com/photo-1555231955-348aa2312e19?auto=format&fit=crop&w=800&q=80" alt="Flowers blooming in a peaceful garden"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>public</span><span class=\'ph-label\'>The New Earth</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>public</span><span class=\'ph-label\'>The New Earth</span></div>'" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8">

@@ -10,7 +10,7 @@
 <meta property="og:description" content="Growing little disciples — Sabbath School for birth through age 12, every Sabbath at 9:00 AM.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/kids.html">
-<meta property="og:image" content="https://mccadventist.org/sda.png">
+<meta property="og:image" content="https://mccadventist.org/sda.png" data-cloudinary-key="/sda.png">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="js/Tailwind-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
@@ -178,6 +178,8 @@
     .hero-slide.active { animation: none; }
   }
 </style>
+
+<script src="/image-map.js" defer></script>
 </head>
 
 <body data-page="kids" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
@@ -190,7 +192,7 @@
     </button>
     <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
       <div class="logo-badge">
-        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        <img alt="Makeni Central SDA Logo" data-cloudinary-key="/sda.png" data-local-fallback="sda.png"/>
       </div>
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </div>
@@ -244,7 +246,6 @@
         <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
           <a href="kids.html" class="active" aria-current="page" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
           <a href="ministries.html#dorcas" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
-          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
         </div>
       </div>
 
@@ -311,7 +312,6 @@
         <div class="accordion-panel">
           <a href="kids.html" class="active" aria-current="page">Children's Ministry</a>
           <a href="dorcus.html">Dorcas</a>
-          <a href="ministries.html#womens-ministries">Women's Ministries</a>
         </div>
       </div>
 
@@ -363,11 +363,11 @@
     -->
     <div class="w-full h-[400px] rounded-xl overflow-hidden sacred-shadow relative group">
       <div class="hero-slideshow" id="kids-hero-slideshow">
-        <div class="hero-slide active" style="background-image:url('images/adven8.jpg');"></div>
-        <div class="hero-slide" style="background-image:url('slideshow/ch1.jpg');"></div>
-        <div class="hero-slide" style="background-image:url('slideshow/ch2.jpg');"></div>
-        <div class="hero-slide" style="background-image:url('slideshow/ch5.jpg');"></div>
-        <div class="hero-slide" style="background-image:url('slideshow/ch4.jpg');"></div>
+        <div class="hero-slide active" data-cloudinary-background="/images/adven8.jpg" data-local-background="images/adven8.jpg" data-cloudinary-width="1600"></div>
+        <div class="hero-slide" data-cloudinary-background="/slideshow/ch1.jpg" data-local-background="slideshow/ch1.jpg" data-cloudinary-width="1600"></div>
+        <div class="hero-slide" data-cloudinary-background="/slideshow/ch2.jpg" data-local-background="slideshow/ch2.jpg" data-cloudinary-width="1600"></div>
+        <div class="hero-slide" data-cloudinary-background="/slideshow/ch5.jpg" data-local-background="slideshow/ch5.jpg" data-cloudinary-width="1600"></div>
+        <div class="hero-slide" data-cloudinary-background="/slideshow/ch4.jpg" data-local-background="slideshow/ch4.jpg" data-cloudinary-width="1600"></div>
       </div>
       <div class="hero-slideshow-dots" id="kids-hero-dots" aria-hidden="true">
         <button class="hero-dot active" data-index="0" aria-label="Slide 1"></button>
@@ -400,9 +400,8 @@
     <div class="rounded-xl overflow-hidden sacred-shadow h-[380px]">
       <img
         class="w-full h-full object-cover"
-        src="slideshow/IMG-20260811-WA0035.jpg"
         alt="Children's Ministry teacher reading a Bible story to a group of children"
-        onerror="this.outerHTML='<div style=\'width:100%;height:380px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>auto_stories</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/kids-story.jpg</span></div>'"
+        onerror="this.outerHTML='<div style=\'width:100%;height:380px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>auto_stories</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/kids-story.jpg</span></div>'" data-cloudinary-key="/slideshow/IMG-20260811-WA0035.jpg" data-local-fallback="slideshow/IMG-20260811-WA0035.jpg" loading="lazy" decoding="async" width="800" height="600"
       />
     </div>
   </section>
@@ -501,8 +500,8 @@
                     <div class="kids-carousel" data-carousel>
           <div class="carousel-track">
           <div class="carousel-slide">
-            <img src="slideshow/ch29.jpg" alt="Beginners parents singing with their babies" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Beginners parents singing with their babies" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch29.jpg" data-local-fallback="slideshow/ch29.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">child_friendly</span>
@@ -510,8 +509,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch27.jpg" alt="A toddler clapping along during Beginners class" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="A toddler clapping along during Beginners class" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch27.jpg" data-local-fallback="slideshow/ch27.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">child_friendly</span>
@@ -519,8 +518,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch26.jpg" alt="Parents seated on the mat with their infants" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Parents seated on the mat with their infants" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch26.jpg" data-local-fallback="slideshow/ch26.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">child_friendly</span>
@@ -528,8 +527,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch25.jpg" alt="A caregiver reading a picture Bible story to a baby" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="A caregiver reading a picture Bible story to a baby" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch25.jpg" data-local-fallback="slideshow/ch25.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">child_friendly</span>
@@ -537,8 +536,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch24.jpg" alt="Beginners class gathered for their first songs of the day" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Beginners class gathered for their first songs of the day" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch24.jpg" data-local-fallback="slideshow/ch24.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">child_friendly</span>
@@ -576,8 +575,8 @@
                     <div class="kids-carousel" data-carousel>
           <div class="carousel-track">
           <div class="carousel-slide">
-            <img src="slideshow/ch23.jpg" alt="Kindergarten class acting out a Bible story" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Kindergarten class acting out a Bible story" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch23.jpg" data-local-fallback="slideshow/ch23.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">toys</span>
@@ -585,8 +584,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch21.jpg" alt="Children building a cardboard ark together" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Children building a cardboard ark together" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch21.jpg" data-local-fallback="slideshow/ch21.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">toys</span>
@@ -594,8 +593,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch18.jpg" alt="A child dressed as one of Noah's animals" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="A child dressed as one of Noah's animals" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch18.jpg" data-local-fallback="slideshow/ch18.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">toys</span>
@@ -603,8 +602,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch19.jpg" alt="Kindergarteners lining up two by two for the story" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Kindergarteners lining up two by two for the story" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch19.jpg" data-local-fallback="slideshow/ch19.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">toys</span>
@@ -612,8 +611,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch20.jpg" alt="A teacher guiding the kindergarten craft table" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="A teacher guiding the kindergarten craft table" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch20.jpg" data-local-fallback="slideshow/ch20.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">toys</span>
@@ -651,8 +650,8 @@
                     <div class="kids-carousel" data-carousel>
           <div class="carousel-track">
           <div class="carousel-slide">
-            <img src="slideshow/ch22.jpg" alt="Primary class collecting an offering for a mission project" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Primary class collecting an offering for a mission project" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch22.jpg" data-local-fallback="slideshow/ch22.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">school</span>
@@ -660,8 +659,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch17.jpg" alt="A child dropping a coin into the mission jar" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="A child dropping a coin into the mission jar" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch17.jpg" data-local-fallback="slideshow/ch17.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">school</span>
@@ -669,8 +668,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch16.jpg" alt="Primary class counting their quarter's offering" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Primary class counting their quarter's offering" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch16.jpg" data-local-fallback="slideshow/ch16.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">school</span>
@@ -678,8 +677,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch10.jpg" alt="Children learning about the overseas mission field" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Children learning about the overseas mission field" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch10.jpg" data-local-fallback="slideshow/ch10.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">school</span>
@@ -687,8 +686,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch15.jpg" alt="The Primary classroom's giving jar on display" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="The Primary classroom's giving jar on display" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch15.jpg" data-local-fallback="slideshow/ch15.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">school</span>
@@ -726,8 +725,8 @@
                     <div class="kids-carousel" data-carousel>
           <div class="carousel-track">
           <div class="carousel-slide">
-            <img src="slideshow/ch14.jpg" alt="Juniors class discussing a Bible passage together" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Juniors class discussing a Bible passage together" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch14.jpg" data-local-fallback="slideshow/ch14.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">groups_2</span>
@@ -735,8 +734,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch12.jpg" alt="A Juniors student asking a question during class" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="A Juniors student asking a question during class" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch12.jpg" data-local-fallback="slideshow/ch12.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">groups_2</span>
@@ -744,8 +743,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch13.jpg" alt="Juniors working through Scripture in small groups" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Juniors working through Scripture in small groups" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch13.jpg" data-local-fallback="slideshow/ch13.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">groups_2</span>
@@ -753,8 +752,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch11.jpg" alt="The Juniors teacher leading an open discussion" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="The Juniors teacher leading an open discussion" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch11.jpg" data-local-fallback="slideshow/ch11.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">groups_2</span>
@@ -762,8 +761,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch10.jpg" alt="Juniors class with open Bibles on the table" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Juniors class with open Bibles on the table" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch10.jpg" data-local-fallback="slideshow/ch10.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">groups_2</span>
@@ -801,8 +800,8 @@
                     <div class="kids-carousel" data-carousel>
           <div class="carousel-track">
           <div class="carousel-slide">
-            <img src="slideshow/ch9.jpg" alt="Children at Vacation Bible School doing a craft activity" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Children at Vacation Bible School doing a craft activity" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch9.jpg" data-local-fallback="slideshow/ch9.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">celebration</span>
@@ -810,8 +809,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch8.jpg" alt="VBS children playing games in the church hall" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="VBS children playing games in the church hall" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch8.jpg" data-local-fallback="slideshow/ch8.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">celebration</span>
@@ -819,8 +818,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch7.jpg" alt="A VBS volunteer leading a Bible story time" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="A VBS volunteer leading a Bible story time" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch7.jpg" data-local-fallback="slideshow/ch7.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">celebration</span>
@@ -828,8 +827,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch6.jpg" alt="Neighbourhood children joining VBS for the week" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Neighbourhood children joining VBS for the week" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch6.jpg" data-local-fallback="slideshow/ch6.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">celebration</span>
@@ -837,8 +836,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch5.jpg" alt="The full VBS group photo on the final day" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="The full VBS group photo on the final day" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch5.jpg" data-local-fallback="slideshow/ch5.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">celebration</span>
@@ -876,8 +875,8 @@
                     <div class="kids-carousel" data-carousel>
           <div class="carousel-track">
           <div class="carousel-slide">
-            <img src="slideshow/ch.jpg" alt="Families worshipping together on a Family Sabbath" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Families worshipping together on a Family Sabbath" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch.jpg" data-local-fallback="slideshow/ch.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">diversity_3</span>
@@ -885,8 +884,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch1.jpg" alt="A child leading a song at Family Sabbath" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="A child leading a song at Family Sabbath" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch1.jpg" data-local-fallback="slideshow/ch1.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">diversity_3</span>
@@ -894,8 +893,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch2.jpg" alt="Every division gathered together for Family Sabbath" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="Every division gathered together for Family Sabbath" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch2.jpg" data-local-fallback="slideshow/ch2.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">diversity_3</span>
@@ -903,8 +902,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch3.jpg" alt="A young reader sharing a scripture reading" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="A young reader sharing a scripture reading" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch3.jpg" data-local-fallback="slideshow/ch3.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">diversity_3</span>
@@ -912,8 +911,8 @@
             </div>
           </div>
           <div class="carousel-slide">
-            <img src="slideshow/ch4.jpg" alt="The congregation applauding the children's Family Sabbath item" loading="lazy"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            <img alt="The congregation applauding the children's Family Sabbath item" loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" data-cloudinary-key="/slideshow/ch4.jpg" data-local-fallback="slideshow/ch4.jpg" decoding="async" width="800" height="600"
             />
             <div class="img-placeholder" style="display:none;">
               <span class="material-symbols-outlined ph-icon">diversity_3</span>

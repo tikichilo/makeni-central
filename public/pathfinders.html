@@ -10,7 +10,7 @@
 <meta property="og:description" content="A worldwide Adventist youth ministry combining outdoor adventure, skill-building, and spiritual growth for ages 10–15.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/pathfinders.html">
-<meta property="og:image" content="https://mccadventist.org/images/path5.jpg">
+<meta property="og:image" content="https://mccadventist.org/images/path5.jpg" data-cloudinary-key="/images/path5.jpg">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="js/Tailwind-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
@@ -286,6 +286,8 @@
     .hero-slide.active { animation: none; }
   }
 </style>
+
+<script src="/image-map.js" defer></script>
 </head>
 
 <body data-page="pathfinders" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
@@ -298,7 +300,7 @@
     </button>
     <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
       <div class="logo-badge">
-        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        <img alt="Makeni Central SDA Logo" data-cloudinary-key="/sda.png" data-local-fallback="sda.png"/>
       </div>
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </div>
@@ -352,7 +354,6 @@
         <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
           <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
           <a href="dorcus.html#dorcas" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
-          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
         </div>
       </div>
 
@@ -419,7 +420,6 @@
         <div class="accordion-panel">
           <a href="kids.html">Children's Ministry</a>
           <a href="dorcus.html">Dorcas</a>
-          <a href="ministries.html#womens-ministries">Women's Ministries</a>
         </div>
       </div>
 
@@ -451,11 +451,11 @@
   <!-- ══════════════ HERO ══════════════ -->
   <section class="relative h-[60vh] min-h-[420px] flex items-end overflow-hidden">
     <div class="hero-slideshow" id="pathfinders-hero-slideshow">
-      <div class="hero-slide active" style="background-image:url('images/path5.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('images/path1.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('images/path2.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('images/path3.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('images/path4.jpg');"></div>
+      <div class="hero-slide active" data-cloudinary-background="/images/path5.jpg" data-local-background="images/path5.jpg" data-cloudinary-width="1600"></div>
+      <div class="hero-slide" data-cloudinary-background="/images/path1.jpg" data-local-background="images/path1.jpg" data-cloudinary-width="1600"></div>
+      <div class="hero-slide" data-cloudinary-background="/images/path2.jpg" data-local-background="images/path2.jpg" data-cloudinary-width="1600"></div>
+      <div class="hero-slide" data-cloudinary-background="/images/path3.jpg" data-local-background="images/path3.jpg" data-cloudinary-width="1600"></div>
+      <div class="hero-slide" data-cloudinary-background="/images/path4.jpg" data-local-background="images/path4.jpg" data-cloudinary-width="1600"></div>
     </div>
     <div class="hero-slideshow-dots" id="pathfinders-hero-dots" aria-hidden="true">
       <button class="hero-dot active" data-index="0" aria-label="Slide 1"></button>
@@ -547,23 +547,23 @@
     <div class="grid grid-cols-2 gap-3 h-[340px] w-full order-2 md:order-1">
       <!-- Large image, left, spans full height -->
       <div class="img-wrap relative rounded-xl overflow-hidden sacred-shadow row-span-2 h-full w-full">
-        <img src="https://i.pinimg.com/736x/ea/3a/3e/ea3a3e7d184d98efa9e5eb5e6670c201.jpg" alt="Pathfinder Club triangular emblem and flag"
+        <img alt="Pathfinder Club triangular emblem and flag"
           class="absolute inset-0 w-full h-full object-cover"
-          onerror="this.parentElement.outerHTML='<div style=\'height:100%;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>change_history</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase;text-align:center;padding:0 8px\'>Add images/pathfinders-emblem.jpg</span></div>'"/>
+          onerror="this.parentElement.outerHTML='<div style=\'height:100%;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>change_history</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase;text-align:center;padding:0 8px\'>Add images/pathfinders-emblem.jpg</span></div>'" data-cloudinary-key="https://i.pinimg.com/736x/ea/3a/3e/ea3a3e7d184d98efa9e5eb5e6670c201.jpg" data-local-fallback="https://i.pinimg.com/736x/ea/3a/3e/ea3a3e7d184d98efa9e5eb5e6670c201.jpg" loading="lazy" decoding="async" width="800" height="600"/>
       </div>
 
       <!-- Top-right image -->
       <div class="img-wrap relative rounded-xl overflow-hidden sacred-shadow h-full w-full">
-        <img src="images/path4.jpg" alt="Pathfinder Club flag ceremony"
+        <img alt="Pathfinder Club flag ceremony"
           class="absolute inset-0 w-full h-full object-cover"
-          onerror="this.parentElement.outerHTML='<div style=\'height:100%;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:32px;color:#c5c6cf\'>flag</span><span style=\'font-family:Inter,sans-serif;font-size:10px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase;text-align:center;padding:0 6px\'>Add images/pathfinders-flag.jpg</span></div>'"/>
+          onerror="this.parentElement.outerHTML='<div style=\'height:100%;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:32px;color:#c5c6cf\'>flag</span><span style=\'font-family:Inter,sans-serif;font-size:10px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase;text-align:center;padding:0 6px\'>Add images/pathfinders-flag.jpg</span></div>'" data-cloudinary-key="/images/path4.jpg" data-local-fallback="images/path4.jpg" loading="lazy" decoding="async" width="800" height="600"/>
       </div>
 
       <!-- Bottom-right image -->
       <div class="img-wrap relative rounded-xl overflow-hidden sacred-shadow h-full w-full">
-        <img src="images/path5.jpg" alt="Pathfinder Club members in uniform"
+        <img alt="Pathfinder Club members in uniform"
           class="absolute inset-0 w-full h-full object-cover"
-          onerror="this.parentElement.outerHTML='<div style=\'height:100%;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:32px;color:#c5c6cf\'>groups</span><span style=\'font-family:Inter,sans-serif;font-size:10px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase;text-align:center;padding:0 6px\'>Add images/pathfinders-members.jpg</span></div>'"/>
+          onerror="this.parentElement.outerHTML='<div style=\'height:100%;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:32px;color:#c5c6cf\'>groups</span><span style=\'font-family:Inter,sans-serif;font-size:10px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase;text-align:center;padding:0 6px\'>Add images/pathfinders-members.jpg</span></div>'" data-cloudinary-key="/images/path5.jpg" data-local-fallback="images/path5.jpg" loading="lazy" decoding="async" width="800" height="600"/>
       </div>
     </div>
 
@@ -733,15 +733,15 @@
 
       <div class="img-wrap relative rounded-xl overflow-hidden sacred-shadow h-[360px]" data-slideshow>
         <div class="slide-track absolute inset-0">
-          <img src="images/path2.jpg" alt="Pathfinder honor sash with earned patches"
+          <img alt="Pathfinder honor sash with earned patches"
             class="slide absolute inset-0 w-full h-full object-cover opacity-100 transition-opacity duration-700 ease-in-out"
-            onerror="this.parentElement.parentElement.outerHTML='<div style=\'height:360px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>workspace_premium</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/pathfinders-honors.jpg</span></div>'"/>
-          <img src="images/path3.jpg" alt="Pathfinders working together on an honor activity"
-            class="slide absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 ease-in-out"/>
-          <img src="images/path4.jpg" alt="Pathfinder honor patches displayed on a sash"
-            class="slide absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 ease-in-out"/>
-          <img src="images/path5.jpg" alt="Pathfinders receiving honors at Investiture"
-            class="slide absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 ease-in-out"/>
+            onerror="this.parentElement.parentElement.outerHTML='<div style=\'height:360px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>workspace_premium</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/pathfinders-honors.jpg</span></div>'" data-cloudinary-key="/images/path2.jpg" data-local-fallback="images/path2.jpg" loading="lazy" decoding="async" width="800" height="600"/>
+          <img alt="Pathfinders working together on an honor activity"
+            class="slide absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 ease-in-out" data-cloudinary-key="/images/path3.jpg" data-local-fallback="images/path3.jpg" loading="lazy" decoding="async" width="800" height="600"/>
+          <img alt="Pathfinder honor patches displayed on a sash"
+            class="slide absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 ease-in-out" data-cloudinary-key="/images/path4.jpg" data-local-fallback="images/path4.jpg" loading="lazy" decoding="async" width="800" height="600"/>
+          <img alt="Pathfinders receiving honors at Investiture"
+            class="slide absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 ease-in-out" data-cloudinary-key="/images/path5.jpg" data-local-fallback="images/path5.jpg" loading="lazy" decoding="async" width="800" height="600"/>
         </div>
 
         <!-- dots -->

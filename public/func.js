@@ -185,7 +185,8 @@ function commentButtonHtml(id, title, count) {
 ═══════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', funcInit);
 
-function funcInit() {
+async function funcInit() {
+  await window.cloudinaryImageMapReady;
   initHeroSlideshow(); // index.html
   initFundTracker();   // building.html
   initStories();       // kids.html
@@ -202,10 +203,8 @@ function funcInit() {
 /* ═══════════════════════════════════════════════
    HERO SLIDESHOW — index.html
    Slides are no longer hardcoded in the HTML. On load this fetches
-   GET /api/hero-slideshow, which returns every image currently in
-   public/slideshow/ (HEIC/HEIF included — the server converts those
-   to JPEG) in a freshly randomized order. Drop photos into that
-   folder and they show up here automatically, no HTML edits needed.
+   GET /api/hero-slideshow, which returns Cloudinary URLs from the
+   generated image map in a freshly randomized order.
 ═══════════════════════════════════════════════ */
 async function initHeroSlideshow() {
   const track    = document.getElementById('hero-slideshow');
@@ -213,7 +212,6 @@ async function initHeroSlideshow() {
   const section  = document.querySelector('[aria-label="Welcome hero"]');
   if (!track) return;
 
-  const FALLBACK_IMAGE = 'images/church.jpg'; // shown if the API is empty or fails
   const INTERVAL        = 6000;
   const RESUME_DELAY    = 8000;
 
@@ -225,12 +223,16 @@ async function initHeroSlideshow() {
   } catch (e) {
     console.warn('[hero] could not load slideshow images:', e);
   }
-  if (!images.length) images = [FALLBACK_IMAGE];
+  images = images.filter(src => /^https:\/\/res\.cloudinary\.com\//i.test(src));
+  if (!images.length) {
+    console.error('[hero] No Cloudinary slideshow images are available.');
+    return;
+  }
 
   // Build one .hero-slide per image, and a matching dot, however
   // many came back.
-  track.innerHTML = images.map(function (src, i) {
-    return '<div class="hero-slide' + (i === 0 ? ' active' : '') + '" style="background-image:url(\'' + src + '\');"></div>';
+  track.innerHTML = images.map(function (_, i) {
+    return '<div class="hero-slide' + (i === 0 ? ' active' : '') + '"><img alt="" aria-hidden="true"></div>';
   }).join('');
 
   if (dotsWrap) {
@@ -243,12 +245,27 @@ async function initHeroSlideshow() {
   const dots   = dotsWrap ? dotsWrap.querySelectorAll('.hero-dot') : [];
   if (!slides.length) return;
 
-  // Preload every slide up front so rotating to it later never shows
-  // a blank flash while the browser fetches it for the first time.
-  images.forEach(function (src) {
-    const img = new Image();
-    img.src = src;
-  });
+  function optimizedUrl(url, width) {
+    return typeof window.cloudinaryImageUrl === 'function'
+      ? window.cloudinaryImageUrl(url, width)
+      : url.replace('/image/upload/', '/image/upload/f_auto,q_auto,w_' + width + '/');
+  }
+
+  function prepareSlide(index, isFirst) {
+    const img = slides[index].querySelector('img');
+    if (!img || img.dataset.prepared) return;
+    img.dataset.prepared = 'true';
+    img.loading = 'eager';
+    img.decoding = 'async';
+    img.fetchPriority = isFirst ? 'high' : 'low';
+    img.sizes = '100vw';
+    img.srcset = optimizedUrl(images[index], 900) + ' 900w, ' +
+      optimizedUrl(images[index], 1600) + ' 1600w';
+    img.src = optimizedUrl(images[index], 1600);
+  }
+
+  prepareSlide(0, true);
+  if (slides.length > 1) prepareSlide(1, false);
 
   let current     = 0;
   let timer       = null;
@@ -266,6 +283,7 @@ async function initHeroSlideshow() {
     setTimeout(() => leaving.classList.remove('prev'), 1300);
 
     current = (index + slides.length) % slides.length;
+    prepareSlide(current, false);
     const incoming = slides[current];
     incoming.style.animation = 'none';
     incoming.offsetHeight;
@@ -276,6 +294,8 @@ async function initHeroSlideshow() {
       dots[current].classList.add('active');
       dots[current].setAttribute('aria-selected', 'true');
     }
+
+    if (slides.length > 1) prepareSlide((current + 1) % slides.length, false);
   }
 
   function next() { goTo(current + 1); }
@@ -423,7 +443,7 @@ function initLeadersGrid() {
 
     const photoBlock = photo
       ? `<div class="img-wrap rounded-xl sacred-shadow border border-outline-variant/30">
-           <img src="${escHtml(photo)}" alt="${escHtml(name)}" loading="lazy"/>
+           <img src="${escHtml(window.cloudinaryImageUrl(photo, 400))}" alt="${escHtml(name)}" loading="lazy" decoding="async" width="400" height="533"/>
          </div>`
       : `<div class="img-placeholder rounded-xl sacred-shadow border border-outline-variant/30">
            <span class="material-symbols-outlined ph-icon">account_circle</span>

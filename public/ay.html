@@ -10,7 +10,7 @@
 <meta property="og:description" content="Leading teens and young adults into a saving relationship with Jesus Christ and an active role in His mission.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/ay.html">
-<meta property="og:image" content="https://mccadventist.org/sda.png">
+<meta property="og:image" content="https://mccadventist.org/sda.png" data-cloudinary-key="/sda.png">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="js/Tailwind-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
@@ -94,6 +94,8 @@
     .hero-slide.active { animation: none; }
   }
 </style>
+
+<script src="/image-map.js" defer></script>
 </head>
 
 <body data-page="ay" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
@@ -106,7 +108,7 @@
     </button>
     <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
       <div class="logo-badge">
-        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        <img alt="Makeni Central SDA Logo" data-cloudinary-key="/sda.png" data-local-fallback="sda.png"/>
       </div>
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </div>
@@ -160,7 +162,6 @@
         <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
           <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
           <a href="dorcus.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
-          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
         </div>
       </div>
 
@@ -227,7 +228,6 @@
         <div class="accordion-panel">
           <a href="kids.html">Children's Ministry</a>
           <a href="ministries.html#dorcas">Dorcas</a>
-          <a href="ministries.html#womens-ministries">Women's Ministries</a>
         </div>
       </div>
 
@@ -259,11 +259,11 @@
   <!-- ══════════════ HERO ══════════════ -->
   <section class="relative h-[60vh] min-h-[420px] flex items-end overflow-hidden">
     <div class="hero-slideshow" id="ay-hero-slideshow">
-      <div class="hero-slide active" style="background-image:url('slideshow/ay1.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('slideshow/ay2.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('slideshow/ay3.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('slideshow/ay5.jpg');"></div>
-      <div class="hero-slide" style="background-image:url('slideshow/ay6.jpg');"></div>
+      <div class="hero-slide active" data-cloudinary-background="/slideshow/ay1.jpg" data-local-background="slideshow/ay1.jpg" data-cloudinary-width="1600"></div>
+      <div class="hero-slide" data-cloudinary-background="/slideshow/ay2.jpg" data-local-background="slideshow/ay2.jpg" data-cloudinary-width="1600"></div>
+      <div class="hero-slide" data-cloudinary-background="/slideshow/ay3.jpg" data-local-background="slideshow/ay3.jpg" data-cloudinary-width="1600"></div>
+      <div class="hero-slide" data-cloudinary-background="/slideshow/ay5.jpg" data-local-background="slideshow/ay5.jpg" data-cloudinary-width="1600"></div>
+      <div class="hero-slide" data-cloudinary-background="/slideshow/ay6.jpg" data-local-background="slideshow/ay6.jpg" data-cloudinary-width="1600"></div>
     </div>
     <div class="hero-slideshow-dots" id="ay-hero-dots" aria-hidden="true">
       <button class="hero-dot active" data-index="0" aria-label="Slide 1"></button>
@@ -455,8 +455,8 @@
   <!-- ══════════════ LEGION OF HONOR ══════════════ -->
   <section class="py-section-gap max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
     <div class="img-wrap rounded-xl overflow-hidden sacred-shadow h-[340px] order-2 md:order-1">
-      <img src="slideshow/ay3.jpg" alt="Adventist Youth in personal devotion and study"
-        onerror="this.parentElement.outerHTML='<div style=\'height:340px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>military_tech</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/ay-legion.jpg</span></div>'"/>
+      <img alt="Adventist Youth in personal devotion and study"
+        onerror="this.parentElement.outerHTML='<div style=\'height:340px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>military_tech</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/ay-legion.jpg</span></div>'" data-cloudinary-key="/slideshow/ay3.jpg" data-local-fallback="slideshow/ay3.jpg" loading="lazy" decoding="async" width="800" height="600"/>
     </div>
     <div class="space-y-6 order-1 md:order-2">
       <span class="font-label-md text-label-md text-secondary tracking-[0.2em] uppercase block">A Deeper Commitment</span>

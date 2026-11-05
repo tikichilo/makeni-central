@@ -72,7 +72,7 @@
       return (
         '<div class="gallery-item' + sizeClass + '" data-category="' + item.category + '" data-index="' + i + '" ' +
              'tabindex="0" role="button" aria-label="View photo: ' + escapeHtml(item.title) + '">' +
-          '<img src="' + escapeHtml(item.imageUrl) + '" alt="' + escapeHtml(item.title) + '" loading="lazy">' +
+          '<img src="' + escapeHtml(window.cloudinaryImageUrl(item.imageUrl, 800)) + '" alt="' + escapeHtml(item.title) + '" loading="lazy" decoding="async" width="800" height="600">' +
           '<div class="gallery-caption">' +
             '<div class="cap-title">' + escapeHtml(item.title) + '</div>' +
             '<span class="cap-tag">' + (CATEGORY_LABELS[item.category] || item.category) + '</span>' +
@@ -129,7 +129,7 @@
     const item = photos[index];
     currentIndex = index;
 
-    lbFrame.innerHTML = '<img src="' + escapeHtml(item.imageUrl) + '" alt="' + escapeHtml(item.title) + '">';
+    lbFrame.innerHTML = '<img src="' + escapeHtml(window.cloudinaryImageUrl(item.imageUrl, 1600)) + '" alt="' + escapeHtml(item.title) + '" loading="eager" decoding="async" width="1600" height="1200">';
     lbTitle.textContent = item.title;
     lbTag.textContent   = CATEGORY_LABELS[item.category] || item.category;
   }

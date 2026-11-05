@@ -10,7 +10,7 @@
 <meta property="og:description" content="Always doing good, always helping the poor — the story of the women who carry Dorcas's spirit forward at Makeni Central.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/dorcas.html">
-<meta property="og:image" content="https://mccadventist.org/sda.png">
+<meta property="og:image" content="https://mccadventist.org/sda.png" data-cloudinary-key="/sda.png">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="js/Tailwind-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
@@ -74,6 +74,8 @@
     .story-quote        { padding-left: 18px; border-left-width: 3px; }
   }
 </style>
+
+<script src="/image-map.js" defer></script>
 </head>
 </head>
 
@@ -87,7 +89,7 @@
     </button>
     <a href="index.html" class="nav-brand flex items-center gap-4 md:static md:transform-none no-underline">
       <div class="logo-badge">
-        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        <img alt="Makeni Central SDA Logo" data-cloudinary-key="/sda.png" data-local-fallback="sda.png"/>
       </div>
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </a>
@@ -141,7 +143,6 @@
         <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
           <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
           <a href="dorcus.html" class="active" aria-current="page" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
-          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
         </div>
       </div>
 
@@ -208,7 +209,6 @@
         <div class="accordion-panel">
           <a href="kids.html">Children's Ministry</a>
           <a href="dorcus.html" class="active" aria-current="page">Dorcas</a>
-          <a href="ministries.html#womens-ministries">Women's Ministries</a>
         </div>
       </div>
 
@@ -243,8 +243,7 @@
       <div class="img-wrap">
         <!-- 👇 PUT YOUR HERO IMAGE LINK HERE -->
         <img alt="Dorcas mothers folding donated clothing for families in need"
-          src="dorcas/dorc6.jpg"
-          onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\' style=\'border-radius:0;\'><span class=\'material-symbols-outlined ph-icon\'>volunteer_activism</span><span class=\'ph-label\'>Hero Image</span></div>'"/>
+          onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\' style=\'border-radius:0;\'><span class=\'material-symbols-outlined ph-icon\'>volunteer_activism</span><span class=\'ph-label\'>Hero Image</span></div>'" data-cloudinary-key="/dorcas/dorc6.jpg" data-local-fallback="dorcas/dorc6.jpg" loading="lazy" decoding="async" width="800" height="600"/>
       </div>
       <div class="absolute inset-0 navy-gradient"></div>
     </div>
@@ -287,9 +286,9 @@
         <div class="order-1 md:order-2">
           <div class="rounded-xl overflow-hidden sacred-shadow h-72 md:h-[420px]">
             <div class="img-wrap">
-              <img src="dorcas/dorc.jpeg"
+              <img
                 alt="Warm sunlight over a quiet coastal town, evoking ancient Joppa"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>church</span><span class=\'ph-label\'>Dorcas/dorc4.jpg</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>church</span><span class=\'ph-label\'>Dorcas/dorc4.jpg</span></div>'" data-cloudinary-key="/dorcas/dorc.jpeg" data-local-fallback="dorcas/dorc.jpeg" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
         </div>
@@ -306,9 +305,9 @@
         <div>
           <div class="rounded-xl overflow-hidden sacred-shadow h-72 md:h-[420px]">
             <div class="img-wrap">
-              <img src="dorcas/dorc2.jpg"
+              <img
                 alt="Hands sewing fabric, carrying on a tradition of practical service"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>content_cut</span><span class=\'ph-label\'>Dorcas/dorc5.jpg</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>content_cut</span><span class=\'ph-label\'>Dorcas/dorc5.jpg</span></div>'" data-cloudinary-key="/dorcas/dorc2.jpg" data-local-fallback="dorcas/dorc2.jpg" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
         </div>
@@ -354,9 +353,9 @@
         <div class="rounded-xl overflow-hidden sacred-shadow">
           <div class="h-56">
             <div class="img-wrap">
-              <img src="dorcas/IMG-20260902-WA0143.jpg"
+              <img
                 alt="A basket of food and provisions ready for delivery"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>volunteer_activism</span><span class=\'ph-label\'>Dorcas/dorc6.jpg</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>volunteer_activism</span><span class=\'ph-label\'>Dorcas/dorc6.jpg</span></div>'" data-cloudinary-key="/dorcas/IMG-20260902-WA0143.jpg" data-local-fallback="dorcas/IMG-20260902-WA0143.jpg" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8 bg-surface-container-lowest">
@@ -370,9 +369,9 @@
         <div class="rounded-xl overflow-hidden sacred-shadow">
           <div class="h-56">
             <div class="img-wrap">
-              <img src="dorcas/IMG-20260902-WA0172.jpg"
+              <img
                 alt="A caring hand resting on the hand of an elderly person"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>favorite</span><span class=\'ph-label\'>Dorcas/dorc4.jpg</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>favorite</span><span class=\'ph-label\'>Dorcas/dorc4.jpg</span></div>'" data-cloudinary-key="/dorcas/IMG-20260902-WA0172.jpg" data-local-fallback="dorcas/IMG-20260902-WA0172.jpg" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8 bg-surface-container-lowest">
@@ -386,9 +385,9 @@
         <div class="rounded-xl overflow-hidden sacred-shadow">
           <div class="h-56">
             <div class="img-wrap">
-              <img src="dorcas/dorc5.jpg"
+              <img
                 alt="A group of women gathered together in fellowship and prayer"
-                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>groups</span><span class=\'ph-label\'>Dorcas/dorc5.jpg</span></div>'"/>
+                onerror="this.parentElement.outerHTML='<div class=\'img-placeholder\'><span class=\'material-symbols-outlined ph-icon\'>groups</span><span class=\'ph-label\'>Dorcas/dorc5.jpg</span></div>'" data-cloudinary-key="/dorcas/dorc5.jpg" data-local-fallback="dorcas/dorc5.jpg" loading="lazy" decoding="async" width="800" height="600"/>
             </div>
           </div>
           <div class="p-8 bg-surface-container-lowest">

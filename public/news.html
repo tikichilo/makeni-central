@@ -11,7 +11,7 @@
 <meta property="og:description" content="Stay connected with what's happening at Makeni Central and the mission of our church community.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/news.html">
-<meta property="og:image" content="https://mccadventist.org/images/church.jpg">
+<meta property="og:image" content="https://mccadventist.org/images/church.jpg" data-cloudinary-key="/images/church.jpg">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="js/Tailwind-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
@@ -244,6 +244,8 @@
     .text-headline-md { font-size: 22px !important; }
   }
 </style>
+
+<script src="/image-map.js" defer></script>
 </head>
 
 <body data-page="news" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
@@ -258,7 +260,7 @@
 
     <a href="index.html" class="nav-brand flex items-center gap-4 md:static md:transform-none no-underline" aria-label="Makeni Central SDA — Home">
       <div class="logo-badge">
-        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        <img alt="Makeni Central SDA Logo" data-cloudinary-key="/sda.png" data-local-fallback="sda.png"/>
       </div>
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </a>
@@ -310,7 +312,6 @@
         <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
           <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
           <a href="ministries.html#dorcas" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
-          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
         </div>
       </div>
 
@@ -382,7 +383,6 @@
         <div class="accordion-panel">
           <a href="kids.html">Children's Ministry</a>
           <a href="dorcus.html">Dorcas</a>
-          <a href="ministries.html#womens-ministries">Women's Ministries</a>
         </div>
       </div>
 
@@ -462,7 +462,7 @@
 <div id="announcement-modal" class="news-modal" role="dialog" aria-modal="true" aria-labelledby="announce-modal-title">
   <div class="news-modal-box">
     <button class="news-modal-close" id="announce-modal-close" aria-label="Close announcement">✕</button>
-    <img id="announce-modal-image" class="news-modal-image" alt="" style="display:none;"/>
+    <img id="announce-modal-image" class="news-modal-image" alt="" style="display:none;" loading="lazy" decoding="async" width="800" height="600"/>
     <div class="news-modal-body">
       <span id="announce-modal-tag" class="news-card-tag">General</span>
       <h2 id="announce-modal-title" class="font-headline-md text-headline-md text-primary mt-4 mb-2">Announcement Title</h2>
@@ -510,7 +510,7 @@
 <div id="event-modal" class="news-modal" role="dialog" aria-modal="true" aria-labelledby="event-modal-title">
   <div class="news-modal-box">
     <button class="news-modal-close" id="event-modal-close" aria-label="Close event details">✕</button>
-    <img id="event-modal-image" class="news-modal-image" alt=""/>
+    <img id="event-modal-image" class="news-modal-image" alt="" loading="lazy" decoding="async" width="800" height="600"/>
     <div class="news-modal-body">
       <span id="event-modal-date" class="news-card-tag">Date</span>
       <h2 id="event-modal-title" class="font-headline-md text-headline-md text-primary mt-4 mb-4">Event Title</h2>
@@ -530,7 +530,7 @@
   <div class="bg-surface-container-low rounded-xl overflow-hidden sacred-shadow border-l-4 border-secondary">
     <div class="grid grid-cols-1 md:grid-cols-2">
       <div class="relative min-h-[260px] md:min-h-full">
-        <img id="featured-event-image" class="absolute inset-0 w-full h-full object-cover" alt=""/>
+        <img id="featured-event-image" class="absolute inset-0 w-full h-full object-cover" alt="" loading="lazy" decoding="async" width="800" height="600"/>
         <span class="absolute top-4 left-4 font-label-md text-label-md text-white bg-primary/80 backdrop-blur px-4 py-1.5 rounded-full uppercase tracking-widest">Featured Event</span>
       </div>
       <div class="p-8 md:p-10 flex flex-col justify-center">
@@ -1078,7 +1078,7 @@
     return `
       <div class="event-poster-card" data-event-id="${esc(id)}" data-event-index="${i}" tabindex="0" role="button" aria-label="View details for ${title}">
         <div class="event-poster-img-wrap">
-          ${poster ? `<img class="event-poster-img" src="${esc(poster)}" alt="${title}" loading="lazy"/>` : ''}
+          ${poster ? `<img class="event-poster-img" src="${esc(window.cloudinaryImageUrl(poster, 800))}" alt="${title}" loading="lazy" decoding="async" width="800" height="600"/>` : ''}
           ${dateBadge ? `<span class="event-poster-date">${esc(dateBadge)}</span>` : ''}
         </div>
         <div class="event-poster-body">
@@ -1142,8 +1142,12 @@
 
     if (imgEl) {
       if (ev.posterUrl) {
-        imgEl.src = ev.posterUrl;
+        imgEl.src = window.cloudinaryImageUrl(ev.posterUrl, 1600);
         imgEl.alt = ev.title || '';
+        imgEl.loading = 'eager';
+        imgEl.decoding = 'async';
+        imgEl.width = 1600;
+        imgEl.height = 1200;
         imgEl.style.display = '';
       } else {
         imgEl.style.display = 'none';
@@ -1230,7 +1234,14 @@
     const titleEl = document.getElementById('featured-event-title');
     const infoEl  = document.getElementById('featured-event-info');
 
-    if (imgEl) { imgEl.src = data.posterUrl || ''; imgEl.alt = data.title || ''; }
+    if (imgEl) {
+      imgEl.src = data.posterUrl ? window.cloudinaryImageUrl(data.posterUrl, 800) : '';
+      imgEl.alt = data.title || '';
+      imgEl.loading = 'lazy';
+      imgEl.decoding = 'async';
+      imgEl.width = 800;
+      imgEl.height = 600;
+    }
     if (dateEl) dateEl.textContent = formatDate(data.date) + (data.time ? ' · ' + data.time : '');
     if (titleEl) titleEl.textContent = data.title || 'Featured Event';
     if (infoEl) infoEl.textContent = data.info || '';
@@ -1275,7 +1286,7 @@
     return `
       <div class="recap-card" data-recap-id="${esc(id)}" data-recap-index="${i}" tabindex="0" role="button" aria-label="View photos from ${title}">
         <div class="recap-card-cover-wrap">
-          ${cover ? `<img class="recap-card-cover-img" src="${esc(cover)}" alt="${title}" loading="lazy"/>` : ''}
+          ${cover ? `<img class="recap-card-cover-img" src="${esc(window.cloudinaryImageUrl(cover, 800))}" alt="${title}" loading="lazy" decoding="async" width="800" height="600"/>` : ''}
           ${photoCount ? `
             <span class="recap-photo-count-badge">
               <span class="material-symbols-outlined" style="font-size:14px;" aria-hidden="true">photo_library</span>
@@ -1337,13 +1348,13 @@
     if (!track || !thumbs) return;
 
     track.innerHTML = images.map(function (url, i) {
-      return `<img class="recap-gallery-img${i === 0 ? ' active' : ''}" src="${esc(url)}" alt="" data-slide-index="${i}"/>`;
+      return `<img class="recap-gallery-img${i === 0 ? ' active' : ''}" src="${esc(window.cloudinaryImageUrl(url, 1600))}" alt="" data-slide-index="${i}" loading="${i === 0 ? 'eager' : 'lazy'}" decoding="async" width="1600" height="1200"/>`;
     }).join('');
 
     thumbs.innerHTML = images.map(function (url, i) {
       return `
         <button type="button" class="recap-gallery-thumb${i === 0 ? ' active' : ''}" data-slide-index="${i}" aria-label="Photo ${i + 1}">
-          <img src="${esc(url)}" alt=""/>
+          <img src="${esc(window.cloudinaryImageUrl(url, 400))}" alt="" loading="lazy" decoding="async" width="400" height="300"/>
         </button>
       `;
     }).join('');

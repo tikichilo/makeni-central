@@ -10,7 +10,7 @@
 <meta property="og:description" content="Building our future together — a sacred sanctuary designed to foster worship, community, and spiritual growth.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/building.html">
-<meta property="og:image" content="https://mccadventist.org/images/jjz.png">
+<meta property="og:image" content="https://mccadventist.org/images/jjz.png" data-cloudinary-key="/images/jjz.png">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="js/Tailwind-config.js"></script>
@@ -139,6 +139,8 @@
     }
   }
 </style>
+
+<script src="/image-map.js" defer></script>
 </head>
 
 <body data-page="building" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
@@ -153,7 +155,7 @@
 
     <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
       <div class="logo-badge">
-        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        <img alt="Makeni Central SDA Logo" data-cloudinary-key="/sda.png" data-local-fallback="sda.png"/>
       </div>
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </div>
@@ -207,7 +209,6 @@
         <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
           <a href="ministries.html#childrens-ministry" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
           <a href="dorcus.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
-          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
         </div>
       </div>
 
@@ -279,7 +280,6 @@
           <div class="accordion-panel">
             <a href="ministries.html#childrens-ministry">Children's Ministry</a>
             <a href="ministries.html#dorcas">Dorcas</a>
-            <a href="ministries.html#womens-ministries">Women's Ministries</a>
           </div>
         </div>
 
@@ -313,7 +313,7 @@
   <section id="building-hero" class="building-hero relative h-[80vh] overflow-hidden" aria-label="Interactive 3D model of the new church building">
 
     <!-- Poster: visible while the 3D model loads, or if WebGL is unavailable -->
-    <img class="hero-poster" src="images/jjz.png" alt="Artist's impression of the new Makeni Central SDA Church building" fetchpriority="high"/>
+    <img class="hero-poster" alt="Artist's impression of the new Makeni Central SDA Church building" fetchpriority="high" data-cloudinary-key="/images/jjz.png" data-local-fallback="images/jjz.png"/>
 
     <!-- Interactive 3D model (mounted by the script at the bottom of the page) -->
     <div class="hero-3d" id="hero-3d"></div>
@@ -456,9 +456,8 @@
       <div class="order-1 md:order-2">
         <img
           class="rounded-xl shadow-xl w-full h-[500px] object-cover"
-          src="images/jjz.png"
           alt="Architectural interior of the new Makeni Central SDA Church"
-          onerror="this.parentElement.innerHTML='<div style=\'height:500px;background:#eeeeee;border-radius:12px;border:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px\'><span class=\'material-symbols-outlined\' style=\'font-size:48px;color:#c5c6cf\'>image</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/building-vision.jpg</span></div>'"
+          onerror="this.parentElement.innerHTML='<div style=\'height:500px;background:#eeeeee;border-radius:12px;border:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px\'><span class=\'material-symbols-outlined\' style=\'font-size:48px;color:#c5c6cf\'>image</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/building-vision.jpg</span></div>'" data-cloudinary-key="/images/jjz.png" data-local-fallback="images/jjz.png" loading="lazy" decoding="async" width="800" height="600"
         />
       </div>
     </div>
@@ -493,9 +492,8 @@
       <div class="md:col-span-2 md:row-span-2 relative overflow-hidden rounded-xl group h-64 md:h-auto">
         <div class="gallery-img-wrap w-full h-full">
           <img
-            src="images/church bld.jpg"
             alt="Foundation laying — construction site overview"
-            onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>domain</span><span class=\'ph-label\'>gallery-main.jpg</span>'"
+            onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>domain</span><span class=\'ph-label\'>gallery-main.jpg</span>'" data-cloudinary-key="/images/church bld.jpg" data-local-fallback="images/church bld.jpg" loading="lazy" decoding="async" width="800" height="600"
           />
         </div>
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6 z-10 pointer-events-none">
@@ -507,9 +505,8 @@
       <div class="md:col-span-2 relative overflow-hidden rounded-xl group h-48 md:h-auto">
         <div class="gallery-img-wrap w-full h-full">
           <img
-            src="images/b1.jpg"
             alt="Wall construction in progress"
-            onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>wall</span><span class=\'ph-label\'>gallery-2.jpg</span>'"
+            onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>wall</span><span class=\'ph-label\'>gallery-2.jpg</span>'" data-cloudinary-key="/images/b1.jpg" data-local-fallback="images/b1.jpg" loading="lazy" decoding="async" width="800" height="600"
           />
         </div>
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6 z-10 pointer-events-none">
@@ -521,9 +518,8 @@
       <div class="relative overflow-hidden rounded-xl group h-48 md:h-auto">
         <div class="gallery-img-wrap w-full h-full">
           <img
-            src="images/b3.jpg"
             alt="Roof framework and trusses"
-            onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>roofing</span><span class=\'ph-label\'>gallery-3.jpg</span>'"
+            onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>roofing</span><span class=\'ph-label\'>gallery-3.jpg</span>'" data-cloudinary-key="/images/b3.jpg" data-local-fallback="images/b3.jpg" loading="lazy" decoding="async" width="800" height="600"
           />
         </div>
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4 z-10 pointer-events-none">
@@ -535,9 +531,8 @@
       <div class="relative overflow-hidden rounded-xl group h-48 md:h-auto">
         <div class="gallery-img-wrap w-full h-full">
           <img
-            src="images/b4.jpg"
             alt="Aerial view of the construction site"
-            onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>landscape</span><span class=\'ph-label\'>gallery-4.jpg</span>'"
+            onerror="this.closest('.gallery-img-wrap').classList.add('placeholder'); this.style.display='none'; this.closest('.gallery-img-wrap').innerHTML='<span class=\'material-symbols-outlined ph-icon\'>landscape</span><span class=\'ph-label\'>gallery-4.jpg</span>'" data-cloudinary-key="/images/b4.jpg" data-local-fallback="images/b4.jpg" loading="lazy" decoding="async" width="800" height="600"
           />
         </div>
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4 z-10 pointer-events-none">
@@ -626,6 +621,7 @@
     var wrap = document.getElementById('hero-3d');
     if (!wrap) return;
     try {
+      await window.cloudinaryImageMapReady;
       if (!window.THREE) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js');
       if (!window.Church3D) await loadScript('church3d.js');
       if (!window.Church3D || typeof window.Church3D.mount !== 'function') {
@@ -635,7 +631,7 @@
         autoRotate: true,
         wheelZoom: 'ctrl',      // page keeps scrolling; Ctrl/Cmd + wheel zooms
         touchAction: 'pan-y',   // swipe sideways to rotate, vertical swipe scrolls the page
-        fallbackImage: 'images/jjz.png'
+        fallbackImage: window.cloudinaryImageUrl('/images/jjz.png', 1600)
       });
     } catch (err) {
       // The poster image stays visible if the viewer cannot load.

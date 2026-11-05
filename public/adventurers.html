@@ -10,7 +10,7 @@
 <meta property="og:description" content="Faith, character, and fun for children ages 4–9, with their families alongside them.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/adventurers.html">
-<meta property="og:image" content="https://mccadventist.org/sda.png">
+<meta property="og:image" content="https://mccadventist.org/sda.png" data-cloudinary-key="/sda.png">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="js/Tailwind-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
@@ -106,6 +106,8 @@
     .hero-slide.active { animation: none; }
   }
 </style>
+
+<script src="/image-map.js" defer></script>
 </head>
 
 <body data-page="adventurers" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
@@ -118,7 +120,7 @@
     </button>
     <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
       <div class="logo-badge">
-        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        <img alt="Makeni Central SDA Logo" data-cloudinary-key="/sda.png" data-local-fallback="sda.png"/>
       </div>
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </div>
@@ -172,7 +174,6 @@
         <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
           <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
           <a href="ministries.html#dorcas" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
-          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
         </div>
       </div>
 
@@ -239,7 +240,6 @@
         <div class="accordion-panel">
           <a href="kids.html">Children's Ministry</a>
           <a href="dorcus.html">Dorcas</a>
-          <a href="ministries.html#womens-ministries">Women's Ministries</a>
         </div>
       </div>
 
@@ -291,11 +291,11 @@
     -->
     <div class="w-full h-[400px] rounded-xl overflow-hidden sacred-shadow relative group">
       <div class="hero-slideshow" id="adventurers-hero-slideshow">
-        <div class="hero-slide active" style="background-image:url('images/adven8.jpg');"></div>
-        <div class="hero-slide" style="background-image:url('images/adven1.jpg');"></div>
-        <div class="hero-slide" style="background-image:url('images/adven2.jpg');"></div>
-        <div class="hero-slide" style="background-image:url('images/adven3.jpg');"></div>
-        <div class="hero-slide" style="background-image:url('images/adven4.jpg');"></div>
+        <div class="hero-slide active" data-cloudinary-background="/images/adven8.jpg" data-local-background="images/adven8.jpg" data-cloudinary-width="1600"></div>
+        <div class="hero-slide" data-cloudinary-background="/images/adven1.jpg" data-local-background="images/adven1.jpg" data-cloudinary-width="1600"></div>
+        <div class="hero-slide" data-cloudinary-background="/images/adven2.jpg" data-local-background="images/adven2.jpg" data-cloudinary-width="1600"></div>
+        <div class="hero-slide" data-cloudinary-background="/images/adven3.jpg" data-local-background="images/adven3.jpg" data-cloudinary-width="1600"></div>
+        <div class="hero-slide" data-cloudinary-background="/images/adven4.jpg" data-local-background="images/adven4.jpg" data-cloudinary-width="1600"></div>
       </div>
       <div class="hero-slideshow-dots" id="adventurers-hero-dots" aria-hidden="true">
         <button class="hero-dot active" data-index="0" aria-label="Slide 1"></button>
@@ -328,9 +328,8 @@
     <div class="rounded-xl overflow-hidden sacred-shadow h-[380px]">
       <img
         class="w-full h-full object-cover"
-        src="images/adven8.jpg"
         alt="Adventurer Club leaders and children praying together"
-        onerror="this.outerHTML='<div style=\'width:100%;height:380px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>diversity_3</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/adventurers-story.jpg</span></div>'"
+        onerror="this.outerHTML='<div style=\'width:100%;height:380px;background:#eeeeee;border:2px dashed #c5c6cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px\'><span class=\'material-symbols-outlined\' style=\'font-size:44px;color:#c5c6cf\'>diversity_3</span><span style=\'font-family:Inter,sans-serif;font-size:12px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>Add images/adventurers-story.jpg</span></div>'" data-cloudinary-key="/images/adven8.jpg" data-local-fallback="images/adven8.jpg" loading="lazy" decoding="async" width="800" height="600"
       />
     </div>
   </section>
@@ -431,8 +430,8 @@
         <!-- Story 1 — Little Lamb blanket prayer -->
         <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden flex flex-col">
           <div class="h-52 w-full">
-            <img class="w-full h-full object-cover" src="https://www.clubministries.org/wp-content/uploads/LittleLambLogo.png" alt="Little Lamb Adventurers praying over a handmade blanket"
-              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>cruelty_free</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>adv-story-lamb.jpg</span></div>'"
+            <img class="w-full h-full object-cover" alt="Little Lamb Adventurers praying over a handmade blanket"
+              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>cruelty_free</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>adv-story-lamb.jpg</span></div>'" data-cloudinary-key="https://www.clubministries.org/wp-content/uploads/LittleLambLogo.png" data-local-fallback="https://www.clubministries.org/wp-content/uploads/LittleLambLogo.png" loading="lazy" decoding="async" width="800" height="600"
             />
           </div>
           <div class="p-8 flex flex-col grow">
@@ -447,8 +446,8 @@
         <!-- Story 2 — Eager Beaver birdhouse -->
         <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden flex flex-col">
           <div class="h-52 w-full">
-            <img class="w-full h-full object-cover" src="https://www.clubministries.org/wp-content/uploads/EagerBeaverLogo.png" alt="Eager Beaver Adventurers building a birdhouse together"
-              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>forest</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>adv-story-beaver.jpg</span></div>'"
+            <img class="w-full h-full object-cover" alt="Eager Beaver Adventurers building a birdhouse together"
+              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>forest</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>adv-story-beaver.jpg</span></div>'" data-cloudinary-key="https://www.clubministries.org/wp-content/uploads/EagerBeaverLogo.png" data-local-fallback="https://www.clubministries.org/wp-content/uploads/EagerBeaverLogo.png" loading="lazy" decoding="async" width="800" height="600"
             />
           </div>
           <div class="p-8 flex flex-col grow">
@@ -463,8 +462,8 @@
         <!-- Story 3 — Busy Bee garden -->
         <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden flex flex-col">
           <div class="h-52 w-full">
-            <img class="w-full h-full object-cover" src="https://www.clubministries.org/wp-content/uploads/BusyBeeLogo.png" alt="Busy Bee Adventurers planting a church garden"
-              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>eco</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>adv-story-garden.jpg</span></div>'"
+            <img class="w-full h-full object-cover" alt="Busy Bee Adventurers planting a church garden"
+              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>eco</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>adv-story-garden.jpg</span></div>'" data-cloudinary-key="https://www.clubministries.org/wp-content/uploads/BusyBeeLogo.png" data-local-fallback="https://www.clubministries.org/wp-content/uploads/BusyBeeLogo.png" loading="lazy" decoding="async" width="800" height="600"
             />
           </div>
           <div class="p-8 flex flex-col grow">
@@ -479,8 +478,8 @@
         <!-- Story 4 — Sunbeam lantern walk -->
         <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden flex flex-col">
           <div class="h-52 w-full">
-            <img class="w-full h-full object-cover" src="https://www.clubministries.org/wp-content/uploads/SunbeamLogo.png" alt="Sunbeam Adventurers on an evening lantern walk"
-              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>emoji_objects</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>adv-story-lantern.jpg</span></div>'"
+            <img class="w-full h-full object-cover" alt="Sunbeam Adventurers on an evening lantern walk"
+              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>emoji_objects</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>adv-story-lantern.jpg</span></div>'" data-cloudinary-key="https://www.clubministries.org/wp-content/uploads/SunbeamLogo.png" data-local-fallback="https://www.clubministries.org/wp-content/uploads/SunbeamLogo.png" loading="lazy" decoding="async" width="800" height="600"
             />
           </div>
           <div class="p-8 flex flex-col grow">
@@ -495,8 +494,8 @@
         <!-- Story 5 — Builder brick fund -->
         <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden flex flex-col">
           <div class="h-52 w-full">
-            <img class="w-full h-full object-cover" src="https://www.clubministries.org/wp-content/uploads/BuilderLogo.png" alt="Builder Adventurers collecting coins for the new church building"
-              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>construction</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>adv-story-builder.jpg</span></div>'"
+            <img class="w-full h-full object-cover" alt="Builder Adventurers collecting coins for the new church building"
+              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>construction</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>adv-story-builder.jpg</span></div>'" data-cloudinary-key="https://www.clubministries.org/wp-content/uploads/BuilderLogo.png" data-local-fallback="https://www.clubministries.org/wp-content/uploads/BuilderLogo.png" loading="lazy" decoding="async" width="800" height="600"
             />
           </div>
           <div class="p-8 flex flex-col grow">
@@ -511,8 +510,8 @@
         <!-- Story 6 — Helping Hand food baskets -->
         <div class="bg-surface-container-lowest rounded-xl sacred-shadow overflow-hidden flex flex-col">
           <div class="h-52 w-full">
-            <img class="w-full h-full object-cover" src="https://www.clubministries.org/wp-content/uploads/HelpingHandLogo.png" alt="Helping Hand Adventurers delivering food baskets"
-              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>volunteer_activism</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>adv-story-basket.jpg</span></div>'"
+            <img class="w-full h-full object-cover" alt="Helping Hand Adventurers delivering food baskets"
+              onerror="this.outerHTML='<div style=\'width:100%;height:208px;background:#eeeeee;border-bottom:2px dashed #c5c6cf;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px\'><span class=\'material-symbols-outlined\' style=\'font-size:36px;color:#c5c6cf\'>volunteer_activism</span><span style=\'font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:#75777f;letter-spacing:0.08em;text-transform:uppercase\'>adv-story-basket.jpg</span></div>'" data-cloudinary-key="https://www.clubministries.org/wp-content/uploads/HelpingHandLogo.png" data-local-fallback="https://www.clubministries.org/wp-content/uploads/HelpingHandLogo.png" loading="lazy" decoding="async" width="800" height="600"
             />
           </div>
           <div class="p-8 flex flex-col grow">

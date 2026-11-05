@@ -473,7 +473,7 @@ function initHero() {
       el.style.animationDelay = `${0.2 + i * 0.15}s`;
     });
 
-    const bgDiv = hero.querySelector('[style*="background-image"]');
+    const bgDiv = hero.querySelector('[style*="background-image"], [data-cloudinary-background]');
     const bgImg = hero.querySelector('img');
     if (bgDiv) bgDiv.classList.add('hero-bg-animate');
     else if (bgImg) bgImg.classList.add('hero-bg-animate');
@@ -669,7 +669,7 @@ function initGiveButton() {
     <div id="give-modal-box">
       <button class="modal-close-give" aria-label="Close">✕</button>
       <div class="crusade-poster-wrap">
-        <img class="crusade-poster" src="images/poster.jpg" alt="Watch and Be Ready Crusade, October 18 to 31, 2026, at Makeni Central SDA Church">
+        <img class="crusade-poster" data-cloudinary-key="/images/poster.jpg" data-local-fallback="images/poster.jpg" alt="Watch and Be Ready Crusade, October 18 to 31, 2026, at Makeni Central SDA Church" loading="lazy" decoding="async" width="800" height="1200">
       </div>
       <div class="crusade-content">
         <span class="crusade-eyebrow"><span class="material-symbols-outlined" aria-hidden="true">church</span>MAKENI CENTRAL SDA CHURCH PRESENTS</span>

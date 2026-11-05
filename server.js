@@ -55,6 +55,8 @@
  *  ALLOWED_ORIGINS        Comma-separated list of extra origins allowed to call the API
  *                         (only needed if a frontend is hosted on a DIFFERENT domain)
  *  FACEBOOK_PAGE_ID, FACEBOOK_ACCESS_TOKEN, PORT, NODE_ENV
+ *  CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY,
+ *  CLOUDINARY_API_SECRET
  */
 
 'use strict';
@@ -68,6 +70,7 @@ const express   = require('express');
 const mongoose  = require('mongoose');
 const cors      = require('cors');
 const multer    = require('multer');
+const cloudinary = require('cloudinary').v2;
 const helmet    = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cheerio   = require('cheerio');
@@ -275,38 +278,51 @@ app.get('/', (req, res) => {
 
 
 /* ═══════════════════════════════════════════════
-   UPLOADS (event posters + recap gallery images + gallery photos)
-   Stored under public/uploads/... so express.static above serves them
-   directly at /uploads/events/<file>, /uploads/recaps/<file>, and
-   /uploads/gallery/<file>. Uploads are admin-only, restricted to
-   JPG/PNG/WEBP, max 5MB, and the real file contents are checked
-   (not just the label the browser sends) before they are kept.
+   CLOUDINARY IMAGE UPLOADS
+   Uploads stay in memory until validated, then are streamed directly
+   to Cloudinary. Configure CLOUDINARY_URL or the CLOUDINARY_* keys.
 ═══════════════════════════════════════════════ */
-const UPLOAD_ROOT        = path.join(__dirname, 'public', 'uploads');
-const EVENT_UPLOAD_DIR   = path.join(UPLOAD_ROOT, 'events');
-const RECAP_UPLOAD_DIR   = path.join(UPLOAD_ROOT, 'recaps');
-const GALLERY_UPLOAD_DIR = path.join(UPLOAD_ROOT, 'gallery');
-[EVENT_UPLOAD_DIR, RECAP_UPLOAD_DIR, GALLERY_UPLOAD_DIR].forEach(dir => fs.mkdirSync(dir, { recursive: true }));
-
-// Hero slideshow images — dropped in manually (not via multer upload),
-// but the folder still needs to exist or GET /api/hero-slideshow below
-// throws ENOENT on the very first request.
-const SLIDESHOW_DIR = path.join(__dirname, 'public', 'slideshow');
-fs.mkdirSync(SLIDESHOW_DIR, { recursive: true });
-
-const IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-
-function makeStorage(dir) {
-  return multer.diskStorage({
-    destination: (req, file, cb) => cb(null, dir),
-    filename: (req, file, cb) => {
-      const ext = path.extname(file.originalname).toLowerCase();
-      const safeExt = ['.jpg', '.jpeg', '.png', '.webp'].includes(ext) ? ext : '.jpg';
-      // Random name from the server — the visitor's filename is never used on disk
-      cb(null, `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${safeExt}`);
-    },
+if (process.env.CLOUDINARY_URL) {
+  cloudinary.config();
+} else {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true,
   });
 }
+
+const IMAGE_MAP_FILE = path.join(__dirname, 'public', 'image-map.json');
+
+function loadHeroSlideshowImages() {
+  try {
+    const imageMap = JSON.parse(fs.readFileSync(IMAGE_MAP_FILE, 'utf8'));
+    if (!imageMap || typeof imageMap !== 'object' || Array.isArray(imageMap)) {
+      throw new Error('the manifest must contain an object mapping local paths to URLs');
+    }
+
+    const images = Object.entries(imageMap)
+      .filter(([localPath, url]) =>
+        localPath.replace(/\\/g, '/').startsWith('/slideshow/') &&
+        typeof url === 'string' &&
+        /^https:\/\/res\.cloudinary\.com\//i.test(url)
+      )
+      .map(([, url]) => url);
+
+    if (!images.length) {
+      console.error(`[hero] No Cloudinary slideshow images found in ${IMAGE_MAP_FILE}.`);
+    }
+    return images;
+  } catch (err) {
+    console.error(`[hero] Could not load Cloudinary slideshow manifest at ${IMAGE_MAP_FILE}: ${err.message}`);
+    return [];
+  }
+}
+
+const HERO_SLIDESHOW_IMAGES = loadHeroSlideshowImages();
+
+const IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 function imageFileFilter(req, file, cb) {
   if (!IMAGE_MIME_TYPES.includes(file.mimetype)) {
@@ -318,19 +334,19 @@ function imageFileFilter(req, file, cb) {
 }
 
 const uploadEventPoster = multer({
-  storage: makeStorage(EVENT_UPLOAD_DIR),
+  storage: multer.memoryStorage(),
   fileFilter: imageFileFilter,
   limits: { fileSize: 5 * 1024 * 1024, files: 1 }, // 5MB
 });
 
 const uploadRecapImages = multer({
-  storage: makeStorage(RECAP_UPLOAD_DIR),
+  storage: multer.memoryStorage(),
   fileFilter: imageFileFilter,
   limits: { fileSize: 5 * 1024 * 1024, files: 10 }, // 5MB each, 10 max
 });
 
 const uploadGalleryPhoto = multer({
-  storage: makeStorage(GALLERY_UPLOAD_DIR),
+  storage: multer.memoryStorage(),
   fileFilter: imageFileFilter,
   limits: { fileSize: 5 * 1024 * 1024, files: 1 }, // 5MB
 });
@@ -345,48 +361,69 @@ function detectImageType(buf) {
   return null;
 }
 
-async function fileLooksLikeImage(filePath) {
-  let handle;
-  try {
-    handle = await fs.promises.open(filePath, 'r');
-    const buf = Buffer.alloc(12);
-    await handle.read(buf, 0, 12, 0);
-    return detectImageType(buf) !== null;
-  } catch (err) {
-    return false;
-  } finally {
-    if (handle) await handle.close();
-  }
-}
-
-// Runs right after multer. If any saved file isn't a genuine image,
-// every file from this request is deleted and the request is rejected.
+// Runs right after multer; checks bytes rather than trusting browser MIME labels.
 function verifyUploadedImages(req, res, next) {
   const files = req.files || (req.file ? [req.file] : []);
-  Promise.all(files.map(f => fileLooksLikeImage(f.path)))
-    .then(results => {
-      if (results.every(Boolean)) return next();
-      files.forEach(f => fs.unlink(f.path, () => {}));
-      res.status(400).json({ error: 'Only real JPG, PNG, and WEBP images are allowed' });
-    })
-    .catch(next);
+  if (files.every(file => detectImageType(file.buffer) !== null)) return next();
+  return res.status(400).json({ error: 'Only real JPG, PNG, and WEBP images are allowed' });
 }
 
-// Best-effort file deletion — never throws, just logs if it fails
-// (e.g. file already gone). Used when deleting events/recaps/gallery photos.
-// Refuses to touch anything outside public/uploads.
-function deleteUploadedFile(publicUrl) {
-  if (!publicUrl || typeof publicUrl !== 'string') return;
-  const filePath = path.join(__dirname, 'public', publicUrl);
-  if (!filePath.startsWith(UPLOAD_ROOT + path.sep)) {
-    console.warn('Refused to delete file outside uploads folder:', publicUrl);
-    return;
+function uploadImageBuffer(buffer, folder, publicId) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream({
+      folder: `church/${folder}`,
+      public_id: publicId,
+      resource_type: 'image',
+    }, (err, result) => {
+      if (err) return reject(err);
+      if (!result || !result.secure_url || !result.public_id) {
+        return reject(new Error('Cloudinary returned an incomplete upload result'));
+      }
+      resolve(result);
+    });
+    stream.end(buffer);
+  });
+}
+
+function cloudinaryPublicId(url) {
+  if (typeof url !== 'string' || !url.includes('res.cloudinary.com/')) return null;
+  let pathname;
+  try {
+    pathname = new URL(url).pathname;
+  } catch {
+    return null;
   }
-  fs.unlink(filePath, err => {
-    if (err && err.code !== 'ENOENT') {
-      console.warn('Could not delete uploaded file:', filePath, err.message);
+  const parts = pathname.split('/').filter(Boolean);
+  const uploadIndex = parts.indexOf('upload');
+  if (uploadIndex < 0) return null;
+  const afterUpload = parts.slice(uploadIndex + 1);
+  const versionIndex = afterUpload.findIndex(part => /^v\d+$/.test(part));
+  const publicIdParts = versionIndex >= 0
+    ? afterUpload.slice(versionIndex + 1)
+    : afterUpload.slice(1);
+  if (!publicIdParts.length) return null;
+  publicIdParts[publicIdParts.length - 1] = publicIdParts[publicIdParts.length - 1].replace(/\.[a-z0-9]+$/i, '');
+  try {
+    return decodeURIComponent(publicIdParts.join('/'));
+  } catch {
+    return publicIdParts.join('/');
+  }
+}
+
+async function deleteCloudinaryImages(urls) {
+  const publicIds = urls.map(cloudinaryPublicId).filter(Boolean);
+  const results = await Promise.allSettled(publicIds.map(publicId =>
+    cloudinary.uploader.destroy(publicId, { resource_type: 'image' })
+  ));
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      console.warn('Could not delete Cloudinary image:', publicIds[index], result.reason.message);
     }
   });
+}
+
+function newUploadPublicId() {
+  return `${Date.now()}-${crypto.randomBytes(8).toString('hex')}`;
 }
 
 
@@ -523,7 +560,7 @@ const VISIT_NEEDS     = ['prayer', 'welcome', 'kids', 'transport'];
 // ── Event — Upcoming Events + Featured Event on news.html ──
 const eventSchema = new mongoose.Schema({
   title:     { type: String,  required: true, maxlength: 120 },
-  posterUrl: { type: String,  default: '' },                  // /uploads/events/<file>
+  posterUrl: { type: String,  default: '' },                  // Cloudinary delivery URL
   date:      { type: Date,    required: true },
   time:      { type: String,  default: '',    maxlength: 60  }, // e.g. "09:00 AM – 04:00 PM"
   location:  { type: String,  default: '',    maxlength: 150 },
@@ -539,7 +576,7 @@ const recapSchema = new mongoose.Schema({
   title:       { type: String, required: true, maxlength: 120 },
   description: { type: String, default: '',    maxlength: 1000 },
   images: {
-    type: [String],   // /uploads/recaps/<file>, up to 10
+    type: [String],   // Cloudinary delivery URLs, up to 10
     default: [],
     validate: {
       validator: arr => arr.length > 0 && arr.length <= 10,
@@ -559,7 +596,7 @@ const GALLERY_CATEGORIES = ['worship', 'youth', 'community', 'baptism', 'events'
 const galleryPhotoSchema = new mongoose.Schema({
   title:     { type: String, required: true, maxlength: 120 },
   category:  { type: String, required: true, enum: GALLERY_CATEGORIES },
-  imageUrl:  { type: String, required: true }, // /uploads/gallery/<file>
+  imageUrl:  { type: String, required: true }, // Cloudinary delivery URL
   createdAt: { type: Date,   default: Date.now },
 });
 const GalleryPhoto = mongoose.model('GalleryPhoto', galleryPhotoSchema);
@@ -971,12 +1008,7 @@ app.get('/api/recaps', async (req, res) => {
 
 
 // ── GET /api/hero-slideshow ──
-// Reads public/slideshow/ and returns a freshly shuffled array of
-// image URLs for whatever standard-format photos are sitting in that
-// folder — a new random order on every request. Drop photos in as
-// .jpg/.jpeg/.png/.webp/.gif and they show up automatically, no code
-// changes needed.
-const HERO_SLIDESHOW_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
+// Keep the existing response shape while serving Cloudinary manifest URLs.
 
 function shuffleHeroImages(arr) {
   const a = arr.slice();
@@ -987,23 +1019,9 @@ function shuffleHeroImages(arr) {
   return a;
 }
 
-app.get('/api/hero-slideshow', async (req, res) => {
-  try {
-    const entries = await fs.promises.readdir(SLIDESHOW_DIR, { withFileTypes: true });
-
-    const urls = entries
-      .filter(e => e.isFile() && HERO_SLIDESHOW_EXTENSIONS.has(path.extname(e.name).toLowerCase()))
-      .map(e => '/slideshow/' + encodeURIComponent(e.name));
-
-    // Never cache this response — a fresh shuffle every page load is
-    // the whole point.
-    res.set('Cache-Control', 'no-store');
-    res.json({ images: shuffleHeroImages(urls) });
-
-  } catch (err) {
-    console.error('GET /api/hero-slideshow:', err);
-    res.status(500).json({ images: [] });
-  }
+app.get('/api/hero-slideshow', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({ images: shuffleHeroImages(HERO_SLIDESHOW_IMAGES) });
 });
 
 
@@ -1236,24 +1254,27 @@ app.delete('/api/announcements/:id', requireAdmin, async (req, res) => {
 // a single `poster` file. Poster is optional — an event without one
 // just renders without a cover image on the frontend.
 app.post('/api/events', requireAdmin, uploadEventPoster.single('poster'), verifyUploadedImages, async (req, res) => {
+  let uploaded;
   try {
     const b = req.body || {};
     const title = cleanText(b.title, 120);
 
     if (!title || !b.date || typeof b.date !== 'string') {
-      if (req.file) deleteUploadedFile(`/uploads/events/${req.file.filename}`);
       return res.status(400).json({ error: 'Title and date are required' });
     }
 
     const parsedDate = new Date(b.date);
     if (isNaN(parsedDate.getTime())) {
-      if (req.file) deleteUploadedFile(`/uploads/events/${req.file.filename}`);
       return res.status(400).json({ error: 'Invalid date' });
+    }
+
+    if (req.file) {
+      uploaded = await uploadImageBuffer(req.file.buffer, 'events', newUploadPublicId());
     }
 
     const event = await Event.create({
       title,
-      posterUrl: req.file ? `/uploads/events/${req.file.filename}` : '',
+      posterUrl: uploaded ? uploaded.secure_url : '',
       date:      parsedDate,
       time:      cleanText(b.time, 60),
       location:  cleanText(b.location, 150),
@@ -1264,7 +1285,7 @@ app.post('/api/events', requireAdmin, uploadEventPoster.single('poster'), verify
 
   } catch (err) {
     console.error('POST /api/events:', err);
-    if (req.file) deleteUploadedFile(`/uploads/events/${req.file.filename}`);
+    if (uploaded) await deleteCloudinaryImages([uploaded.secure_url]);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -1297,7 +1318,7 @@ app.delete('/api/events/:id', requireAdmin, async (req, res) => {
 
     if (!event) return res.status(404).json({ error: 'Not found' });
 
-    deleteUploadedFile(event.posterUrl);
+    await deleteCloudinaryImages([event.posterUrl]);
 
     res.json({ success: true });
 
@@ -1312,12 +1333,12 @@ app.delete('/api/events/:id', requireAdmin, async (req, res) => {
 // multipart/form-data: fields (title, description) + up to 10 files
 // under the `images` field. At least one image is required.
 app.post('/api/recaps', requireAdmin, uploadRecapImages.array('images', 10), verifyUploadedImages, async (req, res) => {
+  const uploaded = [];
   try {
     const b = req.body || {};
     const title = cleanText(b.title, 120);
 
     if (!title) {
-      (req.files || []).forEach(f => deleteUploadedFile(`/uploads/recaps/${f.filename}`));
       return res.status(400).json({ error: 'Title is required' });
     }
 
@@ -1325,19 +1346,21 @@ app.post('/api/recaps', requireAdmin, uploadRecapImages.array('images', 10), ver
       return res.status(400).json({ error: 'At least one image is required' });
     }
 
-    const images = req.files.map(f => `/uploads/recaps/${f.filename}`);
+    for (const file of req.files) {
+      uploaded.push(await uploadImageBuffer(file.buffer, 'recaps', newUploadPublicId()));
+    }
 
     const recap = await Recap.create({
       title,
       description: cleanText(b.description, 1000),
-      images,
+      images: uploaded.map(image => image.secure_url),
     });
 
     res.status(201).json({ success: true, id: recap._id });
 
   } catch (err) {
     console.error('POST /api/recaps:', err);
-    (req.files || []).forEach(f => deleteUploadedFile(`/uploads/recaps/${f.filename}`));
+    await deleteCloudinaryImages(uploaded.map(image => image.secure_url));
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -1350,7 +1373,7 @@ app.delete('/api/recaps/:id', requireAdmin, async (req, res) => {
 
     if (!recap) return res.status(404).json({ error: 'Not found' });
 
-    (recap.images || []).forEach(deleteUploadedFile);
+    await deleteCloudinaryImages(recap.images || []);
 
     res.json({ success: true });
 
@@ -1367,18 +1390,17 @@ app.delete('/api/recaps/:id', requireAdmin, async (req, res) => {
 // GALLERY_CATEGORIES so it always lines up with a filter pill on the
 // home page.
 app.post('/api/gallery', requireAdmin, uploadGalleryPhoto.single('photo'), verifyUploadedImages, async (req, res) => {
+  let uploaded;
   try {
     const b = req.body || {};
     const title = cleanText(b.title, 120);
     const category = typeof b.category === 'string' ? b.category : '';
 
     if (!title || !category) {
-      if (req.file) deleteUploadedFile(`/uploads/gallery/${req.file.filename}`);
       return res.status(400).json({ error: 'Title and category are required' });
     }
 
     if (!GALLERY_CATEGORIES.includes(category)) {
-      if (req.file) deleteUploadedFile(`/uploads/gallery/${req.file.filename}`);
       return res.status(400).json({ error: 'Invalid category' });
     }
 
@@ -1386,17 +1408,19 @@ app.post('/api/gallery', requireAdmin, uploadGalleryPhoto.single('photo'), verif
       return res.status(400).json({ error: 'A photo is required' });
     }
 
+    uploaded = await uploadImageBuffer(req.file.buffer, 'gallery', newUploadPublicId());
+
     const photo = await GalleryPhoto.create({
       title,
       category,
-      imageUrl: `/uploads/gallery/${req.file.filename}`,
+      imageUrl: uploaded.secure_url,
     });
 
     res.status(201).json({ success: true, id: photo._id });
 
   } catch (err) {
     console.error('POST /api/gallery:', err);
-    if (req.file) deleteUploadedFile(`/uploads/gallery/${req.file.filename}`);
+    if (uploaded) await deleteCloudinaryImages([uploaded.secure_url]);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -1409,7 +1433,7 @@ app.delete('/api/gallery/:id', requireAdmin, async (req, res) => {
 
     if (!photo) return res.status(404).json({ error: 'Not found' });
 
-    deleteUploadedFile(photo.imageUrl);
+    await deleteCloudinaryImages([photo.imageUrl]);
 
     res.json({ success: true });
 

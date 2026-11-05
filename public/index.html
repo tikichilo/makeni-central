@@ -11,7 +11,7 @@
 <meta property="og:description" content="A Sanctuary of Hope, A Community of Grace — join us this Sabbath in Lusaka, Zambia.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/">
-<meta property="og:image" content="https://mccadventist.org/images/ch1.jpg">
+<meta property="og:image" content="https://mccadventist.org/images/ch1.jpg" data-cloudinary-key="/images/ch1.jpg">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="js/Tailwind-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
@@ -38,11 +38,17 @@
   .hero-slide {
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-position: center;
     opacity: 0;
     transition: opacity 1.2s ease-in-out;
     will-change: opacity, transform;
+  }
+  .hero-slide img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
   }
   .hero-slide.active {
     opacity: 1;
@@ -1281,6 +1287,8 @@
   .gallery-lightbox-prev, .gallery-lightbox-next { width: 38px; height: 38px; background: rgba(4,21,52,0.5); }
 }
 </style>
+
+<script src="/image-map.js" defer></script>
 </head>
 
 <body data-page="index" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
@@ -1297,7 +1305,7 @@
     <!-- Brand -->
     <a href="#" class="nav-brand flex items-center gap-4 md:static md:transform-none no-underline" aria-label="Makeni Central SDA — Home">
       <div class="logo-badge">
-        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        <img alt="Makeni Central SDA Logo" data-cloudinary-key="/sda.png" data-local-fallback="sda.png"/>
       </div>
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </a>
@@ -1351,7 +1359,6 @@
         <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
           <a href="kids.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
           <a href="dorcus.html" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
-          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
         </div>
       </div>
 
@@ -1427,7 +1434,6 @@
         <div class="accordion-panel">
           <a href="kids.html">Children's Ministry</a>
           <a href="dorcus.html">Dorcas</a>
-          <a href="ministries.html#womens-ministries">Women's Ministries</a>
         </div>
       </div>
 
@@ -1459,12 +1465,7 @@
 <!-- ══════════════ HERO ══════════════ -->
   <section class="relative h-[85vh] w-full overflow-hidden flex items-center justify-center" aria-label="Welcome hero">
     <!-- Hero Slideshow backgrounds -->
-    <div id="hero-slideshow" aria-hidden="true">
-      <div class="hero-slide active" style="background-image: url('images/adven8.jpg');"></div>
-      <div class="hero-slide" style="background-image: url('images/adven7.jpg');"></div>
-      <div class="hero-slide" style="background-image: url('images/church3.jpg');"></div>
-      <div class="hero-slide" style="background-image: url('images/church%20bld.jpg');"></div>
-    </div>
+    <div id="hero-slideshow" aria-hidden="true"></div>
 
     <!-- Overlay -->
     <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(4,21,52,0.55) 0%, rgba(4,21,52,0.35) 60%, rgba(4,21,52,0.65) 100%);"></div>
@@ -1476,9 +1477,8 @@
     <!-- Content -->
     <div class="hero-content relative z-10 text-center px-margin-mobile">
       <img
-        src="indexlogo.png"
         alt="Seventh-day Adventist Church symbol"
-        class="hero-logo mx-auto mb-6"
+        class="hero-logo mx-auto mb-6" data-cloudinary-key="/indexlogo.png" data-local-fallback="indexlogo.png" loading="lazy" decoding="async" width="800" height="600"
       />
       <h1 class="hero-h1 font-display-lg text-display-lg text-on-primary mb-3 max-w-4xl mx-auto">
         Makeni Central

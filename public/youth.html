@@ -10,7 +10,7 @@
 <meta property="og:description" content="A sacred space for the youth of Makeni Central to explore faith, ask questions, and build lasting spiritual connections.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mccadventist.org/youth.html">
-<meta property="og:image" content="https://mccadventist.org/sda.png">
+<meta property="og:image" content="https://mccadventist.org/sda.png" data-cloudinary-key="/sda.png">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="js/Tailwind-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
@@ -226,6 +226,8 @@
     .modal-body         { padding: 20px 20px 24px !important; }
   }
 </style>
+
+<script src="/image-map.js" defer></script>
 </head>
 
 <body data-page="youth" class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
@@ -238,7 +240,7 @@
     </button>
     <div class="nav-brand flex items-center gap-4 md:static md:transform-none">
       <div class="logo-badge">
-        <img alt="Makeni Central SDA Logo" src="sda.png"/>
+        <img alt="Makeni Central SDA Logo" data-cloudinary-key="/sda.png" data-local-fallback="sda.png"/>
       </div>
       <span class="logo-text font-headline-md text-headline-md font-bold text-primary">Makeni Central SDA</span>
     </div>
@@ -292,7 +294,6 @@
         <div class="nav-dropdown" role="menu" aria-label="Ministries submenu">
           <a href="ministries.html#childrens-ministry" role="menuitem"><span class="dot" aria-hidden="true"></span>Children's Ministry</a>
           <a href="ministries.html#dorcas" role="menuitem"><span class="dot" aria-hidden="true"></span>Dorcas</a>
-          <a href="ministries.html#womens-ministries" role="menuitem"><span class="dot" aria-hidden="true"></span>Women's Ministries</a>
         </div>
       </div>
 
@@ -359,7 +360,6 @@
         <div class="accordion-panel">
           <a href="ministries.html#childrens-ministry">Children's Ministry</a>
           <a href="dorcus.html#dorcas">Dorcas</a>
-          <a href="ministries.html#womens-ministries">Women's Ministries</a>
         </div>
       </div>
 
