@@ -1448,14 +1448,17 @@ app.delete('/api/gallery/:id', requireAdmin, async (req, res) => {
    DAILY LESSON — pulled live from ssnet.org
 ═══════════════════════════════════════════════ */
 
-// Update this array ~4x/year when ssnet.org publishes a new quarter.
-// `start` = the Sabbath (Saturday) that begins Lesson 1 — find it by
-// opening https://ssnet.org/lessons/<code>/index.html and reading the
-// date range shown for Lesson 01.
+// Fallback for quarter schedules that cannot be calculated automatically.
+// `start` = the Sabbath (Saturday) that begins Lesson 1.
 const LESSON_QUARTERS = [
   { code: '26a', start: '2025-12-27' }, // Q1 2026: Uniting Heaven and Earth
-  { code: '26b', start: '2026-03-28' }, // Q2 2026 — unverified guess, double check when you're rested
+  { code: '26b', start: '2026-03-28' }, // Q2 2026: Growing in a Relationship With God
   { code: '26c', start: '2026-06-27' }, // Q3 2026: First and Second Corinthians — confirmed (Lesson 3 = July 11–17)
+  { code: '26d', start: '2026-09-26' }, // Q4 2026: The Gift of Prophecy
+  { code: '27a', start: '2026-12-26' }, // Q1 2027 fallback
+  { code: '27b', start: '2027-03-27' }, // Q2 2027 fallback
+  { code: '27c', start: '2027-06-26' }, // Q3 2027 fallback
+  { code: '27d', start: '2027-09-25' }, // Q4 2027 fallback
 ];
 
 const DAY_KEYS = ['sab', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
@@ -1465,9 +1468,6 @@ const DAY_LABELS = {
 };
 
 const TIMEZONE = 'Africa/Lusaka'; // UTC+2 year-round, no DST
-
-const lessonCache = new Map(); // url -> { fetchedAt, data }
-const LESSON_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
 
 // ── Timezone-safe date helpers ──────────────────────────────
 
@@ -1489,7 +1489,37 @@ function getTodayInZambia() {
 
 // ── Lesson lookup ────────────────────────────────────────────
 
-function findQuarter(date) {
+function calculateQuarterStart(year, quarterIndex) {
+  const firstDay = new Date(Date.UTC(year, quarterIndex * 3, 1));
+  const daysUntilFirstSabbath = (6 - firstDay.getUTCDay() + 7) % 7;
+
+  // Lesson 1's week starts on the Sabbath before the quarter's first Sabbath.
+  firstDay.setUTCDate(firstDay.getUTCDate() + daysUntilFirstSabbath - 7);
+  return firstDay;
+}
+
+function calculateQuarter(date) {
+  const year = date.getUTCFullYear();
+  let match = null;
+
+  // Include adjacent years because Lesson 1 starts in the week before
+  // January's first Sabbath, which can fall in the previous calendar year.
+  for (let candidateYear = year - 1; candidateYear <= year + 1; candidateYear += 1) {
+    for (let quarterIndex = 0; quarterIndex < 4; quarterIndex += 1) {
+      const start = calculateQuarterStart(candidateYear, quarterIndex);
+      if (start <= date && (!match || start > match.start)) {
+        match = {
+          code: `${String(candidateYear).slice(-2)}${String.fromCharCode(97 + quarterIndex)}`,
+          start,
+        };
+      }
+    }
+  }
+
+  return match;
+}
+
+function findFallbackQuarter(date) {
   const sorted = [...LESSON_QUARTERS].sort(
     (a, b) => parseDateOnlyUTC(a.start) - parseDateOnlyUTC(b.start)
   );
@@ -1500,20 +1530,24 @@ function findQuarter(date) {
   return match;
 }
 
+function findQuarter(date) {
+  return calculateQuarter(date) || findFallbackQuarter(date);
+}
+
 // `date` must be a UTC-midnight Date — always pass output of parseDateOnlyUTC()
 function getLessonInfo(date) {
   const quarter = findQuarter(date);
-  const start = parseDateOnlyUTC(quarter.start);
+  const start = quarter.start instanceof Date ? quarter.start : parseDateOnlyUTC(quarter.start);
   const diffDays = Math.round((date - start) / 86400000);
-  let lessonNum = Math.floor(diffDays / 7) + 1;
-  lessonNum = Math.min(Math.max(lessonNum, 1), 13);
+  const weekNum = Math.floor(diffDays / 7) + 1;
+  const lessonNum = Math.min(Math.max(weekNum, 1), 13);
 
   const weekSabbath = new Date(start);
-  weekSabbath.setUTCDate(weekSabbath.getUTCDate() + (lessonNum - 1) * 7);
+  weekSabbath.setUTCDate(weekSabbath.getUTCDate() + (weekNum - 1) * 7);
 
   // Which day-of-week (0=sab...6=fri) is `date` within this lesson week?
   const dayOffset = Math.round((date - weekSabbath) / 86400000);
-  const dayKey = DAY_KEYS[Math.min(Math.max(dayOffset, 0), 6)];
+  const dayKey = DAY_KEYS[dayOffset];
 
   const num = String(lessonNum).padStart(2, '0');
   const url = `https://ssnet.org/lessons/${quarter.code}/less${num}.html`;
@@ -1522,9 +1556,6 @@ function getLessonInfo(date) {
 }
 
 async function fetchLessonPage(url) {
-  const cached = lessonCache.get(url);
-  if (cached && Date.now() - cached.fetchedAt < LESSON_CACHE_TTL) return cached.data;
-
   const response = await fetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MakeniCentralSDA-site/1.0)' },
     signal: AbortSignal.timeout(8000), // don't let a slow ssnet.org hang our requests
@@ -1580,9 +1611,7 @@ async function fetchLessonPage(url) {
       content: bodyParts,
     };
   });
-
   const data = { weekTitle, memoryText, days };
-  lessonCache.set(url, { fetchedAt: Date.now(), data });
   return data;
 }
 
@@ -1593,6 +1622,7 @@ async function fetchLessonPage(url) {
 // Falls back gracefully (502) if ssnet.org is unreachable or changed
 // their markup — the frontend keeps its static placeholder in that case.
 app.get('/api/daily-lesson', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   try {
     const dateStr = req.query.date === undefined ? getTodayInZambia() : req.query.date;
     if (typeof dateStr !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
